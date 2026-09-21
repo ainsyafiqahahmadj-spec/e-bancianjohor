@@ -194,7 +194,7 @@
     .calc-banner small { font-size: 0.72rem; color: #166534; font-weight: 700; text-transform: uppercase; }
     .calc-banner div { font-size: 1.25rem; font-weight: 800; color: #14532d; margin-top: 2px; }
 
-    /* STATUS PENYELARASAN CLOUD */
+    /* STATUS CLOUD SYNC */
     .sync-status {
       display: inline-flex;
       align-items: center;
@@ -227,7 +227,7 @@
   <header>
     <div class="brand-wrap">
       <div class="brand-logos">
-        <!-- Logo Maju Johor Hexagon -->
+        <!-- Logo Maju Johor Hexagon Sahaja -->
         <svg width="34" height="38" viewBox="0 0 500 577">
           <defs>
             <clipPath id="hexagonClip">
@@ -309,7 +309,7 @@
           <div style="display:flex; align-items:center; gap:10px;">
             <div class="sync-status" id="cloudStatus">
               <span class="sync-dot loading" id="syncDot"></span>
-              <span id="syncText">Memuatkan data dari cloud...</span>
+              <span id="syncText">Menyambung ke Google Sheets...</span>
             </div>
             <button class="btn btn-outline" onclick="loadFromSheetDB()">🔄 Muat Semula</button>
             <button class="btn btn-outline" onclick="exportExcel()">⬇ Eksport Excel</button>
@@ -498,10 +498,6 @@
               <label>Agensi / Pemberi Bantuan (Jika Ada)</label>
               <input type="text" id="fHelpAgency" placeholder="Contoh: JKM / MAINJ">
             </div>
-            <div class="form-group">
-              <label>Nilai Bantuan Sebulan (RM)</label>
-              <input type="number" id="fHelpVal" min="0" step="0.01" value="0">
-            </div>
           </div>
 
           <!-- BAHAGIAN F -->
@@ -533,7 +529,7 @@
   </footer>
 
   <script>
-    // URL SheetDB Rasmi
+    // Pautan rasmi SheetDB anda
     const SHEETDB_URL = "https://sheetdb.io/api/v1/k4vnnko52f2rg";
 
     const DISTRICTS_ORDER = [
@@ -662,32 +658,34 @@
       });
 
       const totalPax = 1 + airRows.length;
-      const totalInc = incomeKir + airIncTotal;
-      const perCapita = totalInc / totalPax;
+      const totalHouseholdInc = kirInc + airIncTotal;
+      const perCapita = totalHouseholdInc / totalPax;
       const statusPGK = checkPGK(strata, perCapita);
 
+      // Data yang dihantar diselaraskan dengan header Google Sheets
       const newRec = {
         id: 'rec-' + Date.now(),
-        nama,
-        ic,
-        umur,
-        jantina,
-        kahwin,
-        daerah,
-        dun,
-        strata,
-        kerja,
-        incomeKir,
-        air_count: airRows.length,
-        totalInc,
-        perCapita: perCapita.toFixed(2),
-        statusPGK,
-        hasHelp: document.getElementById('fHasHelp').value,
-        helpAgency: document.getElementById('fHelpAgency').value,
-        kkDate: document.getElementById('fKkDate').value || new Date().toISOString().split('T')[0]
+        nama: String(nama),
+        ic: String(ic),
+        umur: Number(umur),
+        jantina: String(jantina),
+        kahwin: String(kahwin),
+        daerah: String(daerah),
+        dun: String(dun),
+        strata: String(strata),
+        kerja: String(kerja),
+        incomeKir: Number(incomeKir),
+        air_count: Number(airRows.length),
+        totalInc: Number(totalInc),
+        perCapita: String(perCapita.toFixed(2)),
+        statusPGK: String(statusPGK),
+        hasHelp: String(document.getElementById('fHasHelp').value),
+        helpAgency: String(document.getElementById('fHelpAgency').value),
+        kkDate: String(document.getElementById('fKkDate').value || new Date().toISOString().split('T')[0])
       };
 
       try {
+        // Hantar ke SheetDB
         const res = await fetch(SHEETDB_URL, {
           method: 'POST',
           headers: {
@@ -696,7 +694,23 @@
           },
           body: JSON.stringify({ data: [newRec] })
         });
-        if (!res.ok) throw new Error('Ralat simpan ke SheetDB');
+
+        if (!res.ok) {
+          // Cubaan kedua dengan format array terus jika objek 'data' ditolak
+          const retryRes = await fetch(SHEETDB_URL, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify([newRec])
+          });
+          
+          if (!retryRes.ok) {
+            const errDetail = await retryRes.text();
+            throw new Error(errDetail || 'Ralat server SheetDB');
+          }
+        }
 
         records.unshift(newRec);
         localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
@@ -707,8 +721,8 @@
         recalculateForm();
         switchPage('tab-dashboard');
       } catch (err) {
-        console.error(err);
-        alert('Ralat semasa menghantar data ke Google Sheets. Sila pastikan sambungan internet stabil.');
+        console.error("SheetDB Error Details:", err);
+        alert('Ralat semasa menghantar data ke Google Sheets:\n' + err.message + '\n\nSila pastikan Baris 1 di Google Sheet mengandungi tajuk lajur: id, nama, ic, umur, jantina, kahwin, daerah, dun, strata, kerja, incomeKir, air_count, totalInc, perCapita, statusPGK, hasHelp, helpAgency, kkDate');
       } finally {
         btnSubmit.disabled = false;
         btnSubmit.innerText = '💾 Simpan Rekod Bancian';
@@ -840,6 +854,7 @@
       XLSX.writeFile(wb, "Data_eBancian_Johor.xlsx");
     }
 
+    // Inisialisasi awal
     recalculateForm();
     loadFromSheetDB();
   </script>
