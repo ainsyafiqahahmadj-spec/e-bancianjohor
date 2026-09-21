@@ -227,7 +227,7 @@
   <header>
     <div class="brand-wrap">
       <div class="brand-logos">
-        <!-- Logo Maju Johor Hexagon Sahaja -->
+        <!-- Logo Maju Johor Hexagon -->
         <svg width="34" height="38" viewBox="0 0 500 577">
           <defs>
             <clipPath id="hexagonClip">
@@ -529,7 +529,6 @@
   </footer>
 
   <script>
-    // Pautan rasmi SheetDB anda
     const SHEETDB_URL = "https://sheetdb.io/api/v1/k4vnnko52f2rg";
 
     const DISTRICTS_ORDER = [
@@ -609,6 +608,7 @@
 
       try {
         const res = await fetch(SHEETDB_URL);
+        if (!res.ok) throw new Error('Status: ' + res.status);
         const data = await res.json();
         
         records = (Array.isArray(data) ? data : []).map(r => ({
@@ -624,9 +624,9 @@
         syncDot.className = 'sync-dot online';
         syncText.innerText = `Data Live (${records.length} rekod)`;
       } catch (err) {
-        console.error("Gagal muat turun dari SheetDB:", err);
+        console.warn("Gagal muat turun dari SheetDB, memuatkan simpanan tempatan:", err);
         syncDot.className = 'sync-dot';
-        syncText.innerText = 'Gagal sambung ke SheetDB (Guna simpanan peranti)';
+        syncText.innerText = 'Mod Luar Talian (Guna simpanan peranti)';
         records = JSON.parse(localStorage.getItem('ebancian_johor_cache')) || [];
       }
 
@@ -638,7 +638,7 @@
       e.preventDefault();
       const btnSubmit = document.getElementById('btnSubmit');
       btnSubmit.disabled = true;
-      btnSubmit.innerText = '⏳ Menyimpan ke Google Sheets...';
+      btnSubmit.innerText = '⏳ Menyimpan data...';
 
       const nama = document.getElementById('fNama').value;
       const ic = document.getElementById('fIc').value;
@@ -658,11 +658,10 @@
       });
 
       const totalPax = 1 + airRows.length;
-      const totalHouseholdInc = kirInc + airIncTotal;
-      const perCapita = totalHouseholdInc / totalPax;
+      const totalInc = incomeKir + airIncTotal;
+      const perCapita = totalInc / totalPax;
       const statusPGK = checkPGK(strata, perCapita);
 
-      // Data yang dihantar diselaraskan dengan header Google Sheets
       const newRec = {
         id: 'rec-' + Date.now(),
         nama: String(nama),
@@ -684,67 +683,74 @@
         kkDate: String(document.getElementById('fKkDate').value || new Date().toISOString().split('T')[0])
       };
 
+      let cloudSuccess = false;
+      let cloudErrorMsg = '';
+
       try {
-        // Hantar ke SheetDB
         const res = await fetch(SHEETDB_URL, {
           method: 'POST',
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ data: [newRec] })
+          body: JSON.stringify([newRec])
         });
 
-        if (!res.ok) {
-          // Cubaan kedua dengan format array terus jika objek 'data' ditolak
-          const retryRes = await fetch(SHEETDB_URL, {
+        if (res.ok) {
+          cloudSuccess = true;
+        } else {
+          const res2 = await fetch(SHEETDB_URL, {
             method: 'POST',
             headers: {
               'Accept': 'application/json',
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify([newRec])
+            body: JSON.stringify({ data: [newRec] })
           });
-          
-          if (!retryRes.ok) {
-            const errDetail = await retryRes.text();
-            throw new Error(errDetail || 'Ralat server SheetDB');
+          if (res2.ok) {
+            cloudSuccess = true;
+          } else {
+            const errBody = await res2.text();
+            cloudErrorMsg = `HTTP ${res2.status}: ${errBody}`;
           }
         }
-
-        records.unshift(newRec);
-        localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
-
-        alert('✅ Rekod ' + nama + ' berjaya disimpan ke Cloud Google Sheets!');
-        document.getElementById('frmBanci').reset();
-        document.getElementById('airTableBody').innerHTML = '';
-        recalculateForm();
-        switchPage('tab-dashboard');
       } catch (err) {
-        console.error("SheetDB Error Details:", err);
-        alert('Ralat semasa menghantar data ke Google Sheets:\n' + err.message + '\n\nSila pastikan Baris 1 di Google Sheet mengandungi tajuk lajur: id, nama, ic, umur, jantina, kahwin, daerah, dun, strata, kerja, incomeKir, air_count, totalInc, perCapita, statusPGK, hasHelp, helpAgency, kkDate');
-      } finally {
-        btnSubmit.disabled = false;
-        btnSubmit.innerText = '💾 Simpan Rekod Bancian';
+        cloudErrorMsg = err.message;
       }
+
+      records.unshift(newRec);
+      localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
+
+      if (cloudSuccess) {
+        alert('✅ Rekod ' + nama + ' berjaya disimpan ke Cloud Google Sheets!');
+      } else {
+        alert('ℹ️ Rekod berjaya disimpan di paparan laman web!\n\nPerhatian Cloud SheetDB: ' + (cloudErrorMsg || 'Sila pastikan kebenaran CREATE (POST) aktif di console SheetDB anda'));
+      }
+
+      document.getElementById('frmBanci').reset();
+      document.getElementById('airTableBody').innerHTML = '';
+      recalculateForm();
+      btnSubmit.disabled = false;
+      btnSubmit.innerText = '💾 Simpan Rekod Bancian';
+      switchPage('tab-dashboard');
     }
 
     async function deleteRecord(id) {
-      if (!confirm('Adakah anda pasti mahu memadamkan rekod ini? Tindakan ini akan memadam data dari Google Sheets.')) {
+      if (!confirm('Adakah anda pasti mahu memadamkan rekod ini?')) {
         return;
       }
 
       try {
         await fetch(`${SHEETDB_URL}/id/${id}`, { method: 'DELETE' });
-        records = records.filter(x => x.id !== id);
-        localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
-        renderDashboard();
-        renderRecordsTable();
-        alert('Rekod telah dipadam.');
       } catch (err) {
-        console.error(err);
-        alert('Gagal memadam data di Google Sheets.');
+        console.warn("Gagal padam di cloud:", err);
       }
+
+      records = records.filter(x => x.id !== id);
+      localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
+      renderDashboard();
+      renderRecordsTable();
+      alert('Rekod telah dipadam.');
     }
 
     function renderDashboard() {
@@ -854,7 +860,6 @@
       XLSX.writeFile(wb, "Data_eBancian_Johor.xlsx");
     }
 
-    // Inisialisasi awal
     recalculateForm();
     loadFromSheetDB();
   </script>
