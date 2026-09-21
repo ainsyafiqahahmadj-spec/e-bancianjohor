@@ -219,7 +219,7 @@
           <path d="M25,82 Q50,70 75,82 Q50,92 25,82" fill="#0c2340" stroke="#c59b27" stroke-width="2" />
         </svg>
 
-        <!-- EXACT SVG FOR MAJU JOHOR HEXAGON LOGO -->
+        <!-- Logo Maju Johor Hexagon -->
         <svg width="32" height="36" viewBox="0 0 500 577">
           <defs>
             <clipPath id="hexagonClip">
@@ -228,15 +228,10 @@
           </defs>
           <polygon points="250,5 490,144 490,433 250,572 10,433 10,144" fill="#9ca3af" />
           <g clip-path="url(#hexagonClip)">
-            <!-- Top Red Field -->
             <path d="M-10,-10 L510,-10 L510,310 C360,345 260,240 10,310 Z" fill="#cc1f29" />
-            <!-- Bottom Dark Blue Field with Wave -->
             <path d="M-10,310 C260,240 360,345 510,310 L510,590 L-10,590 Z" fill="#1b2374" />
-            <!-- Crescent Moon -->
             <path d="M 235,90 C 182,90 140,132 140,185 C 140,238 182,280 235,280 C 205,265 185,228 185,185 C 185,142 205,105 235,90 Z" fill="#ffffff" />
-            <!-- Five-Point Star tilted towards crescent -->
             <polygon points="270,126 280,160 316,160 287,181 298,215 270,194 242,215 253,181 224,160 260,160" fill="#ffffff" transform="rotate(18 270 171)" />
-            <!-- Typography MAJU JOHOR -->
             <text x="250" y="405" font-family="'Arial Black', Impact, sans-serif" font-weight="900" font-size="62" fill="#ffffff" text-anchor="middle" letter-spacing="2">MAJU</text>
             <text x="250" y="468" font-family="'Arial Black', Impact, sans-serif" font-weight="900" font-size="62" fill="#ffffff" text-anchor="middle" letter-spacing="2">JOHOR</text>
           </g>
@@ -258,12 +253,9 @@
 
   <main class="container">
 
-    <!-- ============================================== -->
-    <!-- TAB 1: HOMEPAGE DASHBOARD (TANPA BORANG)       -->
-    <!-- ============================================== -->
+    <!-- TAB 1: HOMEPAGE DASHBOARD -->
     <div id="tab-dashboard" class="tab-content active">
       
-      <!-- 4 KAD KPI UTAMA SEPERTI DI GAMBAR -->
       <section class="kpi-row">
         <div class="kpi-card-box">
           <div class="kpi-icon icon-blue">🏠</div>
@@ -354,9 +346,7 @@
 
     </div>
 
-    <!-- ============================================== -->
-    <!-- TAB 2: BORANG BANCIAN (MUNCUL BILA KLIK TAB)   -->
-    <!-- ============================================== -->
+    <!-- TAB 2: BORANG BANCIAN -->
     <div id="tab-borang" class="tab-content">
       
       <section class="section-card">
@@ -544,7 +534,7 @@
       "Penternakan", "Perikanan", "Perniagaan / Jualan", "Dandanan / Kecantikan", 
       "Pengasuhan Kanak-Kanak", "Pembaikan Elektrik", "Komputer / IT", 
       "Kraftangan", "Fotografi / Media", "Pemanduan / Pengangkutan"
-    ];[cite: 1]
+    ];
 
     let records = JSON.parse(localStorage.getItem('ebancian_johor_db')) || [];
 
@@ -783,6 +773,7 @@
       XLSX.writeFile(wb, "Data_eBancian_Johor.xlsx");
     }
 
+    // Inisialisasi awal
     initSkills();
     recalculateForm();
     renderDashboard();
