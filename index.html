@@ -74,9 +74,9 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 8px 16px;
+      padding: 7px 14px;
       border-radius: 8px;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       font-weight: 700;
       cursor: pointer;
       border: none;
@@ -172,6 +172,7 @@
 
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
     .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group.col-span-2 { grid-column: span 2; }
     label { font-size: 0.75rem; font-weight: 700; color: #334155; }
     input, select, textarea { padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.82rem; outline: none; }
     input:focus, select:focus, textarea:focus { border-color: var(--johor-blue); }
@@ -185,6 +186,8 @@
       display: flex;
       justify-content: space-around;
       text-align: center;
+      flex-wrap: wrap;
+      gap: 12px;
     }
     .calc-banner small { font-size: 0.72rem; color: #166534; font-weight: 700; text-transform: uppercase; }
     .calc-banner div { font-size: 1.25rem; font-weight: 800; color: #14532d; margin-top: 2px; }
@@ -206,17 +209,71 @@
 
     @keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
 
+    /* MODAL PAPARAN PROFIL */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(12, 35, 64, 0.6);
+      backdrop-filter: blur(3px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.active { display: flex; }
+    .modal-window {
+      background: #fff;
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 850px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-header {
+      background: var(--johor-blue);
+      color: #fff;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid var(--johor-gold);
+    }
+    .modal-header h3 { font-size: 1.05rem; font-weight: 800; }
+    .modal-body { padding: 22px; display: flex; flex-direction: column; gap: 18px; font-size: 0.85rem; }
+    .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; background: #f8fafc; padding: 14px; border-radius: 8px; border: 1px solid var(--border-color); }
+    .detail-item small { display: block; font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+    .detail-item strong { font-size: 0.9rem; color: var(--text-main); }
+    
+    .cost-card {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 8px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
     footer.site-footer { background: #fff; border-top: 1px solid var(--border-color); padding: 18px; text-align: center; font-size: 0.76rem; color: var(--text-muted); margin-top: auto; }
 
     @media (max-width: 768px) {
-      .calc-banner { flex-direction: column; gap: 12px; }
+      .calc-banner { flex-direction: column; }
       header { flex-direction: column; align-items: flex-start; }
-      .nav-tabs { width: 100%; justify-content: flex-start; }
+      .nav-tabs { width: 100%; }
+      .form-group.col-span-2 { grid-column: span 1; }
     }
   </style>
 </head>
 <body>
 
+  <!-- HEADER -->
   <header>
     <div class="brand-wrap">
       <div class="brand-logos">
@@ -300,9 +357,9 @@
           <div style="display:flex; align-items:center; gap:10px;">
             <div class="sync-status" id="cloudStatus">
               <span class="sync-dot loading" id="syncDot"></span>
-              <span id="syncText">Menyegerak Firebase...</span>
+              <span id="syncText">Menyegerak Google Sheets...</span>
             </div>
-            <button class="btn btn-outline" onclick="loadFromFirebase()">🔄 Muat Semula</button>
+            <button class="btn btn-outline" onclick="loadFromSheetDB()">🔄 Muat Semula</button>
             <button class="btn btn-outline" onclick="exportExcel()">⬇ Eksport Excel</button>
           </div>
         </div>
@@ -324,11 +381,11 @@
         </div>
       </section>
 
-      <!-- SENARAI REKOD -->
+      <!-- SENARAI REKOD BANCIAN -->
       <section class="section-card">
         <div class="section-title">
           <span>📋 Senarai Rekod Bancian Berdaftar</span>
-          <input type="text" id="searchBox" placeholder="Cari Nama / No. KP / Daerah..." oninput="renderRecordsTable()" style="max-width:280px; font-weight:normal;">
+          <input type="text" id="searchBox" placeholder="Cari Nama / No. KP / Daerah / Alamat..." oninput="renderRecordsTable()" style="max-width:280px; font-weight:normal;">
         </div>
         <div class="table-container">
           <table>
@@ -342,6 +399,7 @@
                 <th>Pendapatan IR</th>
                 <th>Per Kapita</th>
                 <th>Status PGK</th>
+                <th>Kos Lepas Miskin / Bln</th>
                 <th style="text-align:center;">Tindakan</th>
               </tr>
             </thead>
@@ -430,6 +488,10 @@
               <label>No. Telefon KIR</label>
               <input type="text" id="fPhone" placeholder="01X-XXXXXXX">
             </div>
+            <div class="form-group col-span-2">
+              <label>Alamat Kediaman Penuh *</label>
+              <input type="text" id="fAlamat" required placeholder="No. Rumah, Jalan, Kampung / Taman, Poskod">
+            </div>
           </div>
 
           <div style="display:flex; justify-content:space-between; align-items:center; margin:22px 0 8px;">
@@ -454,7 +516,7 @@
 
           <div class="calc-banner">
             <div>
-              <small>Jumlah Pendapatan Isi Rumah</small>
+              <small>Jumlah Pendapatan IR</small>
               <div id="liveTotalInc">RM 0.00</div>
             </div>
             <div>
@@ -468,6 +530,10 @@
             <div>
               <small>Status PGK</small>
               <div id="liveStatus">-</div>
+            </div>
+            <div>
+              <small>Anggaran Kos Lepas PGK</small>
+              <div id="liveExitCost" style="color:var(--johor-red);">RM 0.00</div>
             </div>
           </div>
 
@@ -508,14 +574,26 @@
 
   </main>
 
+  <!-- MODAL PAPARAN PROFIL LENGKAP -->
+  <div class="modal-backdrop" id="viewModal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3>🔍 Paparan Lengkap Profil Bancian</h3>
+        <button onclick="closeModal()" style="background:none; border:none; color:#fff; font-size:1.4rem; cursor:pointer;">&times;</button>
+      </div>
+      <div class="modal-body" id="modalContent"></div>
+      <div style="padding:14px 20px; background:#f8fafc; border-top:1px solid var(--border-color); text-align:right;">
+        <button class="btn btn-outline" onclick="closeModal()">Tutup</button>
+      </div>
+    </div>
+  </div>
+
   <footer class="site-footer">
     &copy; 2026 Bahagian Pemantauan Projek dan Kesejahteraan Rakyat, Pejabat Setiausaha Kerajaan Johor. Hak Cipta Terpelihara.
   </footer>
 
   <script>
-    // Pangkalan data Firebase Realtime Database anda
-    const FIREBASE_DB_URL = "https://e-bancian-johor-default-rtdb.firebaseio.com";
-    const FIREBASE_BACKUP_URL = "https://e-bancian-johor-default-rtdb.asia-southeast1.firebasedatabase.app";
+    const SHEETDB_URL = "https://sheetdb.io/api/v1/k4vnnko52f2rg";
 
     const DISTRICTS_ORDER = [
       'Johor Bahru', 'Kulai', 'Pontian', 'Kota Tinggi', 'Kluang',
@@ -523,7 +601,6 @@
     ];
 
     let records = [];
-    let activeFirebaseUrl = FIREBASE_DB_URL;
 
     function switchPage(pageId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -549,6 +626,15 @@
       }
     }
 
+    function calculateExitCost(strata, perCapita, totalPax) {
+      const threshold = (strata === 'Bandar') ? 830 : 677;
+      if (perCapita >= threshold) {
+        return 0;
+      }
+      const gapPerCapita = threshold - perCapita;
+      return gapPerCapita * totalPax;
+    }
+
     function recalculateForm() {
       const strata = document.getElementById('fStrata').value;
       const kirInc = parseFloat(document.getElementById('fIncome').value) || 0;
@@ -563,12 +649,22 @@
       const totalHouseholdInc = kirInc + airTotalInc;
       const perCapita = totalHouseholdInc / totalPax;
       const status = checkPGK(strata, perCapita);
+      const exitCost = calculateExitCost(strata, perCapita, totalPax);
 
       document.getElementById('liveTotalInc').innerText = 'RM ' + totalHouseholdInc.toFixed(2);
       document.getElementById('liveTotalPax').innerText = totalPax + ' Orang';
       document.getElementById('livePerCapita').innerText = 'RM ' + perCapita.toFixed(2);
       document.getElementById('liveStatus').innerText = status;
       document.getElementById('liveStatus').style.color = status.includes('Miskin') ? 'var(--johor-red)' : 'var(--success)';
+      
+      const exitCostEl = document.getElementById('liveExitCost');
+      if (exitCost > 0) {
+        exitCostEl.innerText = 'RM ' + exitCost.toFixed(2) + ' / bln';
+        exitCostEl.style.color = 'var(--johor-red)';
+      } else {
+        exitCostEl.innerText = 'RM 0.00 (Telah Lepas)';
+        exitCostEl.style.color = 'var(--success)';
+      }
     }
 
     function addAirRow(data = {}) {
@@ -586,52 +682,42 @@
       recalculateForm();
     }
 
-    async function tryFetchFirebase(path, options = {}) {
-      try {
-        let res = await fetch(`${activeFirebaseUrl}${path}`, options);
-        if (!res.ok && activeFirebaseUrl === FIREBASE_DB_URL) {
-          activeFirebaseUrl = FIREBASE_BACKUP_URL;
-          res = await fetch(`${activeFirebaseUrl}${path}`, options);
-        }
-        return res;
-      } catch (e) {
-        if (activeFirebaseUrl === FIREBASE_DB_URL) {
-          activeFirebaseUrl = FIREBASE_BACKUP_URL;
-          return await fetch(`${activeFirebaseUrl}${path}`, options);
-        }
-        throw e;
-      }
-    }
-
-    async function loadFromFirebase() {
+    async function loadFromSheetDB() {
       const syncDot = document.getElementById('syncDot');
       const syncText = document.getElementById('syncText');
 
       syncDot.className = 'sync-dot loading';
-      syncText.innerText = 'Menyegerak dari Firebase...';
+      syncText.innerText = 'Menyegerak data Google Sheets...';
 
       try {
-        const res = await tryFetchFirebase('/bancian.json');
+        const res = await fetch(SHEETDB_URL);
+        if (!res.ok) throw new Error('Status: ' + res.status);
         const data = await res.json();
         
-        if (data && typeof data === 'object') {
-          records = Object.keys(data).map(key => ({
-            ...data[key],
-            firebaseKey: key,
-            incomeKir: parseFloat(data[key].incomeKir) || 0,
-            air_count: parseInt(data[key].air_count) || 0,
-            totalInc: parseFloat(data[key].totalInc) || 0,
-            perCapita: parseFloat(data[key].perCapita) || 0
-          })).reverse();
-        } else {
-          records = [];
-        }
+        records = (Array.isArray(data) ? data : []).map(r => {
+          let airParsed = [];
+          try {
+            airParsed = r.air_details ? JSON.parse(r.air_details) : [];
+          } catch(e) {
+            airParsed = [];
+          }
+
+          return {
+            ...r,
+            incomeKir: parseFloat(r.incomeKir) || 0,
+            air_count: parseInt(r.air_count) || airParsed.length,
+            air_list: airParsed,
+            totalInc: parseFloat(r.totalInc) || 0,
+            perCapita: parseFloat(r.perCapita) || 0,
+            exitCost: parseFloat(r.exitCost) || 0
+          };
+        }).reverse();
 
         localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
         syncDot.className = 'sync-dot online';
-        syncText.innerText = `Firebase Live (${records.length} rekod)`;
+        syncText.innerText = `Data Live (${records.length} rekod)`;
       } catch (err) {
-        console.warn("Gagal muat turun dari Firebase:", err);
+        console.warn("Gagal muat turun dari SheetDB, memuatkan simpanan tempatan:", err);
         syncDot.className = 'sync-dot';
         syncText.innerText = 'Mod Luar Talian (Guna cache peranti)';
         records = JSON.parse(localStorage.getItem('ebancian_johor_cache')) || [];
@@ -645,7 +731,7 @@
       e.preventDefault();
       const btnSubmit = document.getElementById('btnSubmit');
       btnSubmit.disabled = true;
-      btnSubmit.innerText = '⏳ Menyimpan ke Firebase...';
+      btnSubmit.innerText = '⏳ Menyimpan data ke Google Sheets...';
 
       const nama = document.getElementById('fNama').value;
       const ic = document.getElementById('fIc').value;
@@ -657,17 +743,28 @@
       const strata = document.getElementById('fStrata').value;
       const kerja = document.getElementById('fKerja').value;
       const incomeKir = parseFloat(document.getElementById('fIncome').value) || 0;
+      const phone = document.getElementById('fPhone').value;
+      const alamat = document.getElementById('fAlamat').value;
 
-      const airRows = document.querySelectorAll('#airTableBody tr');
+      const airList = [];
       let airIncTotal = 0;
-      airRows.forEach(r => {
-        airIncTotal += parseFloat(r.querySelector('.air-inc').value) || 0;
+      document.querySelectorAll('#airTableBody tr').forEach(r => {
+        const aName = r.querySelector('.air-name').value.trim();
+        const aRel = r.querySelector('.air-rel').value.trim();
+        const aAge = parseInt(r.querySelector('.air-age').value) || 0;
+        const aJob = r.querySelector('.air-job').value.trim();
+        const aInc = parseFloat(r.querySelector('.air-inc').value) || 0;
+        if (aName) {
+          airList.push({ nama: aName, hubungan: aRel, umur: aAge, kerja: aJob, inc: aInc });
+          airIncTotal += aInc;
+        }
       });
 
-      const totalPax = 1 + airRows.length;
+      const totalPax = 1 + airList.length;
       const totalInc = incomeKir + airIncTotal;
       const perCapita = totalInc / totalPax;
       const statusPGK = checkPGK(strata, perCapita);
+      const exitCost = calculateExitCost(strata, perCapita, totalPax);
 
       const newRec = {
         id: 'rec-' + Date.now(),
@@ -678,58 +775,94 @@
         kahwin: String(kahwin),
         daerah: String(daerah),
         dun: String(dun),
+        alamat: String(alamat),
         strata: String(strata),
         kerja: String(kerja),
         incomeKir: Number(incomeKir),
-        air_count: Number(airRows.length),
+        phone: String(phone),
+        air_count: Number(airList.length),
+        air_details: JSON.stringify(airList),
         totalInc: Number(totalInc),
         perCapita: String(perCapita.toFixed(2)),
         statusPGK: String(statusPGK),
+        exitCost: String(exitCost.toFixed(2)),
         hasHelp: String(document.getElementById('fHasHelp').value),
         helpAgency: String(document.getElementById('fHelpAgency').value),
+        kkName: String(document.getElementById('fKkName').value),
         kkDate: String(document.getElementById('fKkDate').value || new Date().toISOString().split('T')[0])
       };
 
+      let cloudSuccess = false;
+      let cloudErrorMsg = '';
+
       try {
-        const res = await tryFetchFirebase('/bancian.json', {
+        const res = await fetch(SHEETDB_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newRec)
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ data: [newRec] })
         });
-        
-        if (!res.ok) throw new Error('Status: ' + res.status);
-        const savedData = await res.json();
-        newRec.firebaseKey = savedData.name;
 
-        records.unshift(newRec);
-        localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
-
-        alert('✅ Rekod ' + nama + ' berjaya disimpan ke Cloud Firebase!');
-        document.getElementById('frmBanci').reset();
-        document.getElementById('airTableBody').innerHTML = '';
-        recalculateForm();
-        renderDashboard();
-        renderRecordsTable();
-        switchPage('tab-dashboard');
+        if (res.ok) {
+          cloudSuccess = true;
+        } else {
+          const res2 = await fetch(SHEETDB_URL, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify([newRec])
+          });
+          if (res2.ok) {
+            cloudSuccess = true;
+          } else {
+            const errBody = await res2.text();
+            cloudErrorMsg = `HTTP ${res2.status}: ${errBody}`;
+          }
+        }
       } catch (err) {
-        console.error("Firebase save error:", err);
-        alert('Ralat menyimpan ke Firebase:\n' + err.message + '\n\nSila pastikan tab "Rules" di Realtime Database disetkan read & write kepada true.');
-      } finally {
-        btnSubmit.disabled = false;
-        btnSubmit.innerText = '💾 Simpan Rekod Bancian';
+        cloudErrorMsg = err.message;
       }
+
+      // Simpan salinan ke rekod paparan
+      const displayRec = {
+        ...newRec,
+        air_list: airList,
+        incomeKir: Number(incomeKir),
+        totalInc: Number(totalInc),
+        perCapita: Number(perCapita),
+        exitCost: Number(exitCost)
+      };
+
+      records.unshift(displayRec);
+      localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
+
+      if (cloudSuccess) {
+        alert('✅ Rekod ' + nama + ' berjaya disimpan terus ke Google Sheets!');
+      } else {
+        alert('ℹ️ Rekod disimpan dalam sistem!\n\nNota Cloud: ' + (cloudErrorMsg || 'Sila pastikan nama lajur Baris 1 di Google Sheet sepadan.'));
+      }
+
+      document.getElementById('frmBanci').reset();
+      document.getElementById('airTableBody').innerHTML = '';
+      recalculateForm();
+      renderDashboard();
+      renderRecordsTable();
+      btnSubmit.disabled = false;
+      btnSubmit.innerText = '💾 Simpan Rekod Bancian';
+      switchPage('tab-dashboard');
     }
 
     async function deleteRecord(id) {
       if (!confirm('Adakah anda pasti mahu memadamkan rekod ini?')) return;
 
-      const rec = records.find(x => x.id === id);
-      if (rec && rec.firebaseKey) {
-        try {
-          await tryFetchFirebase(`/bancian/${rec.firebaseKey}.json`, { method: 'DELETE' });
-        } catch (err) {
-          console.warn("Gagal padam di cloud:", err);
-        }
+      try {
+        await fetch(`${SHEETDB_URL}/id/${id}`, { method: 'DELETE' });
+      } catch (err) {
+        console.warn("Gagal padam di Google Sheets:", err);
       }
 
       records = records.filter(x => x.id !== id);
@@ -737,6 +870,103 @@
       renderDashboard();
       renderRecordsTable();
       alert('Rekod telah dipadam.');
+    }
+
+    function viewRecord(id) {
+      const r = records.find(x => x.id === id);
+      if (!r) return;
+
+      const airList = r.air_list || [];
+      const threshold = r.strata === 'Bandar' ? 830 : 677;
+      const exitCost = parseFloat(r.exitCost) || calculateExitCost(r.strata, parseFloat(r.perCapita), (parseInt(r.air_count) || airList.length) + 1);
+
+      let airRowsHtml = '';
+      if (airList.length > 0) {
+        airRowsHtml = airList.map((a, i) => `
+          <tr>
+            <td>${i + 1}</td>
+            <td><strong>${a.nama || '-'}</strong></td>
+            <td>${a.hubungan || '-'}</td>
+            <td>${a.umur ? a.umur + ' thn' : '-'}</td>
+            <td>${a.kerja || '-'}</td>
+            <td style="text-align:right;">RM ${(parseFloat(a.inc) || 0).toFixed(2)}</td>
+          </tr>
+        `).join('');
+      } else {
+        airRowsHtml = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Tiada tanggungan AIR didaftarkan.</td></tr>`;
+      }
+
+      const modalContent = document.getElementById('modalContent');
+      modalContent.innerHTML = `
+        <div>
+          <h4 style="color:var(--johor-blue); margin-bottom:8px;">A. MAKLUMAT KETUA ISI RUMAH (KIR)</h4>
+          <div class="detail-grid">
+            <div class="detail-item"><small>Nama Penuh</small><strong>${r.nama}</strong></div>
+            <div class="detail-item"><small>No. Kad Pengenalan</small><strong>${r.ic}</strong></div>
+            <div class="detail-item"><small>Umur / Jantina</small><strong>${r.umur || '-'} Tahun / ${r.jantina || '-'}</strong></div>
+            <div class="detail-item"><small>Status Perkahwinan</small><strong>${r.kahwin || '-'}</strong></div>
+            <div class="detail-item"><small>Daerah / DUN</small><strong>${r.daerah} (${r.dun || '-'})</strong></div>
+            <div class="detail-item"><small>Kawasan Strata</small><strong>${r.strata} (PGK: RM ${threshold})</strong></div>
+            <div class="detail-item"><small>Pekerjaan</small><strong>${r.kerja || '-'}</strong></div>
+            <div class="detail-item"><small>Pendapatan Bulanan KIR</small><strong>RM ${(parseFloat(r.incomeKir) || 0).toFixed(2)}</strong></div>
+            <div class="detail-item"><small>No. Telefon</small><strong>${r.phone || '-'}</strong></div>
+            <div class="detail-item" style="grid-column:1 / -1;"><small>Alamat Kediaman Penuh</small><strong>${r.alamat || 'Tiada rekod alamat'}</strong></div>
+          </div>
+        </div>
+
+        <div>
+          <h4 style="color:var(--johor-blue); margin-bottom:8px;">B. MAKLUMAT AHLI ISI RUMAH (AIR) - ${airList.length} Orang</h4>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:40px;">#</th>
+                  <th>Nama Ahli</th>
+                  <th>Hubungan</th>
+                  <th>Umur</th>
+                  <th>Pekerjaan</th>
+                  <th style="text-align:right;">Pendapatan</th>
+                </tr>
+              </thead>
+              <tbody>${airRowsHtml}</tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="cost-card">
+          <div>
+            <div style="font-size:0.75rem; color:#9a3412; font-weight:700; text-transform:uppercase;">Status & Analisis Pendapatan</div>
+            <div style="font-size:1.15rem; font-weight:800; color:#7c2d12; margin-top:2px;">
+              ${r.statusPGK} &bull; Per Kapita: RM ${(parseFloat(r.perCapita) || 0).toFixed(2)}
+            </div>
+            <div style="font-size:0.78rem; color:#9a3412; margin-top:4px;">
+              Jumlah Pendapatan IR: <strong>RM ${(parseFloat(r.totalInc) || 0).toFixed(2)}</strong> | Saiz Keluarga: <strong>${(parseInt(r.air_count) || airList.length) + 1} Orang</strong>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:0.75rem; color:#9a3412; font-weight:700; text-transform:uppercase;">Anggaran Kos Terkeluar PGK</div>
+            <div style="font-size:1.3rem; font-weight:900; color:var(--johor-red); margin-top:2px;">
+              ${exitCost > 0 ? 'RM ' + exitCost.toFixed(2) + ' / Bulan' : '<span style="color:var(--success);">RM 0.00 (Lepas PGK)</span>'}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 style="color:var(--johor-blue); margin-bottom:8px;">C. MAKLUMAT BANTUAN & PENGESAHAN</h4>
+          <div class="detail-grid">
+            <div class="detail-item"><small>Status Bantuan</small><strong>${r.hasHelp || 'Tidak'}</strong></div>
+            <div class="detail-item"><small>Agensi Pemberi</small><strong>${r.helpAgency || '-'}</strong></div>
+            <div class="detail-item"><small>Ketua Kampung Pengesah</small><strong>${r.kkName || '-'}</strong></div>
+            <div class="detail-item"><small>Tarikh Bancian</small><strong>${r.kkDate || '-'}</strong></div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('viewModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('viewModal').classList.remove('active');
     }
 
     function renderDashboard() {
@@ -782,20 +1012,21 @@
 
     function renderRecordsTable() {
       const q = (document.getElementById('searchBox')?.value || '').toLowerCase();
-      const filtered = records.filter(r => [r.nama, r.ic, r.daerah, r.dun].join(' ').toLowerCase().includes(q));
+      const filtered = records.filter(r => [r.nama, r.ic, r.daerah, r.dun, r.alamat].join(' ').toLowerCase().includes(q));
       const tbody = document.getElementById('recordsBody');
       tbody.innerHTML = '';
 
       if (!filtered.length) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:var(--text-muted);">Belum ada rekod bancian dijumpai.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:var(--text-muted);">Belum ada rekod bancian dijumpai.</td></tr>`;
         return;
       }
 
       filtered.forEach(r => {
         const isPoor = (r.statusPGK || '').includes('Miskin');
-        const airCount = parseInt(r.air_count) || 0;
+        const airCount = parseInt(r.air_count) || (r.air_list ? r.air_list.length : 0);
         const totalIncome = parseFloat(r.totalInc) || 0;
         const perCapita = parseFloat(r.perCapita) || 0;
+        const exitCost = parseFloat(r.exitCost) || calculateExitCost(r.strata, perCapita, airCount + 1);
 
         tbody.innerHTML += `
           <tr>
@@ -807,7 +1038,9 @@
             <td>RM ${totalIncome.toFixed(2)}</td>
             <td><strong>RM ${perCapita.toFixed(2)}</strong></td>
             <td><span class="badge ${isPoor ? 'badge-red' : 'badge-green'}">${r.statusPGK || '-'}</span></td>
-            <td style="text-align:center;">
+            <td><strong>${exitCost > 0 ? 'RM ' + exitCost.toFixed(2) : '<span style="color:var(--success);">RM 0.00</span>'}</strong></td>
+            <td style="text-align:center; white-space:nowrap;">
+              <button class="btn btn-johor" style="padding:4px 8px; font-size:0.75rem;" onclick="viewRecord('${r.id}')">👁 Paparan</button>
               <button class="btn btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--johor-red);" onclick="deleteRecord('${r.id}')">Padam</button>
             </td>
           </tr>
@@ -829,13 +1062,15 @@
         "Status Perkahwinan": r.kahwin,
         "Daerah": r.daerah,
         "Mukim / DUN": r.dun,
+        "Alamat Kediaman": r.alamat || '-',
         "Strata": r.strata,
         "Pekerjaan": r.kerja,
         "Pendapatan KIR (RM)": r.incomeKir,
         "Bil Tanggungan (AIR)": r.air_count,
         "Jumlah Pendapatan (RM)": r.totalInc,
-        "Per Kapita (RM)": r.perCapita,
+        "Per Kapita (RM)": (parseFloat(r.perCapita) || 0).toFixed(2),
         "Status PGK": r.statusPGK,
+        "Anggaran Kos Lepas Miskin (RM/Bln)": (parseFloat(r.exitCost) || 0).toFixed(2),
         "Menerima Bantuan": r.hasHelp,
         "Agensi Bantuan": r.helpAgency,
         "Tarikh Bancian": r.kkDate
@@ -847,7 +1082,7 @@
     }
 
     recalculateForm();
-    loadFromFirebase();
+    loadFromSheetDB();
   </script>
 </body>
 </html>
