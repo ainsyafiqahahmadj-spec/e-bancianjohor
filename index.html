@@ -794,10 +794,12 @@
   </footer>
 
   <script>
+    // URL Pangkalan Data
     const FIREBASE_DB_URL = "https://e-bancian-johor-default-rtdb.firebaseio.com";
     const FIREBASE_BACKUP_URL = "https://e-bancian-johor-default-rtdb.asia-southeast1.firebasedatabase.app";
     const SHEETDB_URL = "https://sheetdb.io/api/v1/k4vnnko52f2rg";
 
+    // KATA LALUAN ADMIN DEFAULT (Boleh ditukar mengikut keperluan)
     const ADMIN_PASSWORD = "adminjohor123";
 
     const DISTRICTS_ORDER = [
@@ -1747,7 +1749,7 @@
             recObj.firebaseKey = resData.name;
           }
         } catch (err) {
-          console.warn('Gagal hantar satu rekod ke Firebase:', err);
+          console.warn('Gagal hantar rekod import ke Firebase:', err);
         }
 
         newItems.push(recObj);
