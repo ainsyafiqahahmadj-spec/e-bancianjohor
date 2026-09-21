@@ -46,6 +46,7 @@
     .brand-text p { font-size: 0.75rem; color: #cbd5e1; }
     .badge-tag { background: var(--johor-gold); color: #000; font-size: 0.65rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
 
+    .nav-wrap { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
     .nav-tabs { display: flex; gap: 8px; align-items: center; }
     .nav-tab-btn {
       background: rgba(255, 255, 255, 0.12);
@@ -69,6 +70,20 @@
       box-shadow: 0 2px 6px rgba(197, 31, 36, 0.35);
     }
 
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .role-admin { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
+    .role-staff { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+
     main.container { flex: 1; padding: 24px; max-width: 1400px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 24px; }
 
     .btn {
@@ -89,7 +104,7 @@
     .btn-outline { background: #fff; border: 1px solid var(--border-color); color: var(--text-main); }
     .btn-outline:hover { background: #f8fafc; }
 
-    /* KAD KPI UTAMA */
+    /* KAD KPI */
     .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
     .kpi-card-box {
       background: #fff;
@@ -170,11 +185,10 @@
     .badge-red { background: #fef2f2; color: var(--johor-red); }
     .badge-green { background: #ecfdf5; color: #15803d; }
 
-    /* TAB KONTEN */
     .tab-content { display: none; }
     .tab-content.active { display: flex; flex-direction: column; gap: 24px; }
 
-    /* BORANG & GRID */
+    /* BORANG */
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
     .form-group { display: flex; flex-direction: column; gap: 4px; }
     .form-group.col-span-2 { grid-column: span 2; }
@@ -188,7 +202,6 @@
       border-radius: 10px;
       padding: 16px;
       margin-bottom: 14px;
-      position: relative;
     }
     .air-card-header {
       display: flex;
@@ -211,7 +224,6 @@
       border: 1px solid var(--border-color);
     }
 
-    /* KEMAHIRAN CHECKBOX GRID */
     .skills-grid-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
@@ -232,16 +244,8 @@
       color: #1e293b;
       transition: all 0.2s ease;
     }
-    .skill-card-label:hover {
-      background: #f0fdf4;
-      border-color: #86efac;
-    }
-    .skill-card-label input[type="checkbox"] {
-      width: 17px;
-      height: 17px;
-      cursor: pointer;
-      accent-color: var(--johor-red);
-    }
+    .skill-card-label:hover { background: #f0fdf4; border-color: #86efac; }
+    .skill-card-label input[type="checkbox"] { width: 17px; height: 17px; cursor: pointer; accent-color: var(--johor-red); }
 
     .calc-banner {
       background: #f0fdf4;
@@ -275,7 +279,7 @@
 
     @keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
 
-    /* MODAL PAPARAN PROFIL */
+    /* MODAL */
     .modal-backdrop {
       display: none;
       position: fixed;
@@ -327,13 +331,24 @@
       gap: 10px;
     }
 
+    .login-box {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 30px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
+      text-align: center;
+      border-top: 5px solid var(--johor-red);
+    }
+
     footer.site-footer { background: #fff; border-top: 1px solid var(--border-color); padding: 18px; text-align: center; font-size: 0.76rem; color: var(--text-muted); margin-top: auto; }
 
     @media (max-width: 768px) {
       .help-row-item { grid-template-columns: 1fr; gap: 6px; }
       .calc-banner { flex-direction: column; }
       header { flex-direction: column; align-items: flex-start; }
-      .nav-tabs { width: 100%; }
+      .nav-wrap { width: 100%; justify-content: space-between; }
       .form-group.col-span-2 { grid-column: span 1; }
     }
   </style>
@@ -344,7 +359,6 @@
   <header>
     <div class="brand-wrap">
       <div class="brand-logos">
-        <!-- Logo Hexagon Maju Johor -->
         <svg width="34" height="38" viewBox="0 0 500 577">
           <defs>
             <clipPath id="hexagonClip">
@@ -369,10 +383,17 @@
       </div>
     </div>
 
-    <!-- BUTANG NAVIGASI DUA TAB -->
-    <div class="nav-tabs">
-      <button class="nav-tab-btn active" id="btnTabDash" onclick="switchPage('tab-dashboard')">📊 Dashboard Utama</button>
-      <button class="nav-tab-btn" id="btnTabForm" onclick="switchPage('tab-borang')">📝 Borang Bancian</button>
+    <!-- NAVIGASI & STATUS PERANAN -->
+    <div class="nav-wrap">
+      <div class="nav-tabs">
+        <button class="nav-tab-btn active" id="btnTabDash" onclick="switchPage('tab-dashboard')">📊 Dashboard Utama</button>
+        <button class="nav-tab-btn" id="btnTabForm" onclick="switchPage('tab-borang')">📝 Borang Bancian</button>
+      </div>
+      
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span id="userRoleBadge" class="role-badge role-admin">Admin</span>
+        <button class="btn btn-outline" style="padding:5px 10px; font-size:0.75rem;" onclick="openLoginModal()">Tukar Akses</button>
+      </div>
     </div>
   </header>
 
@@ -426,10 +447,10 @@
           <div style="display:flex; align-items:center; gap:10px;">
             <div class="sync-status" id="cloudStatus">
               <span class="sync-dot loading" id="syncDot"></span>
-              <span id="syncText">Menyegerak Firebase...</span>
+              <span id="syncText">Menyegerak Data...</span>
             </div>
             <button class="btn btn-outline" onclick="loadFromFirebase()">🔄 Muat Semula</button>
-            <button class="btn btn-outline" onclick="exportExcel()">⬇ Eksport Excel</button>
+            <button class="btn btn-outline" id="btnExportExcel" onclick="exportExcel()">⬇ Eksport Excel (KIR & AIR)</button>
           </div>
         </div>
         <div class="table-container">
@@ -613,7 +634,7 @@
             <span id="liveTotalHelp" style="font-size:1.1rem; font-weight:800; color:#a16207;">RM 0.00</span>
           </div>
 
-          <!-- BAHAGIAN D: KEMAHIRAN YANG DIMILIKI (TEPAT SEPERTI GAMBAR) -->
+          <!-- BAHAGIAN D: KEMAHIRAN YANG DIMILIKI -->
           <div style="margin: 20px 0;">
             <h4 style="color:var(--johor-blue); font-size:0.95rem; font-weight:800; margin-bottom:4px;">D. KEMAHIRAN YANG DIMILIKI</h4>
             <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px;">Pilih kemahiran yang dimiliki oleh KIR atau AIR untuk tujuan pemadanan program peningkatan pendapatan:</p>
@@ -683,6 +704,39 @@
     </div>
   </div>
 
+  <!-- MODAL PENETAPAN PERANAN / LOG MASUK -->
+  <div class="modal-backdrop" id="loginModal">
+    <div class="login-box">
+      <h3 style="color:var(--johor-blue); margin-bottom:6px;">Pilih Akses Pengguna</h3>
+      <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:20px;">Sila pilih peranan anda untuk memulakan sistem.</p>
+      
+      <div style="display:flex; flex-direction:column; gap:12px; text-align:left;">
+        <div style="border:1px solid var(--border-color); padding:12px; border-radius:8px;">
+          <label style="font-weight:800; font-size:0.85rem; display:flex; align-items:center; gap:6px;">
+            <input type="radio" name="accessChoice" value="staff" checked onchange="togglePasswordField()"> Pegawai Pejabat Daerah
+          </label>
+          <p style="font-size:0.72rem; color:var(--text-muted); margin-top:4px;">Akses untuk memasukkan rekod bancian, mengira PGK & melihat senarai profil.</p>
+        </div>
+
+        <div style="border:1px solid var(--border-color); padding:12px; border-radius:8px;">
+          <label style="font-weight:800; font-size:0.85rem; display:flex; align-items:center; gap:6px;">
+            <input type="radio" name="accessChoice" value="admin" onchange="togglePasswordField()"> Pentadbir (Admin / SUK Johor)
+          </label>
+          <p style="font-size:0.72rem; color:var(--text-muted); margin-top:4px;">Akses penuh: Kemas kini, eksport Excel & kebenaran memadam rekod.</p>
+          
+          <div id="adminPassField" style="display:none; margin-top:10px;">
+            <input type="password" id="adminPasswordInput" placeholder="Masukkan Kata Laluan Admin" style="width:100%;">
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px; display:flex; justify-content:flex-end; gap:10px;">
+        <button class="btn btn-outline" onclick="closeLoginModal()">Batal</button>
+        <button class="btn btn-red" onclick="applyRoleSelection()">Sahkan Akses</button>
+      </div>
+    </div>
+  </div>
+
   <footer class="site-footer">
     &copy; 2026 Bahagian Pemantauan Projek dan Kesejahteraan Rakyat, Pejabat Setiausaha Kerajaan Johor. Hak Cipta Terpelihara.
   </footer>
@@ -693,6 +747,9 @@
     const FIREBASE_BACKUP_URL = "https://e-bancian-johor-default-rtdb.asia-southeast1.firebasedatabase.app";
     const SHEETDB_URL = "https://sheetdb.io/api/v1/k4vnnko52f2rg";
 
+    // KATA LALUAN ADMIN DEFAULT
+    const ADMIN_PASSWORD = "adminjohor123";
+
     const DISTRICTS_ORDER = [
       'Johor Bahru', 'Kulai', 'Pontian', 'Kota Tinggi', 'Kluang',
       'Batu Pahat', 'Muar', 'Tangkak', 'Segamat', 'Mersing'
@@ -700,6 +757,54 @@
 
     let records = [];
     let activeFirebaseUrl = FIREBASE_DB_URL;
+    let currentRole = localStorage.getItem('ebancian_user_role') || 'staff';
+
+    function initRoleUI() {
+      const badge = document.getElementById('userRoleBadge');
+      if (currentRole === 'admin') {
+        badge.innerText = 'Admin (SUK)';
+        badge.className = 'role-badge role-admin';
+      } else {
+        badge.innerText = 'Pejabat Daerah';
+        badge.className = 'role-badge role-staff';
+      }
+      renderRecordsTable();
+    }
+
+    function openLoginModal() {
+      document.getElementById('loginModal').classList.add('active');
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').classList.remove('active');
+    }
+
+    function togglePasswordField() {
+      const isSelectAdmin = document.querySelector('input[name="accessChoice"][value="admin"]').checked;
+      document.getElementById('adminPassField').style.display = isSelectAdmin ? 'block' : 'none';
+    }
+
+    function applyRoleSelection() {
+      const isSelectAdmin = document.querySelector('input[name="accessChoice"][value="admin"]').checked;
+      if (isSelectAdmin) {
+        const pass = document.getElementById('adminPasswordInput').value;
+        if (pass === ADMIN_PASSWORD) {
+          currentRole = 'admin';
+          localStorage.setItem('ebancian_user_role', 'admin');
+          alert('Berjaya log masuk sebagai Pentadbir!');
+          closeLoginModal();
+          initRoleUI();
+        } else {
+          alert('Kata laluan admin tidak sah!');
+        }
+      } else {
+        currentRole = 'staff';
+        localStorage.setItem('ebancian_user_role', 'staff');
+        alert('Akses Pejabat Daerah diaktifkan.');
+        closeLoginModal();
+        initRoleUI();
+      }
+    }
 
     function switchPage(pageId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -763,7 +868,6 @@
         exitCostEl.style.color = 'var(--success)';
       }
 
-      // Kira Jumlah Bantuan
       let totalHelpVal = 0;
       document.querySelectorAll('.help-val-field').forEach(input => {
         totalHelpVal += parseFloat(input.value) || 0;
@@ -873,7 +977,7 @@
       const row = document.createElement('div');
       row.className = 'help-row-item';
       row.innerHTML = `
-        <input type="text" class="help-name-field" value="${data.nama || ''}" placeholder="Nama Program (Cth: STR / JKM Kanak-kanak / Baitulmal)">
+        <input type="text" class="help-name-field" value="${data.nama || ''}" placeholder="Nama Program (Cth: STR / JKM / Baitulmal)">
         <input type="text" class="help-agency-field" value="${data.agensi || ''}" placeholder="Agensi (Cth: JKM / MAINJ / YPJ)">
         <select class="help-freq-field">
           <option value="Bulanan" ${data.freq === 'Bulanan' ? 'selected' : ''}>Bulanan</option>
@@ -963,7 +1067,6 @@
       const phone = document.getElementById('fPhone').value;
       const alamat = document.getElementById('fAlamat').value;
 
-      // Ambil Maklumat Penuh Semua AIR
       const airList = [];
       let airIncTotal = 0;
       document.querySelectorAll('.air-card-box').forEach(box => {
@@ -989,7 +1092,6 @@
         }
       });
 
-      // Ambil Maklumat Semua Bantuan
       const helpList = [];
       let helpTotalVal = 0;
       document.querySelectorAll('.help-row-item').forEach(row => {
@@ -1004,7 +1106,6 @@
         }
       });
 
-      // Ambil Semua Kemahiran Yang Ditandakan
       const selectedSkills = [];
       document.querySelectorAll('input[name="skillCheck"]:checked').forEach(cb => {
         selectedSkills.push(cb.value);
@@ -1040,7 +1141,8 @@
         helpTotalVal: Number(helpTotalVal),
         skills: selectedSkills,
         kkName: String(document.getElementById('fKkName').value),
-        kkDate: String(document.getElementById('fKkDate').value || new Date().toISOString().split('T')[0])
+        kkDate: String(document.getElementById('fKkDate').value || new Date().toISOString().split('T')[0]),
+        recordedBy: currentRole
       };
 
       try {
@@ -1054,7 +1156,6 @@
         const savedData = await res.json();
         newRec.firebaseKey = savedData.name;
 
-        // Sandaran ke SheetDB jika aktif
         if (SHEETDB_URL) {
           fetch(SHEETDB_URL, {
             method: 'POST',
@@ -1070,7 +1171,7 @@
         records.unshift(newRec);
         localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
 
-        alert('✅ Rekod ' + nama + ' berjaya disimpan ke Cloud Firebase!');
+        alert('✅ Rekod ' + nama + ' (' + daerah + ') berjaya disimpan!');
         document.getElementById('frmBanci').reset();
         document.getElementById('airContainer').innerHTML = '';
         document.getElementById('helpContainer').innerHTML = '';
@@ -1081,7 +1182,7 @@
         switchPage('tab-dashboard');
       } catch (err) {
         console.error("Firebase save error:", err);
-        alert('Ralat semasa menyimpan ke Firebase:\n' + err.message);
+        alert('Ralat semasa menyimpan: ' + err.message);
       } finally {
         btnSubmit.disabled = false;
         btnSubmit.innerText = '💾 Simpan Rekod Bancian';
@@ -1089,6 +1190,11 @@
     }
 
     async function deleteRecord(id) {
+      if (currentRole !== 'admin') {
+        alert('⛔ Akses Ditolak: Hanya Pentadbir (Admin) dibenarkan memadam rekod.');
+        return;
+      }
+
       if (!confirm('Adakah anda pasti mahu memadamkan rekod ini?')) return;
 
       const rec = records.find(x => x.id === id);
@@ -1107,7 +1213,6 @@
       alert('Rekod telah dipadam.');
     }
 
-    // MODAL PAPARAN PROFIL LENGKAP
     function viewRecord(id) {
       const r = records.find(x => x.id === id);
       if (!r) return;
@@ -1160,7 +1265,6 @@
 
       const modalContent = document.getElementById('modalContent');
       modalContent.innerHTML = `
-        <!-- SEKSYEN A -->
         <div>
           <h4 style="color:var(--johor-blue); margin-bottom:8px;">A. MAKLUMAT KETUA ISI RUMAH (KIR)</h4>
           <div class="detail-grid">
@@ -1177,7 +1281,6 @@
           </div>
         </div>
 
-        <!-- SEKSYEN B -->
         <div>
           <h4 style="color:var(--johor-blue); margin-bottom:8px;">B. MAKLUMAT LENGKAP SEMUA AIR (${airList.length} Orang)</h4>
           <div class="table-container">
@@ -1199,7 +1302,6 @@
           </div>
         </div>
 
-        <!-- KAD KOS LEPAS MISKIN -->
         <div class="cost-card">
           <div>
             <div style="font-size:0.75rem; color:#9a3412; font-weight:700; text-transform:uppercase;">Status & Analisis Pendapatan Keluarga</div>
@@ -1218,7 +1320,6 @@
           </div>
         </div>
 
-        <!-- SEKSYEN C -->
         <div>
           <h4 style="color:var(--johor-blue); margin-bottom:8px;">C. PROGRAM BANTUAN YANG DITERIMA (${helpList.length} Bantuan)</h4>
           <div class="table-container">
@@ -1237,7 +1338,6 @@
           </div>
         </div>
 
-        <!-- SEKSYEN D -->
         <div>
           <h4 style="color:var(--johor-blue); margin-bottom:8px;">D. KEMAHIRAN YANG DIMILIKI</h4>
           <div style="display:flex; flex-wrap:wrap; gap:8px; padding:12px; background:#f8fafc; border-radius:8px; border:1px solid var(--border-color);">
@@ -1245,7 +1345,6 @@
           </div>
         </div>
 
-        <!-- SEKSYEN F -->
         <div>
           <h4 style="color:var(--johor-blue); margin-bottom:8px;">F. PENGESAHAN KETUA KAMPUNG / PENGHULU</h4>
           <div class="detail-grid">
@@ -1321,6 +1420,11 @@
         const perCapita = parseFloat(r.perCapita) || 0;
         const exitCost = r.exitCost || calculateExitCost(r.strata, perCapita, airCount + 1);
 
+        const actionButtons = `
+          <button class="btn btn-johor" style="padding:4px 8px; font-size:0.75rem;" onclick="viewRecord('${r.id}')">👁 Paparan</button>
+          ${currentRole === 'admin' ? `<button class="btn btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--johor-red);" onclick="deleteRecord('${r.id}')">Padam</button>` : ''}
+        `;
+
         tbody.innerHTML += `
           <tr>
             <td><strong>${r.nama || '-'}</strong><br><small style="color:var(--text-muted);">${r.kerja || '-'}</small></td>
@@ -1332,49 +1436,104 @@
             <td><strong>RM ${perCapita.toFixed(2)}</strong></td>
             <td><span class="badge ${isPoor ? 'badge-red' : 'badge-green'}">${r.statusPGK || '-'}</span></td>
             <td><strong>${exitCost > 0 ? 'RM ' + exitCost.toFixed(2) : '<span style="color:var(--success);">RM 0.00</span>'}</strong></td>
-            <td style="text-align:center; white-space:nowrap;">
-              <button class="btn btn-johor" style="padding:4px 8px; font-size:0.75rem;" onclick="viewRecord('${r.id}')">👁 Paparan</button>
-              <button class="btn btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--johor-red);" onclick="deleteRecord('${r.id}')">Padam</button>
-            </td>
+            <td style="text-align:center; white-space:nowrap;">${actionButtons}</td>
           </tr>
         `;
       });
     }
 
+    // =========================================================================
+    // FUNGSI EKSPORT EXCEL BERGANDA (SHEET 1: KIR | SHEET 2: SEMUA AIR)
+    // =========================================================================
     function exportExcel() {
       if (!records.length) {
         alert('Tiada data untuk dieksport.');
         return;
       }
-      const rows = records.map(r => ({
-        "ID": r.id,
-        "Nama KIR": r.nama,
-        "No. KP": r.ic,
-        "Umur": r.umur,
-        "Jantina": r.jantina,
-        "Status Perkahwinan": r.kahwin,
-        "Daerah": r.daerah,
-        "Mukim / DUN": r.dun,
-        "Alamat Kediaman": r.alamat || '-',
-        "Strata": r.strata,
-        "Pekerjaan": r.kerja,
-        "Pendapatan KIR (RM)": r.incomeKir,
-        "Bil Tanggungan (AIR)": r.air_count,
-        "Jumlah Pendapatan (RM)": r.totalInc,
-        "Per Kapita (RM)": (r.perCapita || 0).toFixed(2),
-        "Status PGK": r.statusPGK,
-        "Anggaran Kos Lepas Miskin (RM/Bln)": (r.exitCost || 0).toFixed(2),
-        "Jumlah Bantuan (RM)": r.helpTotalVal || 0,
-        "Kemahiran Dimiliki": (r.skills || []).join(', '),
-        "Tarikh Bancian": r.kkDate
-      }));
-      const ws = XLSX.utils.json_to_sheet(rows);
+
+      // LEMBARAN 1: MAKLUMAT PENUH KIR & KELUARGA
+      const rowsKIR = records.map(r => {
+        const airList = r.air_list || [];
+        const helpList = r.help_list || [];
+        const assistanceSummary = helpList.map(h => `${h.nama || '-'} (${h.agensi || '-'}, RM${(parseFloat(h.nilai) || 0).toFixed(2)})`).join('; ');
+
+        return {
+          "ID Rekod": r.id,
+          "Nama KIR": r.nama,
+          "No. Kad Pengenalan": r.ic,
+          "Umur": r.umur,
+          "Jantina": r.jantina,
+          "Status Perkahwinan": r.kahwin,
+          "Daerah": r.daerah,
+          "Mukim / DUN": r.dun,
+          "Alamat Kediaman Penuh": r.alamat || '-',
+          "No Telefon": r.phone || '-',
+          "Strata": r.strata,
+          "Pekerjaan KIR": r.kerja,
+          "Pendapatan KIR (RM)": (parseFloat(r.incomeKir) || 0).toFixed(2),
+          "Bilangan Tanggungan (AIR)": r.air_count || airList.length,
+          "Jumlah Ahli Keluarga": (parseInt(r.air_count) || airList.length) + 1,
+          "Jumlah Pendapatan IR (RM)": (parseFloat(r.totalInc) || 0).toFixed(2),
+          "Pendapatan Per Kapita (RM)": (parseFloat(r.perCapita) || 0).toFixed(2),
+          "Status PGK": r.statusPGK,
+          "Anggaran Kos Lepas Miskin (RM/Bulan)": (parseFloat(r.exitCost) || 0).toFixed(2),
+          "Jumlah Nilai Bantuan (RM)": (parseFloat(r.helpTotalVal) || 0).toFixed(2),
+          "Perincian Bantuan Diterima": assistanceSummary || 'Tiada Bantuan',
+          "Kemahiran Dimiliki": (r.skills || []).join(', ') || 'Tiada',
+          "Ketua Kampung / Pengesah": r.kkName || '-',
+          "Tarikh Bancian": r.kkDate || '-'
+        };
+      });
+
+      // LEMBARAN 2: MAKLUMAT PENUH SETIAP AIR
+      const rowsAIR = [];
+      records.forEach(r => {
+        const airList = r.air_list || [];
+        airList.forEach((a, idx) => {
+          rowsAIR.push({
+            "ID Rekod KIR": r.id,
+            "Nama Ketua Isi Rumah (KIR)": r.nama,
+            "No. KP KIR": r.ic,
+            "Daerah": r.daerah,
+            "Bil. AIR": idx + 1,
+            "Nama Ahli Isi Rumah (AIR)": a.nama || '-',
+            "No. KP / MyKid AIR": a.ic || '-',
+            "Hubungan Dengan KIR": a.hubungan || '-',
+            "Umur AIR": a.umur ? `${a.umur} Tahun` : '-',
+            "Jantina": a.jantina || '-',
+            "Status Perkahwinan": a.kahwin || '-',
+            "Status Kesihatan / OKU": a.kesihatan || 'Sihat',
+            "Tahap Pendidikan": a.pendidikan || '-',
+            "Status Pekerjaan": a.statusKerja || '-',
+            "Pekerjaan Spesifik": a.kerja || '-',
+            "Pendapatan Sebulan (RM)": (parseFloat(a.inc) || 0).toFixed(2)
+          });
+        });
+      });
+
+      // BINA WORKBOOK EXCEL
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Bancian_Johor");
-      XLSX.writeFile(wb, "Data_eBancian_Johor.xlsx");
+
+      // Cipta sheet KIR
+      const wsKIR = XLSX.utils.json_to_sheet(rowsKIR);
+      XLSX.utils.book_append_sheet(wb, wsKIR, "Ringkasan_KIR");
+
+      // Cipta sheet AIR (jika ada tanggungan)
+      if (rowsAIR.length > 0) {
+        const wsAIR = XLSX.utils.json_to_sheet(rowsAIR);
+        XLSX.utils.book_append_sheet(wb, wsAIR, "Maklumat_Penuh_AIR");
+      } else {
+        const wsEmpty = XLSX.utils.json_to_sheet([{"Maklumat": "Tiada tanggungan AIR direkodkan."}]);
+        XLSX.utils.book_append_sheet(wb, wsEmpty, "Maklumat_Penuh_AIR");
+      }
+
+      // Muat turun fail Excel
+      const fileName = `eBancian_Johor_Lengkap_${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(wb, fileName);
     }
 
     // Inisialisasi awal
+    initRoleUI();
     recalculateForm();
     loadFromFirebase();
   </script>
