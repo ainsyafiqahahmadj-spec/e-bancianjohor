@@ -23,7 +23,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
     body { background: var(--bg-slate); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
 
-    /* HEADER & TAB */
     header {
       background: linear-gradient(135deg, var(--johor-blue) 0%, #051424 100%);
       color: #fff;
@@ -89,7 +88,6 @@
     .btn-outline { background: #fff; border: 1px solid var(--border-color); color: var(--text-main); }
     .btn-outline:hover { background: #f8fafc; }
 
-    /* 4 KAD KPI UTAMA */
     .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
     .kpi-card-box {
       background: #fff;
@@ -125,7 +123,6 @@
     .kpi-number.green { color: #15803d; }
     .kpi-desc { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
 
-    /* SEKSYEN KAD & JADUAL */
     .section-card {
       background: #fff;
       border: 1px solid var(--border-color);
@@ -170,11 +167,9 @@
     .badge-red { background: #fef2f2; color: var(--johor-red); }
     .badge-green { background: #ecfdf5; color: #15803d; }
 
-    /* TAB KONTEN */
     .tab-content { display: none; }
     .tab-content.active { display: flex; flex-direction: column; gap: 24px; }
 
-    /* BORANG */
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
     .form-group { display: flex; flex-direction: column; gap: 4px; }
     label { font-size: 0.75rem; font-weight: 700; color: #334155; }
@@ -194,7 +189,6 @@
     .calc-banner small { font-size: 0.72rem; color: #166534; font-weight: 700; text-transform: uppercase; }
     .calc-banner div { font-size: 1.25rem; font-weight: 800; color: #14532d; margin-top: 2px; }
 
-    /* STATUS CLOUD SYNC */
     .sync-status {
       display: inline-flex;
       align-items: center;
@@ -223,11 +217,9 @@
 </head>
 <body>
 
-  <!-- HEADER -->
   <header>
     <div class="brand-wrap">
       <div class="brand-logos">
-        <!-- Logo Maju Johor Hexagon -->
         <svg width="34" height="38" viewBox="0 0 500 577">
           <defs>
             <clipPath id="hexagonClip">
@@ -252,7 +244,6 @@
       </div>
     </div>
 
-    <!-- BUTANG NAVIGASI DUA TAB -->
     <div class="nav-tabs">
       <button class="nav-tab-btn active" id="btnTabDash" onclick="switchPage('tab-dashboard')">📊 Dashboard Utama</button>
       <button class="nav-tab-btn" id="btnTabForm" onclick="switchPage('tab-borang')">📝 Borang Bancian</button>
@@ -302,16 +293,16 @@
         </div>
       </section>
 
-      <!-- JADUAL TABURAN 10 DAERAH JOHOR -->
+      <!-- JADUAL 10 DAERAH -->
       <section class="section-card">
         <div class="section-title">
           <span>📍 Taburan Kesejahteraan & Status PGK 10 Daerah Johor</span>
           <div style="display:flex; align-items:center; gap:10px;">
             <div class="sync-status" id="cloudStatus">
               <span class="sync-dot loading" id="syncDot"></span>
-              <span id="syncText">Menyambung ke Google Sheets...</span>
+              <span id="syncText">Menyegerak Firebase...</span>
             </div>
-            <button class="btn btn-outline" onclick="loadFromSheetDB()">🔄 Muat Semula</button>
+            <button class="btn btn-outline" onclick="loadFromFirebase()">🔄 Muat Semula</button>
             <button class="btn btn-outline" onclick="exportExcel()">⬇ Eksport Excel</button>
           </div>
         </div>
@@ -333,7 +324,7 @@
         </div>
       </section>
 
-      <!-- SENARAI REKOD BANCIAN BERDAFTAR -->
+      <!-- SENARAI REKOD -->
       <section class="section-card">
         <div class="section-title">
           <span>📋 Senarai Rekod Bancian Berdaftar</span>
@@ -363,7 +354,6 @@
 
     <!-- TAB 2: BORANG BANCIAN -->
     <div id="tab-borang" class="tab-content">
-      
       <section class="section-card">
         <div class="section-title" style="border-bottom:2px solid #e2e8f0; padding-bottom:12px;">
           <span>📝 Borang Bancian Profil & Pemangkasan Kemiskinan</span>
@@ -371,7 +361,6 @@
         </div>
 
         <form id="frmBanci" onsubmit="saveBanci(event)">
-          <!-- BAHAGIAN A -->
           <h4 style="color:var(--johor-blue); font-size:0.9rem; margin-bottom:12px;">A. MAKLUMAT KETUA DAN ASAS ISI RUMAH</h4>
           <div class="form-grid">
             <div class="form-group">
@@ -443,7 +432,6 @@
             </div>
           </div>
 
-          <!-- BAHAGIAN B -->
           <div style="display:flex; justify-content:space-between; align-items:center; margin:22px 0 8px;">
             <h4 style="color:var(--johor-blue); font-size:0.9rem;">B. MAKLUMAT AHLI ISI RUMAH (AIR)</h4>
             <button type="button" class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="addAirRow()">+ Tambah Ahli</button>
@@ -464,7 +452,6 @@
             </table>
           </div>
 
-          <!-- KOTAK STATUS PGK REAL-TIME -->
           <div class="calc-banner">
             <div>
               <small>Jumlah Pendapatan Isi Rumah</small>
@@ -484,7 +471,6 @@
             </div>
           </div>
 
-          <!-- BAHAGIAN C -->
           <h4 style="color:var(--johor-blue); font-size:0.9rem; margin:18px 0 10px;">C. MAKLUMAT BANTUAN YANG DITERIMA</h4>
           <div class="form-grid">
             <div class="form-group">
@@ -500,7 +486,6 @@
             </div>
           </div>
 
-          <!-- BAHAGIAN F -->
           <h4 style="color:var(--johor-blue); font-size:0.9rem; margin:20px 0 10px;">F. PENGESAHAN KETUA KAMPUNG</h4>
           <div class="form-grid">
             <div class="form-group">
@@ -519,7 +504,6 @@
           </div>
         </form>
       </section>
-
     </div>
 
   </main>
@@ -529,7 +513,9 @@
   </footer>
 
   <script>
-    const SHEETDB_URL = "https://sheetdb.io/api/v1/k4vnnko52f2rg";
+    // Pangkalan data Firebase Realtime Database anda
+    const FIREBASE_DB_URL = "https://e-bancian-johor-default-rtdb.firebaseio.com";
+    const FIREBASE_BACKUP_URL = "https://e-bancian-johor-default-rtdb.asia-southeast1.firebasedatabase.app";
 
     const DISTRICTS_ORDER = [
       'Johor Bahru', 'Kulai', 'Pontian', 'Kota Tinggi', 'Kluang',
@@ -537,6 +523,7 @@
     ];
 
     let records = [];
+    let activeFirebaseUrl = FIREBASE_DB_URL;
 
     function switchPage(pageId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -599,34 +586,54 @@
       recalculateForm();
     }
 
-    async function loadFromSheetDB() {
+    async function tryFetchFirebase(path, options = {}) {
+      try {
+        let res = await fetch(`${activeFirebaseUrl}${path}`, options);
+        if (!res.ok && activeFirebaseUrl === FIREBASE_DB_URL) {
+          activeFirebaseUrl = FIREBASE_BACKUP_URL;
+          res = await fetch(`${activeFirebaseUrl}${path}`, options);
+        }
+        return res;
+      } catch (e) {
+        if (activeFirebaseUrl === FIREBASE_DB_URL) {
+          activeFirebaseUrl = FIREBASE_BACKUP_URL;
+          return await fetch(`${activeFirebaseUrl}${path}`, options);
+        }
+        throw e;
+      }
+    }
+
+    async function loadFromFirebase() {
       const syncDot = document.getElementById('syncDot');
       const syncText = document.getElementById('syncText');
 
       syncDot.className = 'sync-dot loading';
-      syncText.innerText = 'Menyegerak data Google Sheets...';
+      syncText.innerText = 'Menyegerak dari Firebase...';
 
       try {
-        const res = await fetch(SHEETDB_URL);
-        if (!res.ok) throw new Error('Status: ' + res.status);
+        const res = await tryFetchFirebase('/bancian.json');
         const data = await res.json();
         
-        records = (Array.isArray(data) ? data : []).map(r => ({
-          ...r,
-          incomeKir: parseFloat(r.incomeKir) || 0,
-          air_count: parseInt(r.air_count) || 0,
-          totalInc: parseFloat(r.totalInc) || 0,
-          perCapita: parseFloat(r.perCapita) || 0
-        }));
+        if (data && typeof data === 'object') {
+          records = Object.keys(data).map(key => ({
+            ...data[key],
+            firebaseKey: key,
+            incomeKir: parseFloat(data[key].incomeKir) || 0,
+            air_count: parseInt(data[key].air_count) || 0,
+            totalInc: parseFloat(data[key].totalInc) || 0,
+            perCapita: parseFloat(data[key].perCapita) || 0
+          })).reverse();
+        } else {
+          records = [];
+        }
 
         localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
-
         syncDot.className = 'sync-dot online';
-        syncText.innerText = `Data Live (${records.length} rekod)`;
+        syncText.innerText = `Firebase Live (${records.length} rekod)`;
       } catch (err) {
-        console.warn("Gagal muat turun dari SheetDB, memuatkan simpanan tempatan:", err);
+        console.warn("Gagal muat turun dari Firebase:", err);
         syncDot.className = 'sync-dot';
-        syncText.innerText = 'Mod Luar Talian (Guna simpanan peranti)';
+        syncText.innerText = 'Mod Luar Talian (Guna cache peranti)';
         records = JSON.parse(localStorage.getItem('ebancian_johor_cache')) || [];
       }
 
@@ -638,7 +645,7 @@
       e.preventDefault();
       const btnSubmit = document.getElementById('btnSubmit');
       btnSubmit.disabled = true;
-      btnSubmit.innerText = '⏳ Menyimpan data...';
+      btnSubmit.innerText = '⏳ Menyimpan ke Firebase...';
 
       const nama = document.getElementById('fNama').value;
       const ic = document.getElementById('fIc').value;
@@ -683,67 +690,46 @@
         kkDate: String(document.getElementById('fKkDate').value || new Date().toISOString().split('T')[0])
       };
 
-      let cloudSuccess = false;
-      let cloudErrorMsg = '';
-
       try {
-        const res = await fetch(SHEETDB_URL, {
+        const res = await tryFetchFirebase('/bancian.json', {
           method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify([newRec])
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newRec)
         });
+        
+        if (!res.ok) throw new Error('Status: ' + res.status);
+        const savedData = await res.json();
+        newRec.firebaseKey = savedData.name;
 
-        if (res.ok) {
-          cloudSuccess = true;
-        } else {
-          const res2 = await fetch(SHEETDB_URL, {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ data: [newRec] })
-          });
-          if (res2.ok) {
-            cloudSuccess = true;
-          } else {
-            const errBody = await res2.text();
-            cloudErrorMsg = `HTTP ${res2.status}: ${errBody}`;
-          }
-        }
+        records.unshift(newRec);
+        localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
+
+        alert('✅ Rekod ' + nama + ' berjaya disimpan ke Cloud Firebase!');
+        document.getElementById('frmBanci').reset();
+        document.getElementById('airTableBody').innerHTML = '';
+        recalculateForm();
+        renderDashboard();
+        renderRecordsTable();
+        switchPage('tab-dashboard');
       } catch (err) {
-        cloudErrorMsg = err.message;
+        console.error("Firebase save error:", err);
+        alert('Ralat menyimpan ke Firebase:\n' + err.message + '\n\nSila pastikan tab "Rules" di Realtime Database disetkan read & write kepada true.');
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.innerText = '💾 Simpan Rekod Bancian';
       }
-
-      records.unshift(newRec);
-      localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
-
-      if (cloudSuccess) {
-        alert('✅ Rekod ' + nama + ' berjaya disimpan ke Cloud Google Sheets!');
-      } else {
-        alert('ℹ️ Rekod berjaya disimpan di paparan laman web!\n\nPerhatian Cloud SheetDB: ' + (cloudErrorMsg || 'Sila pastikan kebenaran CREATE (POST) aktif di console SheetDB anda'));
-      }
-
-      document.getElementById('frmBanci').reset();
-      document.getElementById('airTableBody').innerHTML = '';
-      recalculateForm();
-      btnSubmit.disabled = false;
-      btnSubmit.innerText = '💾 Simpan Rekod Bancian';
-      switchPage('tab-dashboard');
     }
 
     async function deleteRecord(id) {
-      if (!confirm('Adakah anda pasti mahu memadamkan rekod ini?')) {
-        return;
-      }
+      if (!confirm('Adakah anda pasti mahu memadamkan rekod ini?')) return;
 
-      try {
-        await fetch(`${SHEETDB_URL}/id/${id}`, { method: 'DELETE' });
-      } catch (err) {
-        console.warn("Gagal padam di cloud:", err);
+      const rec = records.find(x => x.id === id);
+      if (rec && rec.firebaseKey) {
+        try {
+          await tryFetchFirebase(`/bancian/${rec.firebaseKey}.json`, { method: 'DELETE' });
+        } catch (err) {
+          console.warn("Gagal padam di cloud:", err);
+        }
       }
 
       records = records.filter(x => x.id !== id);
@@ -861,7 +847,7 @@
     }
 
     recalculateForm();
-    loadFromSheetDB();
+    loadFromFirebase();
   </script>
 </body>
 </html>
