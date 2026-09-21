@@ -23,6 +23,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
     body { background: var(--bg-slate); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
 
+    /* HEADER & TAB */
     header {
       background: linear-gradient(135deg, var(--johor-blue) 0%, #051424 100%);
       color: #fff;
@@ -88,6 +89,7 @@
     .btn-outline { background: #fff; border: 1px solid var(--border-color); color: var(--text-main); }
     .btn-outline:hover { background: #f8fafc; }
 
+    /* KAD KPI UTAMA */
     .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
     .kpi-card-box {
       background: #fff;
@@ -123,6 +125,7 @@
     .kpi-number.green { color: #15803d; }
     .kpi-desc { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
 
+    /* SEKSYEN KAD & JADUAL */
     .section-card {
       background: #fff;
       border: 1px solid var(--border-color);
@@ -167,15 +170,78 @@
     .badge-red { background: #fef2f2; color: var(--johor-red); }
     .badge-green { background: #ecfdf5; color: #15803d; }
 
+    /* TAB KONTEN */
     .tab-content { display: none; }
     .tab-content.active { display: flex; flex-direction: column; gap: 24px; }
 
+    /* BORANG & GRID */
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
     .form-group { display: flex; flex-direction: column; gap: 4px; }
     .form-group.col-span-2 { grid-column: span 2; }
     label { font-size: 0.75rem; font-weight: 700; color: #334155; }
     input, select, textarea { padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.82rem; outline: none; }
     input:focus, select:focus, textarea:focus { border-color: var(--johor-blue); }
+
+    .air-card-box {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .air-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      border-bottom: 1px dashed var(--border-color);
+      padding-bottom: 8px;
+    }
+
+    .help-row-item {
+      display: grid;
+      grid-template-columns: 2fr 1.5fr 1.2fr 1.2fr 40px;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+      background: #f8fafc;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    /* KEMAHIRAN CHECKBOX GRID */
+    .skills-grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .skill-card-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      padding: 11px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #1e293b;
+      transition: all 0.2s ease;
+    }
+    .skill-card-label:hover {
+      background: #f0fdf4;
+      border-color: #86efac;
+    }
+    .skill-card-label input[type="checkbox"] {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: var(--johor-red);
+    }
 
     .calc-banner {
       background: #f0fdf4;
@@ -214,7 +280,7 @@
       display: none;
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(12, 35, 64, 0.6);
+      background: rgba(12, 35, 64, 0.65);
       backdrop-filter: blur(3px);
       z-index: 1000;
       align-items: center;
@@ -226,10 +292,10 @@
       background: #fff;
       border-radius: var(--radius);
       width: 100%;
-      max-width: 850px;
+      max-width: 900px;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.25);
       border: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
@@ -264,6 +330,7 @@
     footer.site-footer { background: #fff; border-top: 1px solid var(--border-color); padding: 18px; text-align: center; font-size: 0.76rem; color: var(--text-muted); margin-top: auto; }
 
     @media (max-width: 768px) {
+      .help-row-item { grid-template-columns: 1fr; gap: 6px; }
       .calc-banner { flex-direction: column; }
       header { flex-direction: column; align-items: flex-start; }
       .nav-tabs { width: 100%; }
@@ -277,6 +344,7 @@
   <header>
     <div class="brand-wrap">
       <div class="brand-logos">
+        <!-- Logo Hexagon Maju Johor -->
         <svg width="34" height="38" viewBox="0 0 500 577">
           <defs>
             <clipPath id="hexagonClip">
@@ -301,6 +369,7 @@
       </div>
     </div>
 
+    <!-- BUTANG NAVIGASI DUA TAB -->
     <div class="nav-tabs">
       <button class="nav-tab-btn active" id="btnTabDash" onclick="switchPage('tab-dashboard')">📊 Dashboard Utama</button>
       <button class="nav-tab-btn" id="btnTabForm" onclick="switchPage('tab-borang')">📝 Borang Bancian</button>
@@ -357,9 +426,9 @@
           <div style="display:flex; align-items:center; gap:10px;">
             <div class="sync-status" id="cloudStatus">
               <span class="sync-dot loading" id="syncDot"></span>
-              <span id="syncText">Menyegerak Google Sheets...</span>
+              <span id="syncText">Menyegerak Firebase...</span>
             </div>
-            <button class="btn btn-outline" onclick="loadFromSheetDB()">🔄 Muat Semula</button>
+            <button class="btn btn-outline" onclick="loadFromFirebase()">🔄 Muat Semula</button>
             <button class="btn btn-outline" onclick="exportExcel()">⬇ Eksport Excel</button>
           </div>
         </div>
@@ -419,6 +488,7 @@
         </div>
 
         <form id="frmBanci" onsubmit="saveBanci(event)">
+          <!-- BAHAGIAN A -->
           <h4 style="color:var(--johor-blue); font-size:0.9rem; margin-bottom:12px;">A. MAKLUMAT KETUA DAN ASAS ISI RUMAH</h4>
           <div class="form-grid">
             <div class="form-group">
@@ -494,26 +564,17 @@
             </div>
           </div>
 
-          <div style="display:flex; justify-content:space-between; align-items:center; margin:22px 0 8px;">
-            <h4 style="color:var(--johor-blue); font-size:0.9rem;">B. MAKLUMAT AHLI ISI RUMAH (AIR)</h4>
-            <button type="button" class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="addAirRow()">+ Tambah Ahli</button>
+          <!-- BAHAGIAN B -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin:24px 0 8px;">
+            <div>
+              <h4 style="color:var(--johor-blue); font-size:0.9rem;">B. MAKLUMAT LENGKAP AHLI ISI RUMAH (AIR)</h4>
+              <p style="font-size:0.75rem; color:var(--text-muted);">Masukkan maklumat lengkap setiap tanggungan dalam keluarga.</p>
+            </div>
+            <button type="button" class="btn btn-outline" onclick="addAirRow()">+ Tambah Ahli (AIR)</button>
           </div>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Nama Ahli</th>
-                  <th>Hubungan</th>
-                  <th>Umur</th>
-                  <th>Pekerjaan</th>
-                  <th>Pendapatan (RM)</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="airTableBody"></tbody>
-            </table>
-          </div>
+          <div id="airContainer"></div>
 
+          <!-- KOTAK STATUS PGK REAL-TIME -->
           <div class="calc-banner">
             <div>
               <small>Jumlah Pendapatan IR</small>
@@ -537,22 +598,55 @@
             </div>
           </div>
 
-          <h4 style="color:var(--johor-blue); font-size:0.9rem; margin:18px 0 10px;">C. MAKLUMAT BANTUAN YANG DITERIMA</h4>
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Menerima Bantuan?</label>
-              <select id="fHasHelp">
-                <option value="Tidak">Tidak</option>
-                <option value="Ya">Ya</option>
-              </select>
+          <!-- BAHAGIAN C -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin:24px 0 8px;">
+            <div>
+              <h4 style="color:var(--johor-blue); font-size:0.9rem;">C. MAKLUMAT PROGRAM BANTUAN YANG DITERIMA</h4>
+              <p style="font-size:0.75rem; color:var(--text-muted);">Senaraikan semua bantuan berkala atau tunai yang diterima keluarga.</p>
             </div>
-            <div class="form-group">
-              <label>Agensi / Pemberi Bantuan (Jika Ada)</label>
-              <input type="text" id="fHelpAgency" placeholder="Contoh: JKM / MAINJ">
+            <button type="button" class="btn btn-outline" onclick="addHelpRow()">+ Tambah Bantuan</button>
+          </div>
+          <div id="helpContainer"></div>
+
+          <div style="background:#fefce8; border:1px solid #fef08a; padding:12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <span style="font-size:0.8rem; font-weight:700; color:#854d0e;">Anggaran Jumlah Nilai Bantuan Bulanan:</span>
+            <span id="liveTotalHelp" style="font-size:1.1rem; font-weight:800; color:#a16207;">RM 0.00</span>
+          </div>
+
+          <!-- BAHAGIAN D: KEMAHIRAN YANG DIMILIKI (TEPAT SEPERTI GAMBAR) -->
+          <div style="margin: 20px 0;">
+            <h4 style="color:var(--johor-blue); font-size:0.95rem; font-weight:800; margin-bottom:4px;">D. KEMAHIRAN YANG DIMILIKI</h4>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px;">Pilih kemahiran yang dimiliki oleh KIR atau AIR untuk tujuan pemadanan program peningkatan pendapatan:</p>
+            
+            <div class="skills-grid-container">
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Memasak / Katering Makanan"> Memasak / Katering Makanan</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Menjahit / Mengubah Pakaian"> Menjahit / Mengubah Pakaian</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Bakeri & Pembuatan Pastri"> Bakeri & Pembuatan Pastri</label>
+              
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Pertukangan Kayu & Perabot"> Pertukangan Kayu & Perabot</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Kerja Pembinaan / Ubah Suai Rumah"> Kerja Pembinaan / Ubah Suai Rumah</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Pendawaian Elektrik Domestik"> Pendawaian Elektrik Domestik</label>
+              
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Pemasangan & Servis Paip"> Pemasangan & Servis Paip</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Mekanik Motosikal / Kenderaan"> Mekanik Motosikal / Kenderaan</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Pertanian / Tanaman Kontan"> Pertanian / Tanaman Kontan</label>
+              
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Penternakan Haiwan"> Penternakan Haiwan</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Perikanan / Akuakultur"> Perikanan / Akuakultur</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Perniagaan Runcit / Gerai"> Perniagaan Runcit / Gerai</label>
+              
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Dandanan Rambut / Kecantikan"> Dandanan Rambut / Kecantikan</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Asuhan Kanak-kanak / Pengasuh"> Asuhan Kanak-kanak / Pengasuh</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Pembaikan Barangan Elektrik"> Pembaikan Barangan Elektrik</label>
+              
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Kemahiran Komputer & Media Sosial"> Kemahiran Komputer & Media Sosial</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Kraftangan & Anyaman"> Kraftangan & Anyaman</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Pemanduan & Pengangkutan"> Pemanduan & Pengangkutan</label>
             </div>
           </div>
 
-          <h4 style="color:var(--johor-blue); font-size:0.9rem; margin:20px 0 10px;">F. PENGESAHAN KETUA KAMPUNG</h4>
+          <!-- BAHAGIAN F: PENGESAHAN -->
+          <h4 style="color:var(--johor-blue); font-size:0.9rem; margin:24px 0 10px;">F. PENGESAHAN KETUA KAMPUNG / PENGHULU</h4>
           <div class="form-grid">
             <div class="form-group">
               <label>Nama Ketua Kampung / Penghulu</label>
@@ -582,7 +676,8 @@
         <button onclick="closeModal()" style="background:none; border:none; color:#fff; font-size:1.4rem; cursor:pointer;">&times;</button>
       </div>
       <div class="modal-body" id="modalContent"></div>
-      <div style="padding:14px 20px; background:#f8fafc; border-top:1px solid var(--border-color); text-align:right;">
+      <div style="padding:14px 20px; background:#f8fafc; border-top:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+        <button class="btn btn-johor" onclick="window.print()">🖨 Cetak Profil</button>
         <button class="btn btn-outline" onclick="closeModal()">Tutup</button>
       </div>
     </div>
@@ -593,6 +688,9 @@
   </footer>
 
   <script>
+    // URL Pangkalan Data
+    const FIREBASE_DB_URL = "https://e-bancian-johor-default-rtdb.firebaseio.com";
+    const FIREBASE_BACKUP_URL = "https://e-bancian-johor-default-rtdb.asia-southeast1.firebasedatabase.app";
     const SHEETDB_URL = "https://sheetdb.io/api/v1/k4vnnko52f2rg";
 
     const DISTRICTS_ORDER = [
@@ -601,6 +699,7 @@
     ];
 
     let records = [];
+    let activeFirebaseUrl = FIREBASE_DB_URL;
 
     function switchPage(pageId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -628,9 +727,7 @@
 
     function calculateExitCost(strata, perCapita, totalPax) {
       const threshold = (strata === 'Bandar') ? 830 : 677;
-      if (perCapita >= threshold) {
-        return 0;
-      }
+      if (perCapita >= threshold) return 0;
       const gapPerCapita = threshold - perCapita;
       return gapPerCapita * totalPax;
     }
@@ -639,7 +736,7 @@
       const strata = document.getElementById('fStrata').value;
       const kirInc = parseFloat(document.getElementById('fIncome').value) || 0;
       
-      const airIncRows = document.querySelectorAll('.air-inc');
+      const airIncRows = document.querySelectorAll('.air-inc-field');
       let airTotalInc = 0;
       airIncRows.forEach(input => {
         airTotalInc += parseFloat(input.value) || 0;
@@ -665,59 +762,179 @@
         exitCostEl.innerText = 'RM 0.00 (Telah Lepas)';
         exitCostEl.style.color = 'var(--success)';
       }
+
+      // Kira Jumlah Bantuan
+      let totalHelpVal = 0;
+      document.querySelectorAll('.help-val-field').forEach(input => {
+        totalHelpVal += parseFloat(input.value) || 0;
+      });
+      document.getElementById('liveTotalHelp').innerText = 'RM ' + totalHelpVal.toFixed(2);
     }
 
     function addAirRow(data = {}) {
-      const tbody = document.getElementById('airTableBody');
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><input type="text" class="air-name" value="${data.nama || ''}" placeholder="Nama Ahli" style="width:100%;"></td>
-        <td><input type="text" class="air-rel" value="${data.hubungan || ''}" placeholder="Contoh: Isteri/Anak" style="width:100px;"></td>
-        <td><input type="number" class="air-age" value="${data.umur || ''}" style="width:60px;"></td>
-        <td><input type="text" class="air-job" value="${data.kerja || ''}" placeholder="Pekerjaan" style="width:100%;"></td>
-        <td><input type="number" class="air-inc" value="${data.inc || 0}" step="0.01" oninput="recalculateForm()" style="width:90px;"></td>
-        <td><button type="button" class="btn btn-outline" style="padding:2px 6px; color:var(--johor-red);" onclick="this.closest('tr').remove(); recalculateForm();">&times;</button></td>
+      const container = document.getElementById('airContainer');
+      const index = container.children.length + 1;
+      const card = document.createElement('div');
+      card.className = 'air-card-box';
+      card.innerHTML = `
+        <div class="air-card-header">
+          <strong style="color:var(--johor-blue); font-size:0.85rem;">Ahli Isi Rumah #${index}</strong>
+          <button type="button" class="btn btn-outline" style="padding:2px 8px; color:var(--johor-red);" onclick="this.closest('.air-card-box').remove(); recalculateForm();">&times; Padam</button>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nama Ahli *</label>
+            <input type="text" class="air-name-field" value="${data.nama || ''}" placeholder="Nama penuh ahli" required>
+          </div>
+          <div class="form-group">
+            <label>No. KP / MyKid</label>
+            <input type="text" class="air-ic-field" value="${data.ic || ''}" placeholder="Contoh: 080202015555">
+          </div>
+          <div class="form-group">
+            <label>Umur (Tahun)</label>
+            <input type="number" class="air-age-field" value="${data.umur || ''}" min="0">
+          </div>
+          <div class="form-group">
+            <label>Jantina</label>
+            <select class="air-gender-field">
+              <option value="Lelaki" ${data.jantina === 'Lelaki' ? 'selected' : ''}>Lelaki</option>
+              <option value="Perempuan" ${data.jantina === 'Perempuan' ? 'selected' : ''}>Perempuan</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Hubungan dengan KIR *</label>
+            <select class="air-rel-field">
+              <option value="Isteri">Isteri</option>
+              <option value="Suami">Suami</option>
+              <option value="Anak Kandung">Anak Kandung</option>
+              <option value="Anak Angkat">Anak Angkat</option>
+              <option value="Ibu / Bapa">Ibu / Bapa</option>
+              <option value="Ibu / Bapa Mertua">Ibu / Bapa Mertua</option>
+              <option value="Cucu">Cucu</option>
+              <option value="Saudara Mara">Saudara Mara</option>
+              <option value="Lain-lain">Lain-lain</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status Perkahwinan</label>
+            <select class="air-marital-field">
+              <option value="Belum Berkahwin">Belum Berkahwin</option>
+              <option value="Berkahwin">Berkahwin</option>
+              <option value="Duda / Janda">Duda / Janda</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status Kesihatan / OKU</label>
+            <select class="air-health-field">
+              <option value="Sihat">Sihat</option>
+              <option value="Sakit Kronik">Sakit Kronik</option>
+              <option value="OKU Berdaftar">OKU Berdaftar</option>
+              <option value="Terlantar">Terlantar</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Tahap Pendidikan</label>
+            <select class="air-edu-field">
+              <option value="Tiada Pendidikan">Tiada Pendidikan</option>
+              <option value="Sekolah Rendah">Sekolah Rendah</option>
+              <option value="PMR / PT3">PMR / PT3</option>
+              <option value="SPM">SPM</option>
+              <option value="Sijil / Kemahiran">Sijil / Kemahiran</option>
+              <option value="Diploma / Ijazah">Diploma / Ijazah</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status Pekerjaan</label>
+            <select class="air-jobstatus-field">
+              <option value="Bekerja Sepenuh Masa">Bekerja Sepenuh Masa</option>
+              <option value="Bekerja Sendiri / Kampung">Bekerja Sendiri / Kampung</option>
+              <option value="Suri Rumah">Suri Rumah</option>
+              <option value="Pelajar / Kanak-kanak">Pelajar / Kanak-kanak</option>
+              <option value="Tidak Bekerja / Penganggur">Tidak Bekerja / Penganggur</option>
+              <option value="Pesara / Warga Emas">Pesara / Warga Emas</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Pekerjaan Spesifik</label>
+            <input type="text" class="air-job-field" value="${data.kerja || ''}" placeholder="Cth: Pembantu Kedai / Pelajar">
+          </div>
+          <div class="form-group">
+            <label>Pendapatan Sebulan (RM)</label>
+            <input type="number" class="air-inc-field" value="${data.inc || 0}" step="0.01" min="0" oninput="recalculateForm()">
+          </div>
+        </div>
       `;
-      tbody.appendChild(tr);
+      container.appendChild(card);
       recalculateForm();
     }
 
-    async function loadFromSheetDB() {
+    function addHelpRow(data = {}) {
+      const container = document.getElementById('helpContainer');
+      const row = document.createElement('div');
+      row.className = 'help-row-item';
+      row.innerHTML = `
+        <input type="text" class="help-name-field" value="${data.nama || ''}" placeholder="Nama Program (Cth: STR / JKM Kanak-kanak / Baitulmal)">
+        <input type="text" class="help-agency-field" value="${data.agensi || ''}" placeholder="Agensi (Cth: JKM / MAINJ / YPJ)">
+        <select class="help-freq-field">
+          <option value="Bulanan" ${data.freq === 'Bulanan' ? 'selected' : ''}>Bulanan</option>
+          <option value="One-Off" ${data.freq === 'One-Off' ? 'selected' : ''}>One-Off</option>
+          <option value="Tahunan" ${data.freq === 'Tahunan' ? 'selected' : ''}>Tahunan</option>
+          <option value="Barangan / Bakul Makanan" ${data.freq === 'Barangan' ? 'selected' : ''}>Barangan</option>
+        </select>
+        <input type="number" class="help-val-field" value="${data.nilai || 0}" step="0.01" placeholder="Nilai (RM)" oninput="recalculateForm()">
+        <button type="button" class="btn btn-outline" style="color:var(--johor-red); padding:4px 8px;" onclick="this.closest('.help-row-item').remove(); recalculateForm();">&times;</button>
+      `;
+      container.appendChild(row);
+      recalculateForm();
+    }
+
+    async function tryFetchFirebase(path, options = {}) {
+      try {
+        let res = await fetch(`${activeFirebaseUrl}${path}`, options);
+        if (!res.ok && activeFirebaseUrl === FIREBASE_DB_URL) {
+          activeFirebaseUrl = FIREBASE_BACKUP_URL;
+          res = await fetch(`${activeFirebaseUrl}${path}`, options);
+        }
+        return res;
+      } catch (e) {
+        if (activeFirebaseUrl === FIREBASE_DB_URL) {
+          activeFirebaseUrl = FIREBASE_BACKUP_URL;
+          return await fetch(`${activeFirebaseUrl}${path}`, options);
+        }
+        throw e;
+      }
+    }
+
+    async function loadFromFirebase() {
       const syncDot = document.getElementById('syncDot');
       const syncText = document.getElementById('syncText');
 
       syncDot.className = 'sync-dot loading';
-      syncText.innerText = 'Menyegerak data Google Sheets...';
+      syncText.innerText = 'Menyegerak Firebase...';
 
       try {
-        const res = await fetch(SHEETDB_URL);
-        if (!res.ok) throw new Error('Status: ' + res.status);
+        const res = await tryFetchFirebase('/bancian.json');
         const data = await res.json();
         
-        records = (Array.isArray(data) ? data : []).map(r => {
-          let airParsed = [];
-          try {
-            airParsed = r.air_details ? JSON.parse(r.air_details) : [];
-          } catch(e) {
-            airParsed = [];
-          }
-
-          return {
-            ...r,
-            incomeKir: parseFloat(r.incomeKir) || 0,
-            air_count: parseInt(r.air_count) || airParsed.length,
-            air_list: airParsed,
-            totalInc: parseFloat(r.totalInc) || 0,
-            perCapita: parseFloat(r.perCapita) || 0,
-            exitCost: parseFloat(r.exitCost) || 0
-          };
-        }).reverse();
+        if (data && typeof data === 'object') {
+          records = Object.keys(data).map(key => ({
+            ...data[key],
+            firebaseKey: key,
+            incomeKir: parseFloat(data[key].incomeKir) || 0,
+            air_count: parseInt(data[key].air_count) || (data[key].air_list ? data[key].air_list.length : 0),
+            totalInc: parseFloat(data[key].totalInc) || 0,
+            perCapita: parseFloat(data[key].perCapita) || 0,
+            exitCost: parseFloat(data[key].exitCost) || 0
+          })).reverse();
+        } else {
+          records = [];
+        }
 
         localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
         syncDot.className = 'sync-dot online';
-        syncText.innerText = `Data Live (${records.length} rekod)`;
+        syncText.innerText = `Firebase Live (${records.length} rekod)`;
       } catch (err) {
-        console.warn("Gagal muat turun dari SheetDB, memuatkan simpanan tempatan:", err);
+        console.warn("Gagal muat turun dari Firebase:", err);
         syncDot.className = 'sync-dot';
         syncText.innerText = 'Mod Luar Talian (Guna cache peranti)';
         records = JSON.parse(localStorage.getItem('ebancian_johor_cache')) || [];
@@ -731,7 +948,7 @@
       e.preventDefault();
       const btnSubmit = document.getElementById('btnSubmit');
       btnSubmit.disabled = true;
-      btnSubmit.innerText = '⏳ Menyimpan data ke Google Sheets...';
+      btnSubmit.innerText = '⏳ Menyimpan ke Firebase...';
 
       const nama = document.getElementById('fNama').value;
       const ic = document.getElementById('fIc').value;
@@ -746,18 +963,51 @@
       const phone = document.getElementById('fPhone').value;
       const alamat = document.getElementById('fAlamat').value;
 
+      // Ambil Maklumat Penuh Semua AIR
       const airList = [];
       let airIncTotal = 0;
-      document.querySelectorAll('#airTableBody tr').forEach(r => {
-        const aName = r.querySelector('.air-name').value.trim();
-        const aRel = r.querySelector('.air-rel').value.trim();
-        const aAge = parseInt(r.querySelector('.air-age').value) || 0;
-        const aJob = r.querySelector('.air-job').value.trim();
-        const aInc = parseFloat(r.querySelector('.air-inc').value) || 0;
+      document.querySelectorAll('.air-card-box').forEach(box => {
+        const aName = box.querySelector('.air-name-field').value.trim();
+        const aIc = box.querySelector('.air-ic-field').value.trim();
+        const aAge = parseInt(box.querySelector('.air-age-field').value) || 0;
+        const aGender = box.querySelector('.air-gender-field').value;
+        const aRel = box.querySelector('.air-rel-field').value;
+        const aMarital = box.querySelector('.air-marital-field').value;
+        const aHealth = box.querySelector('.air-health-field').value;
+        const aEdu = box.querySelector('.air-edu-field').value;
+        const aJobStatus = box.querySelector('.air-jobstatus-field').value;
+        const aJob = box.querySelector('.air-job-field').value.trim();
+        const aInc = parseFloat(box.querySelector('.air-inc-field').value) || 0;
+
         if (aName) {
-          airList.push({ nama: aName, hubungan: aRel, umur: aAge, kerja: aJob, inc: aInc });
+          airList.push({
+            nama: aName, ic: aIc, umur: aAge, jantina: aGender,
+            hubungan: aRel, kahwin: aMarital, kesihatan: aHealth,
+            pendidikan: aEdu, statusKerja: aJobStatus, kerja: aJob, inc: aInc
+          });
           airIncTotal += aInc;
         }
+      });
+
+      // Ambil Maklumat Semua Bantuan
+      const helpList = [];
+      let helpTotalVal = 0;
+      document.querySelectorAll('.help-row-item').forEach(row => {
+        const hName = row.querySelector('.help-name-field').value.trim();
+        const hAgency = row.querySelector('.help-agency-field').value.trim();
+        const hFreq = row.querySelector('.help-freq-field').value;
+        const hVal = parseFloat(row.querySelector('.help-val-field').value) || 0;
+
+        if (hName || hAgency) {
+          helpList.push({ nama: hName, agensi: hAgency, kekerapan: hFreq, nilai: hVal });
+          helpTotalVal += hVal;
+        }
+      });
+
+      // Ambil Semua Kemahiran Yang Ditandakan
+      const selectedSkills = [];
+      document.querySelectorAll('input[name="skillCheck"]:checked').forEach(cb => {
+        selectedSkills.push(cb.value);
       });
 
       const totalPax = 1 + airList.length;
@@ -775,94 +1025,79 @@
         kahwin: String(kahwin),
         daerah: String(daerah),
         dun: String(dun),
-        alamat: String(alamat),
         strata: String(strata),
         kerja: String(kerja),
         incomeKir: Number(incomeKir),
         phone: String(phone),
+        alamat: String(alamat),
+        air_list: airList,
         air_count: Number(airList.length),
-        air_details: JSON.stringify(airList),
         totalInc: Number(totalInc),
-        perCapita: String(perCapita.toFixed(2)),
+        perCapita: Number(perCapita),
         statusPGK: String(statusPGK),
-        exitCost: String(exitCost.toFixed(2)),
-        hasHelp: String(document.getElementById('fHasHelp').value),
-        helpAgency: String(document.getElementById('fHelpAgency').value),
+        exitCost: Number(exitCost),
+        help_list: helpList,
+        helpTotalVal: Number(helpTotalVal),
+        skills: selectedSkills,
         kkName: String(document.getElementById('fKkName').value),
         kkDate: String(document.getElementById('fKkDate').value || new Date().toISOString().split('T')[0])
       };
 
-      let cloudSuccess = false;
-      let cloudErrorMsg = '';
-
       try {
-        const res = await fetch(SHEETDB_URL, {
+        const res = await tryFetchFirebase('/bancian.json', {
           method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ data: [newRec] })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newRec)
         });
+        
+        if (!res.ok) throw new Error('Status: ' + res.status);
+        const savedData = await res.json();
+        newRec.firebaseKey = savedData.name;
 
-        if (res.ok) {
-          cloudSuccess = true;
-        } else {
-          const res2 = await fetch(SHEETDB_URL, {
+        // Sandaran ke SheetDB jika aktif
+        if (SHEETDB_URL) {
+          fetch(SHEETDB_URL, {
             method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify([newRec])
-          });
-          if (res2.ok) {
-            cloudSuccess = true;
-          } else {
-            const errBody = await res2.text();
-            cloudErrorMsg = `HTTP ${res2.status}: ${errBody}`;
-          }
+            headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify([{
+              id: newRec.id, nama, ic, umur, jantina, kahwin, daerah, dun, strata, kerja,
+              incomeKir, alamat, air_count: airList.length, totalInc, perCapita: perCapita.toFixed(2),
+              statusPGK, exitCost: exitCost.toFixed(2), kkDate: newRec.kkDate
+            }])
+          }).catch(e => console.warn('SheetDB sync error:', e));
         }
+
+        records.unshift(newRec);
+        localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
+
+        alert('✅ Rekod ' + nama + ' berjaya disimpan ke Cloud Firebase!');
+        document.getElementById('frmBanci').reset();
+        document.getElementById('airContainer').innerHTML = '';
+        document.getElementById('helpContainer').innerHTML = '';
+        document.querySelectorAll('input[name="skillCheck"]').forEach(cb => cb.checked = false);
+        recalculateForm();
+        renderDashboard();
+        renderRecordsTable();
+        switchPage('tab-dashboard');
       } catch (err) {
-        cloudErrorMsg = err.message;
+        console.error("Firebase save error:", err);
+        alert('Ralat semasa menyimpan ke Firebase:\n' + err.message);
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.innerText = '💾 Simpan Rekod Bancian';
       }
-
-      // Simpan salinan ke rekod paparan
-      const displayRec = {
-        ...newRec,
-        air_list: airList,
-        incomeKir: Number(incomeKir),
-        totalInc: Number(totalInc),
-        perCapita: Number(perCapita),
-        exitCost: Number(exitCost)
-      };
-
-      records.unshift(displayRec);
-      localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
-
-      if (cloudSuccess) {
-        alert('✅ Rekod ' + nama + ' berjaya disimpan terus ke Google Sheets!');
-      } else {
-        alert('ℹ️ Rekod disimpan dalam sistem!\n\nNota Cloud: ' + (cloudErrorMsg || 'Sila pastikan nama lajur Baris 1 di Google Sheet sepadan.'));
-      }
-
-      document.getElementById('frmBanci').reset();
-      document.getElementById('airTableBody').innerHTML = '';
-      recalculateForm();
-      renderDashboard();
-      renderRecordsTable();
-      btnSubmit.disabled = false;
-      btnSubmit.innerText = '💾 Simpan Rekod Bancian';
-      switchPage('tab-dashboard');
     }
 
     async function deleteRecord(id) {
       if (!confirm('Adakah anda pasti mahu memadamkan rekod ini?')) return;
 
-      try {
-        await fetch(`${SHEETDB_URL}/id/${id}`, { method: 'DELETE' });
-      } catch (err) {
-        console.warn("Gagal padam di Google Sheets:", err);
+      const rec = records.find(x => x.id === id);
+      if (rec && rec.firebaseKey) {
+        try {
+          await tryFetchFirebase(`/bancian/${rec.firebaseKey}.json`, { method: 'DELETE' });
+        } catch (err) {
+          console.warn("Gagal padam di cloud:", err);
+        }
       }
 
       records = records.filter(x => x.id !== id);
@@ -872,32 +1107,60 @@
       alert('Rekod telah dipadam.');
     }
 
+    // MODAL PAPARAN PROFIL LENGKAP
     function viewRecord(id) {
       const r = records.find(x => x.id === id);
       if (!r) return;
 
       const airList = r.air_list || [];
+      const helpList = r.help_list || [];
+      const skills = r.skills || [];
       const threshold = r.strata === 'Bandar' ? 830 : 677;
-      const exitCost = parseFloat(r.exitCost) || calculateExitCost(r.strata, parseFloat(r.perCapita), (parseInt(r.air_count) || airList.length) + 1);
+      const exitCost = r.exitCost || calculateExitCost(r.strata, r.perCapita, (r.air_count || airList.length) + 1);
 
       let airRowsHtml = '';
       if (airList.length > 0) {
         airRowsHtml = airList.map((a, i) => `
           <tr>
             <td>${i + 1}</td>
-            <td><strong>${a.nama || '-'}</strong></td>
+            <td><strong>${a.nama || '-'}</strong><br><small style="color:var(--text-muted);">${a.ic || 'Tiada No. KP'}</small></td>
             <td>${a.hubungan || '-'}</td>
-            <td>${a.umur ? a.umur + ' thn' : '-'}</td>
-            <td>${a.kerja || '-'}</td>
+            <td>${a.umur ? a.umur + ' thn' : '-'} / ${a.jantina || '-'}</td>
+            <td>${a.kesihatan || 'Sihat'}</td>
+            <td>${a.pendidikan || '-'}</td>
+            <td>${a.kerja || a.statusKerja || '-'}</td>
             <td style="text-align:right;">RM ${(parseFloat(a.inc) || 0).toFixed(2)}</td>
           </tr>
         `).join('');
       } else {
-        airRowsHtml = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Tiada tanggungan AIR didaftarkan.</td></tr>`;
+        airRowsHtml = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted);">Tiada tanggungan AIR didaftarkan.</td></tr>`;
+      }
+
+      let helpRowsHtml = '';
+      if (helpList.length > 0) {
+        helpRowsHtml = helpList.map((h, i) => `
+          <tr>
+            <td>${i + 1}</td>
+            <td><strong>${h.nama || '-'}</strong></td>
+            <td>${h.agensi || '-'}</td>
+            <td>${h.kekerapan || '-'}</td>
+            <td style="text-align:right;">RM ${(parseFloat(h.nilai) || 0).toFixed(2)}</td>
+          </tr>
+        `).join('');
+      } else {
+        helpRowsHtml = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Tiada rekod program bantuan didaftarkan.</td></tr>`;
+      }
+
+      let skillsHtml = '';
+      if (skills.length > 0) {
+        skillsHtml = skills.map(s => `<span class="badge" style="background:#e0f2fe; color:#0369a1; padding:5px 10px; font-size:0.75rem;">✔ ${s}</span>`).join(' ');
+      } else {
+        skillsHtml = '<span style="color:var(--text-muted); font-size:0.8rem;">Tiada kemahiran khusus didaftarkan.</span>';
       }
 
       const modalContent = document.getElementById('modalContent');
       modalContent.innerHTML = `
+        <!-- SEKSYEN A -->
         <div>
           <h4 style="color:var(--johor-blue); margin-bottom:8px;">A. MAKLUMAT KETUA ISI RUMAH (KIR)</h4>
           <div class="detail-grid">
@@ -906,24 +1169,27 @@
             <div class="detail-item"><small>Umur / Jantina</small><strong>${r.umur || '-'} Tahun / ${r.jantina || '-'}</strong></div>
             <div class="detail-item"><small>Status Perkahwinan</small><strong>${r.kahwin || '-'}</strong></div>
             <div class="detail-item"><small>Daerah / DUN</small><strong>${r.daerah} (${r.dun || '-'})</strong></div>
-            <div class="detail-item"><small>Kawasan Strata</small><strong>${r.strata} (PGK: RM ${threshold})</strong></div>
+            <div class="detail-item"><small>Kawasan Strata</small><strong>${r.strata} (Ambang PGK: RM ${threshold})</strong></div>
             <div class="detail-item"><small>Pekerjaan</small><strong>${r.kerja || '-'}</strong></div>
-            <div class="detail-item"><small>Pendapatan Bulanan KIR</small><strong>RM ${(parseFloat(r.incomeKir) || 0).toFixed(2)}</strong></div>
+            <div class="detail-item"><small>Pendapatan Sebulan KIR</small><strong>RM ${(r.incomeKir || 0).toFixed(2)}</strong></div>
             <div class="detail-item"><small>No. Telefon</small><strong>${r.phone || '-'}</strong></div>
             <div class="detail-item" style="grid-column:1 / -1;"><small>Alamat Kediaman Penuh</small><strong>${r.alamat || 'Tiada rekod alamat'}</strong></div>
           </div>
         </div>
 
+        <!-- SEKSYEN B -->
         <div>
-          <h4 style="color:var(--johor-blue); margin-bottom:8px;">B. MAKLUMAT AHLI ISI RUMAH (AIR) - ${airList.length} Orang</h4>
+          <h4 style="color:var(--johor-blue); margin-bottom:8px;">B. MAKLUMAT LENGKAP SEMUA AIR (${airList.length} Orang)</h4>
           <div class="table-container">
             <table>
               <thead>
                 <tr>
-                  <th style="width:40px;">#</th>
-                  <th>Nama Ahli</th>
+                  <th style="width:30px;">#</th>
+                  <th>Nama & No. KP</th>
                   <th>Hubungan</th>
-                  <th>Umur</th>
+                  <th>Umur/Jantina</th>
+                  <th>Kesihatan/OKU</th>
+                  <th>Pendidikan</th>
                   <th>Pekerjaan</th>
                   <th style="text-align:right;">Pendapatan</th>
                 </tr>
@@ -933,14 +1199,15 @@
           </div>
         </div>
 
+        <!-- KAD KOS LEPAS MISKIN -->
         <div class="cost-card">
           <div>
-            <div style="font-size:0.75rem; color:#9a3412; font-weight:700; text-transform:uppercase;">Status & Analisis Pendapatan</div>
+            <div style="font-size:0.75rem; color:#9a3412; font-weight:700; text-transform:uppercase;">Status & Analisis Pendapatan Keluarga</div>
             <div style="font-size:1.15rem; font-weight:800; color:#7c2d12; margin-top:2px;">
-              ${r.statusPGK} &bull; Per Kapita: RM ${(parseFloat(r.perCapita) || 0).toFixed(2)}
+              ${r.statusPGK} &bull; Per Kapita: RM ${(r.perCapita || 0).toFixed(2)}
             </div>
             <div style="font-size:0.78rem; color:#9a3412; margin-top:4px;">
-              Jumlah Pendapatan IR: <strong>RM ${(parseFloat(r.totalInc) || 0).toFixed(2)}</strong> | Saiz Keluarga: <strong>${(parseInt(r.air_count) || airList.length) + 1} Orang</strong>
+              Jumlah Pendapatan IR: <strong>RM ${(r.totalInc || 0).toFixed(2)}</strong> | Saiz Keluarga: <strong>${(r.air_count || airList.length) + 1} Orang</strong>
             </div>
           </div>
           <div style="text-align:right;">
@@ -951,12 +1218,38 @@
           </div>
         </div>
 
+        <!-- SEKSYEN C -->
         <div>
-          <h4 style="color:var(--johor-blue); margin-bottom:8px;">C. MAKLUMAT BANTUAN & PENGESAHAN</h4>
+          <h4 style="color:var(--johor-blue); margin-bottom:8px;">C. PROGRAM BANTUAN YANG DITERIMA (${helpList.length} Bantuan)</h4>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:30px;">#</th>
+                  <th>Nama Program Bantuan</th>
+                  <th>Agensi Pemberi</th>
+                  <th>Kekerapan / Bentuk</th>
+                  <th style="text-align:right;">Nilai Bantuan</th>
+                </tr>
+              </thead>
+              <tbody>${helpRowsHtml}</tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SEKSYEN D -->
+        <div>
+          <h4 style="color:var(--johor-blue); margin-bottom:8px;">D. KEMAHIRAN YANG DIMILIKI</h4>
+          <div style="display:flex; flex-wrap:wrap; gap:8px; padding:12px; background:#f8fafc; border-radius:8px; border:1px solid var(--border-color);">
+            ${skillsHtml}
+          </div>
+        </div>
+
+        <!-- SEKSYEN F -->
+        <div>
+          <h4 style="color:var(--johor-blue); margin-bottom:8px;">F. PENGESAHAN KETUA KAMPUNG / PENGHULU</h4>
           <div class="detail-grid">
-            <div class="detail-item"><small>Status Bantuan</small><strong>${r.hasHelp || 'Tidak'}</strong></div>
-            <div class="detail-item"><small>Agensi Pemberi</small><strong>${r.helpAgency || '-'}</strong></div>
-            <div class="detail-item"><small>Ketua Kampung Pengesah</small><strong>${r.kkName || '-'}</strong></div>
+            <div class="detail-item"><small>Nama Pegawai Pengesah</small><strong>${r.kkName || '-'}</strong></div>
             <div class="detail-item"><small>Tarikh Bancian</small><strong>${r.kkDate || '-'}</strong></div>
           </div>
         </div>
@@ -1026,7 +1319,7 @@
         const airCount = parseInt(r.air_count) || (r.air_list ? r.air_list.length : 0);
         const totalIncome = parseFloat(r.totalInc) || 0;
         const perCapita = parseFloat(r.perCapita) || 0;
-        const exitCost = parseFloat(r.exitCost) || calculateExitCost(r.strata, perCapita, airCount + 1);
+        const exitCost = r.exitCost || calculateExitCost(r.strata, perCapita, airCount + 1);
 
         tbody.innerHTML += `
           <tr>
@@ -1068,11 +1361,11 @@
         "Pendapatan KIR (RM)": r.incomeKir,
         "Bil Tanggungan (AIR)": r.air_count,
         "Jumlah Pendapatan (RM)": r.totalInc,
-        "Per Kapita (RM)": (parseFloat(r.perCapita) || 0).toFixed(2),
+        "Per Kapita (RM)": (r.perCapita || 0).toFixed(2),
         "Status PGK": r.statusPGK,
-        "Anggaran Kos Lepas Miskin (RM/Bln)": (parseFloat(r.exitCost) || 0).toFixed(2),
-        "Menerima Bantuan": r.hasHelp,
-        "Agensi Bantuan": r.helpAgency,
+        "Anggaran Kos Lepas Miskin (RM/Bln)": (r.exitCost || 0).toFixed(2),
+        "Jumlah Bantuan (RM)": r.helpTotalVal || 0,
+        "Kemahiran Dimiliki": (r.skills || []).join(', '),
         "Tarikh Bancian": r.kkDate
       }));
       const ws = XLSX.utils.json_to_sheet(rows);
@@ -1081,8 +1374,9 @@
       XLSX.writeFile(wb, "Data_eBancian_Johor.xlsx");
     }
 
+    // Inisialisasi awal
     recalculateForm();
-    loadFromSheetDB();
+    loadFromFirebase();
   </script>
 </body>
 </html>
