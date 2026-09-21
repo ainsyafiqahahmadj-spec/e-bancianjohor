@@ -101,6 +101,8 @@
     .btn-johor { background: var(--johor-blue); color: #fff; }
     .btn-johor:hover { background: #16365c; }
     .btn-red { background: var(--johor-red); color: #fff; }
+    .btn-green { background: #16a34a; color: #fff; }
+    .btn-green:hover { background: #15803d; }
     .btn-outline { background: #fff; border: 1px solid var(--border-color); color: var(--text-main); }
     .btn-outline:hover { background: #f8fafc; }
 
@@ -342,6 +344,20 @@
       border-top: 5px solid var(--johor-red);
     }
 
+    .upload-zone {
+      border: 2px dashed #94a3b8;
+      border-radius: 10px;
+      padding: 30px 20px;
+      text-align: center;
+      background: #f8fafc;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .upload-zone:hover {
+      border-color: var(--johor-blue);
+      background: #f0f7ff;
+    }
+
     footer.site-footer { background: #fff; border-top: 1px solid var(--border-color); padding: 18px; text-align: center; font-size: 0.76rem; color: var(--text-muted); margin-top: auto; }
 
     @media (max-width: 768px) {
@@ -444,13 +460,14 @@
       <section class="section-card">
         <div class="section-title">
           <span>📍 Taburan Kesejahteraan & Status PGK 10 Daerah Johor</span>
-          <div style="display:flex; align-items:center; gap:10px;">
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <div class="sync-status" id="cloudStatus">
               <span class="sync-dot loading" id="syncDot"></span>
               <span id="syncText">Menyegerak Data...</span>
             </div>
             <button class="btn btn-outline" onclick="loadFromFirebase()">🔄 Muat Semula</button>
-            <button class="btn btn-outline" id="btnExportExcel" onclick="exportExcel()">⬇ Eksport Excel (KIR & AIR)</button>
+            <button class="btn btn-green" onclick="openImportModal()">⬆ Import Excel</button>
+            <button class="btn btn-outline" id="btnExportExcel" onclick="exportExcel()">⬇ Eksport Excel</button>
           </div>
         </div>
         <div class="table-container">
@@ -704,6 +721,41 @@
     </div>
   </div>
 
+  <!-- MODAL IMPORT EXCEL -->
+  <div class="modal-backdrop" id="importModal">
+    <div class="modal-window" style="max-width:550px;">
+      <div class="modal-header">
+        <h3>⬆ Import Data Excel (.xlsx / .xls)</h3>
+        <button onclick="closeImportModal()" style="background:none; border:none; color:#fff; font-size:1.4rem; cursor:pointer;">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.8rem; color:var(--text-muted); line-height:1.5;">
+          Muat naik fail Excel untuk mendaftarkan senarai isi rumah secara kelompok (*bulk*). Pendapatan per kapita dan status PGK akan dihitung secara automatik.
+        </p>
+
+        <div style="display:flex; justify-content:flex-end;">
+          <button class="btn btn-outline" style="font-size:0.75rem;" onclick="downloadTemplateExcel()">📥 Muat Turun Templat Excel</button>
+        </div>
+
+        <div class="upload-zone" onclick="document.getElementById('excelFileInput').click()">
+          <div style="font-size:2rem; margin-bottom:6px;">📁</div>
+          <div style="font-size:0.85rem; font-weight:700; color:var(--johor-blue);">Klik untuk pilih fail Excel</div>
+          <div style="font-size:0.72rem; color:var(--text-muted); margin-top:4px;">Format disokong: .xlsx, .xls, .csv</div>
+        </div>
+        <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" style="display:none;" onchange="handleExcelFile(event)">
+
+        <div id="importPreview" style="display:none; background:#f8fafc; padding:12px; border-radius:8px; border:1px solid var(--border-color); font-size:0.8rem;">
+          <div>Nama Fail: <strong id="importFileName">-</strong></div>
+          <div>Jumlah Rekod Dijumpai: <strong id="importRecordCount" style="color:var(--success);">0</strong></div>
+        </div>
+      </div>
+      <div style="padding:14px 20px; background:#f8fafc; border-top:1px solid var(--border-color); display:flex; justify-content:flex-end; gap:10px;">
+        <button class="btn btn-outline" onclick="closeImportModal()">Batal</button>
+        <button class="btn btn-green" id="btnConfirmImport" onclick="processImportData()" disabled>Sahkan & Muat Naik ke Sistem</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL PENETAPAN PERANAN / LOG MASUK -->
   <div class="modal-backdrop" id="loginModal">
     <div class="login-box">
@@ -742,12 +794,10 @@
   </footer>
 
   <script>
-    // URL Pangkalan Data
     const FIREBASE_DB_URL = "https://e-bancian-johor-default-rtdb.firebaseio.com";
     const FIREBASE_BACKUP_URL = "https://e-bancian-johor-default-rtdb.asia-southeast1.firebasedatabase.app";
     const SHEETDB_URL = "https://sheetdb.io/api/v1/k4vnnko52f2rg";
 
-    // KATA LALUAN ADMIN DEFAULT
     const ADMIN_PASSWORD = "adminjohor123";
 
     const DISTRICTS_ORDER = [
@@ -758,6 +808,7 @@
     let records = [];
     let activeFirebaseUrl = FIREBASE_DB_URL;
     let currentRole = localStorage.getItem('ebancian_user_role') || 'staff';
+    let parsedImportRows = [];
 
     function initRoleUI() {
       const badge = document.getElementById('userRoleBadge');
@@ -1451,7 +1502,6 @@
         return;
       }
 
-      // LEMBARAN 1: MAKLUMAT PENUH KIR & KELUARGA
       const rowsKIR = records.map(r => {
         const airList = r.air_list || [];
         const helpList = r.help_list || [];
@@ -1485,7 +1535,6 @@
         };
       });
 
-      // LEMBARAN 2: MAKLUMAT PENUH SETIAP AIR
       const rowsAIR = [];
       records.forEach(r => {
         const airList = r.air_list || [];
@@ -1511,14 +1560,10 @@
         });
       });
 
-      // BINA WORKBOOK EXCEL
       const wb = XLSX.utils.book_new();
-
-      // Cipta sheet KIR
       const wsKIR = XLSX.utils.json_to_sheet(rowsKIR);
       XLSX.utils.book_append_sheet(wb, wsKIR, "Ringkasan_KIR");
 
-      // Cipta sheet AIR (jika ada tanggungan)
       if (rowsAIR.length > 0) {
         const wsAIR = XLSX.utils.json_to_sheet(rowsAIR);
         XLSX.utils.book_append_sheet(wb, wsAIR, "Maklumat_Penuh_AIR");
@@ -1527,9 +1572,195 @@
         XLSX.utils.book_append_sheet(wb, wsEmpty, "Maklumat_Penuh_AIR");
       }
 
-      // Muat turun fail Excel
       const fileName = `eBancian_Johor_Lengkap_${new Date().toISOString().split('T')[0]}.xlsx`;
       XLSX.writeFile(wb, fileName);
+    }
+
+    // =========================================================================
+    // FUNGSI IMPORT EXCEL & MUAT TURUN TEMPLAT
+    // =========================================================================
+    function openImportModal() {
+      parsedImportRows = [];
+      document.getElementById('excelFileInput').value = '';
+      document.getElementById('importPreview').style.display = 'none';
+      document.getElementById('btnConfirmImport').disabled = true;
+      document.getElementById('importModal').classList.add('active');
+    }
+
+    function closeImportModal() {
+      document.getElementById('importModal').classList.remove('active');
+    }
+
+    function downloadTemplateExcel() {
+      const templateData = [
+        {
+          "Nama KIR": "Ahmad Bin Ismail",
+          "No KP": "750812015643",
+          "Umur": 51,
+          "Jantina": "Lelaki",
+          "Status Kahwin": "Berkahwin",
+          "Daerah": "Johor Bahru",
+          "Mukim DUN": "Mukim Plentong",
+          "Alamat Penuh": "No 12, Jalan Hang Tuah, Kampung Maju Jaya, 81100 Johor Bahru",
+          "No Telefon": "0123456789",
+          "Strata": "Bandar",
+          "Pekerjaan": "Pemandu Lori",
+          "Pendapatan KIR (RM)": 1400,
+          "Bilangan AIR": 3,
+          "Jumlah Pendapatan AIR (RM)": 300,
+          "Kemahiran Dimiliki": "Pertukangan Kayu & Perabot, Pemanduan & Pengangkutan",
+          "Nama Pengesah": "Daud Bin Omar",
+          "Tarikh Bancian": "2026-09-01"
+        },
+        {
+          "Nama KIR": "Siti Aminah Binti Yusof",
+          "No KP": "830504016122",
+          "Umur": 43,
+          "Jantina": "Perempuan",
+          "Status Kahwin": "Janda",
+          "Daerah": "Kota Tinggi",
+          "Mukim DUN": "Mukim Sedili",
+          "Alamat Penuh": "Batu 4, Kampung Teluk Jerit, 81900 Kota Tinggi",
+          "No Telefon": "0198765432",
+          "Strata": "Luar Bandar",
+          "Pekerjaan": "Penjual Kuih",
+          "Pendapatan KIR (RM)": 800,
+          "Bilangan AIR": 2,
+          "Jumlah Pendapatan AIR (RM)": 0,
+          "Kemahiran Dimiliki": "Memasak / Katering Makanan, Bakeri & Pembuatan Pastri",
+          "Nama Pengesah": "Kassim Bin Jamil",
+          "Tarikh Bancian": "2026-09-05"
+        }
+      ];
+
+      const ws = XLSX.utils.json_to_sheet(templateData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Templat_Bancian");
+      XLSX.writeFile(wb, "Templat_Import_eBancian_Johor.xlsx");
+    }
+
+    function handleExcelFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const data = new Uint8Array(evt.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const jsonRows = XLSX.utils.sheet_to_json(worksheet);
+
+          if (!jsonRows.length) {
+            alert('Fail Excel kosong atau tiada format data yang sah!');
+            return;
+          }
+
+          parsedImportRows = jsonRows;
+          document.getElementById('importFileName').innerText = file.name;
+          document.getElementById('importRecordCount').innerText = jsonRows.length + ' Rekod';
+          document.getElementById('importPreview').style.display = 'block';
+          document.getElementById('btnConfirmImport').disabled = false;
+        } catch (err) {
+          console.error(err);
+          alert('Ralat semasa membaca fail Excel. Pastikan format .xlsx/.xls sah.');
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    async function processImportData() {
+      if (!parsedImportRows.length) return;
+
+      const btnConfirm = document.getElementById('btnConfirmImport');
+      btnConfirm.disabled = true;
+      btnConfirm.innerText = '⏳ Sedang Memuat Naik...';
+
+      let successCount = 0;
+      const newItems = [];
+
+      for (let i = 0; i < parsedImportRows.length; i++) {
+        const row = parsedImportRows[i];
+
+        const nama = row["Nama KIR"] || row["Nama"] || row["nama"] || `KIR-${Date.now()}-${i}`;
+        const ic = String(row["No KP"] || row["No. Kad Pengenalan"] || row["ic"] || '-');
+        const umur = parseInt(row["Umur"] || row["umur"]) || 0;
+        const jantina = row["Jantina"] || row["jantina"] || 'Lelaki';
+        const kahwin = row["Status Kahwin"] || row["Status Perkahwinan"] || row["kahwin"] || 'Berkahwin';
+        const daerah = row["Daerah"] || row["daerah"] || 'Johor Bahru';
+        const dun = row["Mukim DUN"] || row["DUN"] || row["dun"] || '-';
+        const alamat = row["Alamat Penuh"] || row["Alamat"] || row["alamat"] || '-';
+        const phone = String(row["No Telefon"] || row["phone"] || '-');
+        const strata = (row["Strata"] || row["strata"] || 'Bandar').toLowerCase().includes('luar') ? 'Luar Bandar' : 'Bandar';
+        const kerja = row["Pekerjaan"] || row["kerja"] || '-';
+        const incomeKir = parseFloat(row["Pendapatan KIR (RM)"] || row["incomeKir"]) || 0;
+
+        const airCount = parseInt(row["Bilangan AIR"] || row["air_count"]) || 0;
+        const airIncTotal = parseFloat(row["Jumlah Pendapatan AIR (RM)"] || row["air_income"]) || 0;
+
+        const totalPax = 1 + airCount;
+        const totalInc = incomeKir + airIncTotal;
+        const perCapita = totalInc / totalPax;
+        const statusPGK = checkPGK(strata, perCapita);
+        const exitCost = calculateExitCost(strata, perCapita, totalPax);
+
+        const skillsRaw = row["Kemahiran Dimiliki"] || row["skills"] || '';
+        const skillsList = typeof skillsRaw === 'string' ? skillsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+        const recObj = {
+          id: 'rec-' + Date.now() + '-' + i,
+          nama: String(nama),
+          ic: String(ic),
+          umur: Number(umur),
+          jantina: String(jantina),
+          kahwin: String(kahwin),
+          daerah: String(daerah),
+          dun: String(dun),
+          strata: String(strata),
+          kerja: String(kerja),
+          incomeKir: Number(incomeKir),
+          phone: String(phone),
+          alamat: String(alamat),
+          air_list: [],
+          air_count: Number(airCount),
+          totalInc: Number(totalInc),
+          perCapita: Number(perCapita),
+          statusPGK: String(statusPGK),
+          exitCost: Number(exitCost),
+          help_list: [],
+          helpTotalVal: 0,
+          skills: skillsList,
+          kkName: String(row["Nama Pengesah"] || row["kkName"] || '-'),
+          kkDate: String(row["Tarikh Bancian"] || row["kkDate"] || new Date().toISOString().split('T')[0]),
+          recordedBy: `Import (${currentRole})`
+        };
+
+        try {
+          const res = await tryFetchFirebase('/bancian.json', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(recObj)
+          });
+          if (res.ok) {
+            const resData = await res.json();
+            recObj.firebaseKey = resData.name;
+          }
+        } catch (err) {
+          console.warn('Gagal hantar satu rekod ke Firebase:', err);
+        }
+
+        newItems.push(recObj);
+        successCount++;
+      }
+
+      records = [...newItems.reverse(), ...records];
+      localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
+
+      alert(`✅ Berjaya mengimport ${successCount} rekod daripada fail Excel!`);
+      closeImportModal();
+      renderDashboard();
+      renderRecordsTable();
     }
 
     // Inisialisasi awal
