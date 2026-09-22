@@ -23,7 +23,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
     body { background: var(--bg-slate); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
 
-    /* HEADER & TAB */
     header {
       background: linear-gradient(135deg, var(--johor-blue) 0%, #051424 100%);
       color: #fff;
@@ -70,20 +69,6 @@
       box-shadow: 0 2px 6px rgba(197, 31, 36, 0.35);
     }
 
-    .role-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .role-admin { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
-    .role-staff { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
-
     main.container { flex: 1; padding: 24px; max-width: 1400px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 24px; }
 
     .btn {
@@ -108,7 +93,6 @@
     .btn-outline { background: #fff; border: 1px solid var(--border-color); color: var(--text-main); }
     .btn-outline:hover { background: #f8fafc; }
 
-    /* KAD KPI */
     .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
     .kpi-card-box {
       background: #fff;
@@ -144,7 +128,6 @@
     .kpi-number.green { color: #15803d; }
     .kpi-desc { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
 
-    /* SEKSYEN KAD & JADUAL */
     .section-card {
       background: #fff;
       border: 1px solid var(--border-color);
@@ -206,7 +189,6 @@
     .tab-content { display: none; }
     .tab-content.active { display: flex; flex-direction: column; gap: 24px; }
 
-    /* BORANG */
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
     .form-group { display: flex; flex-direction: column; gap: 4px; }
     .form-group.col-span-2 { grid-column: span 2; }
@@ -242,28 +224,35 @@
       border: 1px solid var(--border-color);
     }
 
-    .skills-grid-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .skill-card-label {
+    /* TAG CONTAINER UNTUK KEMAHIRAN */
+    .skill-tag-container {
       display: flex;
-      align-items: center;
-      gap: 10px;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+      min-height: 36px;
+      padding: 6px;
       background: #ffffff;
-      border: 1px solid #d1d5db;
-      padding: 11px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: #1e293b;
-      transition: all 0.2s ease;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
     }
-    .skill-card-label:hover { background: #f0fdf4; border-color: #86efac; }
-    .skill-card-label input[type="checkbox"] { width: 17px; height: 17px; cursor: pointer; accent-color: var(--johor-red); }
+    .skill-chip {
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 4px 10px;
+      border-radius: 16px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .skill-chip span.remove-btn {
+      cursor: pointer;
+      color: #0284c7;
+      font-weight: 900;
+    }
+    .skill-chip span.remove-btn:hover { color: var(--johor-red); }
 
     .calc-banner {
       background: #f0fdf4;
@@ -349,17 +338,6 @@
       gap: 10px;
     }
 
-    .login-box {
-      background: #fff;
-      border-radius: var(--radius);
-      padding: 30px;
-      width: 100%;
-      max-width: 440px;
-      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
-      text-align: center;
-      border-top: 5px solid var(--johor-red);
-    }
-
     .upload-zone {
       border: 2px dashed #94a3b8;
       border-radius: 10px;
@@ -369,10 +347,17 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-    .upload-zone:hover {
-      border-color: var(--johor-blue);
-      background: #f0f7ff;
+    .upload-zone:hover { border-color: var(--johor-blue); background: #f0f7ff; }
+
+    .image-preview-wrapper {
+      margin-top: 10px;
+      max-width: 260px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      display: none;
     }
+    .image-preview-wrapper img { width: 100%; height: auto; display: block; }
 
     footer.site-footer { background: #fff; border-top: 1px solid var(--border-color); padding: 18px; text-align: center; font-size: 0.76rem; color: var(--text-muted); margin-top: auto; }
 
@@ -415,17 +400,13 @@
       </div>
     </div>
 
-    <!-- NAVIGASI & STATUS PERANAN -->
+    <!-- NAVIGASI -->
     <div class="nav-wrap">
       <div class="nav-tabs">
         <button class="nav-tab-btn active" id="btnTabDash" onclick="switchPage('tab-dashboard')">📊 Dashboard Utama</button>
         <button class="nav-tab-btn" id="btnTabForm" onclick="switchPage('tab-borang')">📝 Borang Bancian</button>
       </div>
-      
-      <div style="display:flex; align-items:center; gap:8px;">
-        <span id="userRoleBadge" class="role-badge role-admin">Admin</span>
-        <button class="btn btn-outline" style="padding:5px 10px; font-size:0.75rem;" onclick="openLoginModal()">Tukar Akses</button>
-      </div>
+      <span class="role-badge role-staff" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;">Akses Sistem Bersama</span>
     </div>
   </header>
 
@@ -545,7 +526,7 @@
         </div>
 
         <div id="editModeNotice" class="edit-banner-info">
-          <span>⚠️ Mod Kemas Kini Aktif: Anda sedang menyunting rekod pendaftaran sedia ada sebagai Pentadbir.</span>
+          <span>⚠️ Mod Kemas Kini Aktif: Anda sedang menyunting rekod pendaftaran sedia ada.</span>
           <button type="button" class="btn btn-outline" style="padding:2px 8px; font-size:0.75rem;" onclick="cancelEditMode()">Batal</button>
         </div>
 
@@ -679,39 +660,69 @@
             <span id="liveTotalHelp" style="font-size:1.1rem; font-weight:800; color:#a16207;">RM 0.00</span>
           </div>
 
-          <!-- BAHAGIAN D: KEMAHIRAN, KECENDERUNGAN & CADANGAN BANTUAN -->
-          <div style="margin: 20px 0;">
-            <h4 style="color:var(--johor-blue); font-size:0.95rem; font-weight:800; margin-bottom:4px;">D. KEMAHIRAN YANG DIMILIKI</h4>
-            <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px;">Pilih kemahiran yang dimiliki oleh KIR atau AIR untuk tujuan pemadanan program peningkatan pendapatan:</p>
+          <!-- BAHAGIAN D: KEMAHIRAN (ASING KIR & AIR), KECENDERUNGAN & CADANGAN BANTUAN -->
+          <div style="margin: 20px 0; background:#f8fafc; padding:18px; border-radius:10px; border:1px solid var(--border-color);">
+            <h4 style="color:var(--johor-blue); font-size:0.95rem; font-weight:800; margin-bottom:4px;">D. KEMAHIRAN, KECENDERUNGAN & INTERVENSI</h4>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:14px;">Pilih kemahiran daripada menu pilihan dropdown atau isi kecenderungan & cadangan bantuan.</p>
             
-            <div class="skills-grid-container">
-              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Memasak / Katering Makanan"> Memasak / Katering Makanan</label>
-              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Menjahit / Mengubah Pakaian"> Menjahit / Mengubah Pakaian</label>
-              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Bakeri & Pembuatan Pastri"> Bakeri & Pembuatan Pastri</label>
-              
-              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Pertukangan Kayu & Perabot"> Pertukangan Kayu & Perabot</label>
-              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Kerja Pembinaan / Ubah Suai Rumah"> Kerja Pembinaan / Ubah Suai Rumah</label>
-              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Pendawaian Elektrik Domestik"> Pendawaian Elektrik Domestik</label>
-              
-              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Pemasangan & Servis Paip"> Pemasangan & Servis Paip</label>
-              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Mekanik Motosikal / Kenderaan"> Mekanik Motosikal / Kenderaan</label>
-              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Pertanian / Tanaman Kontan"> Pertanian / Tanaman Kontan</label>
-              
-              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Penternakan Haiwan"> Penternakan Haiwan</label>
-              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Perikanan / Akuakultur"> Perikanan / Akuakultur</label>
-              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Perniagaan Runcit / Gerai"> Perniagaan Runcit / Gerai</label>
-              
-              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Dandanan Rambut / Kecantikan"> Dandanan Rambut / Kecantikan</label>
-              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Asuhan Kanak-kanak / Pengasuh"> Asuhan Kanak-kanak / Pengasuh</label>
-              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Pembaikan Barangan Elektrik"> Pembaikan Barangan Elektrik</label>
-              
-              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Kemahiran Komputer & Media Sosial"> Kemahiran Komputer & Media Sosial</label>
-              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Kraftangan & Anyaman"> Kraftangan & Anyaman</label>
-              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Pemanduan & Pengangkutan"> Pemanduan & Pengangkutan</label>
+            <div class="form-grid">
+              <!-- DROPDOWN KEMAHIRAN KIR -->
+              <div class="form-group">
+                <label>Pilih Kemahiran Dimiliki (KIR)</label>
+                <select id="ddSkillKir" onchange="addSkillFromDropdown('kir', this.value); this.value='';">
+                  <option value="">-- Pilih Kemahiran KIR --</option>
+                  <option value="Memasak / Katering Makanan">Memasak / Katering Makanan</option>
+                  <option value="Menjahit / Mengubah Pakaian">Menjahit / Mengubah Pakaian</option>
+                  <option value="Bakeri & Pembuatan Pastri">Bakeri & Pembuatan Pastri</option>
+                  <option value="Pertukangan Kayu & Perabot">Pertukangan Kayu & Perabot</option>
+                  <option value="Kerja Pembinaan / Ubah Suai Rumah">Kerja Pembinaan / Ubah Suai Rumah</option>
+                  <option value="Pendawaian Elektrik Domestik">Pendawaian Elektrik Domestik</option>
+                  <option value="Pemasangan & Servis Paip">Pemasangan & Servis Paip</option>
+                  <option value="Mekanik Motosikal / Kenderaan">Mekanik Motosikal / Kenderaan</option>
+                  <option value="Pertanian / Tanaman Kontan">Pertanian / Tanaman Kontan</option>
+                  <option value="Penternakan Haiwan">Penternakan Haiwan</option>
+                  <option value="Perikanan / Akuakultur">Perikanan / Akuakultur</option>
+                  <option value="Perniagaan Runcit / Gerai">Perniagaan Runcit / Gerai</option>
+                  <option value="Dandanan Rambut / Kecantikan">Dandanan Rambut / Kecantikan</option>
+                  <option value="Asuhan Kanak-kanak / Pengasuh">Asuhan Kanak-kanak / Pengasuh</option>
+                  <option value="Pembaikan Barangan Elektrik">Pembaikan Barangan Elektrik</option>
+                  <option value="Kemahiran Komputer & Media Sosial">Kemahiran Komputer & Media Sosial</option>
+                  <option value="Kraftangan & Anyaman">Kraftangan & Anyaman</option>
+                  <option value="Pemanduan & Pengangkutan">Pemanduan & Pengangkutan</option>
+                </select>
+                <div id="kirSkillsContainer" class="skill-tag-container"></div>
+              </div>
+
+              <!-- DROPDOWN KEMAHIRAN AIR -->
+              <div class="form-group">
+                <label>Pilih Kemahiran Dimiliki (Ahli Isi Rumah / AIR)</label>
+                <select id="ddSkillAir" onchange="addSkillFromDropdown('air', this.value); this.value='';">
+                  <option value="">-- Pilih Kemahiran AIR --</option>
+                  <option value="Memasak / Katering Makanan">Memasak / Katering Makanan</option>
+                  <option value="Menjahit / Mengubah Pakaian">Menjahit / Mengubah Pakaian</option>
+                  <option value="Bakeri & Pembuatan Pastri">Bakeri & Pembuatan Pastri</option>
+                  <option value="Pertukangan Kayu & Perabot">Pertukangan Kayu & Perabot</option>
+                  <option value="Kerja Pembinaan / Ubah Suai Rumah">Kerja Pembinaan / Ubah Suai Rumah</option>
+                  <option value="Pendawaian Elektrik Domestik">Pendawaian Elektrik Domestik</option>
+                  <option value="Pemasangan & Servis Paip">Pemasangan & Servis Paip</option>
+                  <option value="Mekanik Motosikal / Kenderaan">Mekanik Motosikal / Kenderaan</option>
+                  <option value="Pertanian / Tanaman Kontan">Pertanian / Tanaman Kontan</option>
+                  <option value="Penternakan Haiwan">Penternakan Haiwan</option>
+                  <option value="Perikanan / Akuakultur">Perikanan / Akuakultur</option>
+                  <option value="Perniagaan Runcit / Gerai">Perniagaan Runcit / Gerai</option>
+                  <option value="Dandanan Rambut / Kecantikan">Dandanan Rambut / Kecantikan</option>
+                  <option value="Asuhan Kanak-kanak / Pengasuh">Asuhan Kanak-kanak / Pengasuh</option>
+                  <option value="Pembaikan Barangan Elektrik">Pembaikan Barangan Elektrik</option>
+                  <option value="Kemahiran Komputer & Media Sosial">Kemahiran Komputer & Media Sosial</option>
+                  <option value="Kraftangan & Anyaman">Kraftangan & Anyaman</option>
+                  <option value="Pemanduan & Pengangkutan">Pemanduan & Pengangkutan</option>
+                </select>
+                <div id="airSkillsContainer" class="skill-tag-container"></div>
+              </div>
             </div>
 
-            <!-- RUANGAN KECENDERUNGAN & CADANGAN BANTUAN YANG DIISI SENDIRI -->
-            <div style="margin-top: 18px; display:flex; flex-direction:column; gap:14px; background:#f8fafc; padding:16px; border-radius:10px; border:1px solid var(--border-color);">
+            <!-- RUANGAN KECENDERUNGAN & CADANGAN BANTUAN -->
+            <div style="margin-top: 14px; display:flex; flex-direction:column; gap:14px;">
               <div class="form-group">
                 <label>Ruangan Kecenderungan Minat (Diisi Sendiri)</label>
                 <textarea id="fKecenderungan" rows="3" placeholder="Nyatakan kecenderungan minat atau kemahiran yang dimiliki oleh keluarga ini..."></textarea>
@@ -724,7 +735,7 @@
             </div>
           </div>
 
-          <!-- BAHAGIAN F: PENGESAHAN KETUA KAMPUNG / PENGHULU / AHLI MAJLIS -->
+          <!-- BAHAGIAN F: PENGESAHAN KETUA KAMPUNG / PENGHULU / AHLI MAJLIS & BUKTI -->
           <h4 style="color:var(--johor-blue); font-size:0.9rem; margin:24px 0 10px;">F. PENGESAHAN KETUA KAMPUNG / PENGHULU / AHLI MAJLIS</h4>
           <div class="form-grid">
             <div class="form-group">
@@ -738,6 +749,15 @@
             <div class="form-group col-span-2">
               <label>Ulasan</label>
               <textarea id="fKkUlasan" rows="3" placeholder="Masukkan ulasan atau sokongan daripada Ketua Kampung / Penghulu / Ahli Majlis..."></textarea>
+            </div>
+            
+            <!-- MUAT NAIK GAMBAR BUKTI PENGESAHAN -->
+            <div class="form-group col-span-2">
+              <label>Muat Naik Gambar Bukti Pengesahan (Surat Sokongan / Tandatangan / Foto Lawatan)</label>
+              <input type="file" id="fBuktiFile" accept="image/*" onchange="handleProofImage(event)">
+              <div id="proofPreviewWrapper" class="image-preview-wrapper">
+                <img id="proofPreviewImg" src="" alt="Bukti Pengesahan">
+              </div>
             </div>
           </div>
 
@@ -801,50 +821,14 @@
     </div>
   </div>
 
-  <!-- MODAL PENETAPAN PERANAN / LOG MASUK -->
-  <div class="modal-backdrop" id="loginModal">
-    <div class="login-box">
-      <h3 style="color:var(--johor-blue); margin-bottom:6px;">Pilih Akses Pengguna</h3>
-      <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:20px;">Sila pilih peranan anda untuk memulakan sistem.</p>
-      
-      <div style="display:flex; flex-direction:column; gap:12px; text-align:left;">
-        <div style="border:1px solid var(--border-color); padding:12px; border-radius:8px;">
-          <label style="font-weight:800; font-size:0.85rem; display:flex; align-items:center; gap:6px;">
-            <input type="radio" name="accessChoice" value="staff" checked onchange="togglePasswordField()"> Pegawai Pejabat Daerah
-          </label>
-          <p style="font-size:0.72rem; color:var(--text-muted); margin-top:4px;">Akses untuk memasukkan rekod bancian, mengira PGK & melihat senarai profil.</p>
-        </div>
-
-        <div style="border:1px solid var(--border-color); padding:12px; border-radius:8px;">
-          <label style="font-weight:800; font-size:0.85rem; display:flex; align-items:center; gap:6px;">
-            <input type="radio" name="accessChoice" value="admin" onchange="togglePasswordField()"> Pentadbir (Admin / SUK Johor)
-          </label>
-          <p style="font-size:0.72rem; color:var(--text-muted); margin-top:4px;">Akses penuh: Mengemas kini, eksport Excel & kebenaran memadam rekod.</p>
-          
-          <div id="adminPassField" style="display:none; margin-top:10px;">
-            <input type="password" id="adminPasswordInput" placeholder="Masukkan Kata Laluan Admin" style="width:100%;">
-          </div>
-        </div>
-      </div>
-
-      <div style="margin-top:20px; display:flex; justify-content:flex-end; gap:10px;">
-        <button class="btn btn-outline" onclick="closeLoginModal()">Batal</button>
-        <button class="btn btn-red" onclick="applyRoleSelection()">Sahkan Akses</button>
-      </div>
-    </div>
-  </div>
-
   <footer class="site-footer">
     &copy; 2026 Bahagian Pemantauan Projek dan Kesejahteraan Rakyat, Pejabat Setiausaha Kerajaan Johor. Hak Cipta Terpelihara.
   </footer>
 
   <script>
-    // URL Pangkalan Data
     const FIREBASE_DB_URL = "https://e-bancian-johor-default-rtdb.firebaseio.com";
     const FIREBASE_BACKUP_URL = "https://e-bancian-johor-default-rtdb.asia-southeast1.firebasedatabase.app";
     const SHEETDB_URL = "https://sheetdb.io/api/v1/k4vnnko52f2rg";
-
-    const ADMIN_PASSWORD = "adminjohor123";
 
     const DISTRICTS_ORDER = [
       'Johor Bahru', 'Kulai', 'Pontian', 'Kota Tinggi', 'Kluang',
@@ -853,58 +837,14 @@
 
     let records = [];
     let activeFirebaseUrl = FIREBASE_DB_URL;
-    let currentRole = localStorage.getItem('ebancian_user_role') || 'staff';
     let parsedImportRows = [];
 
     let editingRecordId = null;
     let editingFirebaseKey = null;
 
-    function initRoleUI() {
-      const badge = document.getElementById('userRoleBadge');
-      if (currentRole === 'admin') {
-        badge.innerText = 'Admin (SUK)';
-        badge.className = 'role-badge role-admin';
-      } else {
-        badge.innerText = 'Pejabat Daerah';
-        badge.className = 'role-badge role-staff';
-      }
-      renderRecordsTable();
-    }
-
-    function openLoginModal() {
-      document.getElementById('loginModal').classList.add('active');
-    }
-
-    function closeLoginModal() {
-      document.getElementById('loginModal').classList.remove('active');
-    }
-
-    function togglePasswordField() {
-      const isSelectAdmin = document.querySelector('input[name="accessChoice"][value="admin"]').checked;
-      document.getElementById('adminPassField').style.display = isSelectAdmin ? 'block' : 'none';
-    }
-
-    function applyRoleSelection() {
-      const isSelectAdmin = document.querySelector('input[name="accessChoice"][value="admin"]').checked;
-      if (isSelectAdmin) {
-        const pass = document.getElementById('adminPasswordInput').value;
-        if (pass === ADMIN_PASSWORD) {
-          currentRole = 'admin';
-          localStorage.setItem('ebancian_user_role', 'admin');
-          alert('Berjaya log masuk sebagai Pentadbir!');
-          closeLoginModal();
-          initRoleUI();
-        } else {
-          alert('Kata laluan admin tidak sah!');
-        }
-      } else {
-        currentRole = 'staff';
-        localStorage.setItem('ebancian_user_role', 'staff');
-        alert('Akses Pejabat Daerah diaktifkan.');
-        closeLoginModal();
-        initRoleUI();
-      }
-    }
+    let selectedSkillsKir = [];
+    let selectedSkillsAir = [];
+    let currentProofBase64 = "";
 
     function switchPage(pageId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -1096,19 +1036,89 @@
       recalculateForm();
     }
 
-    function startEditRecord(id) {
-      if (currentRole !== 'admin') {
-        alert('⛔ Akses Ditolak: Hanya Pentadbir (Admin) dibenarkan mengemas kini data.');
-        return;
+    // PENGURUSAN DROPDOWN KEMAHIRAN (KIR & AIR)
+    function addSkillFromDropdown(type, skill) {
+      if (!skill) return;
+      if (type === 'kir') {
+        if (!selectedSkillsKir.includes(skill)) selectedSkillsKir.push(skill);
+      } else {
+        if (!selectedSkillsAir.includes(skill)) selectedSkillsAir.push(skill);
       }
+      renderSkillTags();
+    }
 
+    function removeSkill(type, skill) {
+      if (type === 'kir') {
+        selectedSkillsKir = selectedSkillsKir.filter(s => s !== skill);
+      } else {
+        selectedSkillsAir = selectedSkillsAir.filter(s => s !== skill);
+      }
+      renderSkillTags();
+    }
+
+    function renderSkillTags() {
+      const kirWrap = document.getElementById('kirSkillsContainer');
+      kirWrap.innerHTML = selectedSkillsKir.length === 0 
+        ? '<span style="font-size:0.75rem; color:#94a3b8;">Belum ada kemahiran KIR dipilih</span>' 
+        : selectedSkillsKir.map(s => `
+          <span class="skill-chip">
+            ${s} <span class="remove-btn" onclick="removeSkill('kir', '${s}')">&times;</span>
+          </span>
+        `).join('');
+
+      const airWrap = document.getElementById('airSkillsContainer');
+      airWrap.innerHTML = selectedSkillsAir.length === 0 
+        ? '<span style="font-size:0.75rem; color:#94a3b8;">Belum ada kemahiran AIR dipilih</span>' 
+        : selectedSkillsAir.map(s => `
+          <span class="skill-chip" style="background:#fef3c7; color:#b45309;">
+            ${s} <span class="remove-btn" onclick="removeSkill('air', '${s}')">&times;</span>
+          </span>
+        `).join('');
+    }
+
+    // PEMAMPATAN & PREVIEW GAMBAR PENGESAHAN (BAHAGIAN F)
+    function handleProofImage(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height && width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          currentProofBase64 = canvas.toDataURL('image/jpeg', 0.65);
+          document.getElementById('proofPreviewImg').src = currentProofBase64;
+          document.getElementById('proofPreviewWrapper').style.display = 'block';
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function startEditRecord(id) {
       const r = records.find(x => x.id === id);
       if (!r) return;
 
       editingRecordId = r.id;
       editingFirebaseKey = r.firebaseKey || null;
 
-      // Bahagian A
       document.getElementById('fNama').value = r.nama || '';
       document.getElementById('fIc').value = r.ic || '';
       document.getElementById('fUmur').value = r.umur || '';
@@ -1123,36 +1133,38 @@
       document.getElementById('fAlamat').value = r.alamat || '';
       document.getElementById('fCatatanKir').value = r.catatanKir || '';
 
-      // Bahagian B (AIR)
       const airContainer = document.getElementById('airContainer');
       airContainer.innerHTML = '';
       if (r.air_list && Array.isArray(r.air_list)) {
         r.air_list.forEach(a => addAirRow(a));
       }
 
-      // Bahagian C (Bantuan)
       const helpContainer = document.getElementById('helpContainer');
       helpContainer.innerHTML = '';
       if (r.help_list && Array.isArray(r.help_list)) {
         r.help_list.forEach(h => addHelpRow(h));
       }
 
-      // Bahagian D (Kemahiran Kotak Semak)
-      const skills = r.skills || [];
-      document.querySelectorAll('input[name="skillCheck"]').forEach(cb => {
-        cb.checked = skills.includes(cb.value);
-      });
+      selectedSkillsKir = r.skillsKir || (r.skills || []);
+      selectedSkillsAir = r.skillsAir || [];
+      renderSkillTags();
 
-      // Bahagian D (Kecenderungan & Cadangan Bantuan Textarea)
       document.getElementById('fKecenderungan').value = r.kecenderungan || '';
       document.getElementById('fCadanganBantuan').value = r.cadanganBantuan || '';
 
-      // Bahagian F (Pengesahan)
       document.getElementById('fKkName').value = r.kkName || '';
       document.getElementById('fKkDate').value = r.kkDate || '';
       document.getElementById('fKkUlasan').value = r.kkUlasan || '';
 
-      document.getElementById('formTitleText').innerText = `✏️ Mengemas Kini Rekod Bancian: ${r.nama}`;
+      currentProofBase64 = r.buktiImg || '';
+      if (currentProofBase64) {
+        document.getElementById('proofPreviewImg').src = currentProofBase64;
+        document.getElementById('proofPreviewWrapper').style.display = 'block';
+      } else {
+        document.getElementById('proofPreviewWrapper').style.display = 'none';
+      }
+
+      document.getElementById('formTitleText').innerText = `✏️ Mengemas Kini Rekod: ${r.nama}`;
       document.getElementById('btnSubmit').innerText = '💾 Kemas Kini Rekod';
       document.getElementById('btnSubmit').className = 'btn btn-amber';
       document.getElementById('btnCancelEdit').style.display = 'inline-flex';
@@ -1169,11 +1181,17 @@
       document.getElementById('frmBanci').reset();
       document.getElementById('airContainer').innerHTML = '';
       document.getElementById('helpContainer').innerHTML = '';
-      document.querySelectorAll('input[name="skillCheck"]').forEach(cb => cb.checked = false);
       document.getElementById('fCatatanKir').value = '';
       document.getElementById('fKecenderungan').value = '';
       document.getElementById('fCadanganBantuan').value = '';
       document.getElementById('fKkUlasan').value = '';
+
+      selectedSkillsKir = [];
+      selectedSkillsAir = [];
+      renderSkillTags();
+
+      currentProofBase64 = '';
+      document.getElementById('proofPreviewWrapper').style.display = 'none';
 
       document.getElementById('formTitleText').innerText = '📝 Borang Bancian Profil & Pemangkasan Kemiskinan';
       document.getElementById('btnSubmit').innerText = '💾 Simpan Rekod Bancian';
@@ -1302,11 +1320,6 @@
         }
       });
 
-      const selectedSkills = [];
-      document.querySelectorAll('input[name="skillCheck"]:checked').forEach(cb => {
-        selectedSkills.push(cb.value);
-      });
-
       const kecenderungan = document.getElementById('fKecenderungan').value.trim();
       const cadanganBantuan = document.getElementById('fCadanganBantuan').value.trim();
       const kkUlasan = document.getElementById('fKkUlasan').value.trim();
@@ -1342,14 +1355,15 @@
         exitCost: Number(exitCost),
         help_list: helpList,
         helpTotalVal: Number(helpTotalVal),
-        skills: selectedSkills,
+        skillsKir: selectedSkillsKir,
+        skillsAir: selectedSkillsAir,
         kecenderungan: String(kecenderungan),
         cadanganBantuan: String(cadanganBantuan),
         kkName: String(document.getElementById('fKkName').value),
         kkDate: String(document.getElementById('fKkDate').value || new Date().toISOString().split('T')[0]),
         kkUlasan: String(kkUlasan),
-        updatedAt: new Date().toISOString(),
-        lastUpdatedBy: currentRole
+        buktiImg: String(currentProofBase64 || ''),
+        updatedAt: new Date().toISOString()
       };
 
       try {
@@ -1362,10 +1376,8 @@
           recObj.firebaseKey = editingFirebaseKey;
 
           const idx = records.findIndex(x => x.id === editingRecordId);
-          if (idx !== -1) {
-            records[idx] = recObj;
-          }
-          alert(`✅ Rekod ${nama} berjaya dikemas kini oleh Admin!`);
+          if (idx !== -1) records[idx] = recObj;
+          alert(`✅ Rekod ${nama} berjaya dikemas kini!`);
         } else {
           const res = await tryFetchFirebase('/bancian.json', {
             method: 'POST',
@@ -1378,7 +1390,7 @@
           recObj.firebaseKey = savedData.name;
 
           records.unshift(recObj);
-          alert(`✅ Rekod ${nama} (${daerah}) berjaya disimpan!`);
+          alert(`✅ Rekod ${nama} (${daerah}) berjaya didaftarkan!`);
         }
 
         localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
@@ -1395,11 +1407,6 @@
     }
 
     async function deleteRecord(id) {
-      if (currentRole !== 'admin') {
-        alert('⛔ Akses Ditolak: Hanya Pentadbir (Admin) dibenarkan memadam rekod.');
-        return;
-      }
-
       if (!confirm('Adakah anda pasti mahu memadamkan rekod ini?')) return;
 
       const rec = records.find(x => x.id === id);
@@ -1424,7 +1431,8 @@
 
       const airList = r.air_list || [];
       const helpList = r.help_list || [];
-      const skills = r.skills || [];
+      const skillsKir = r.skillsKir || (r.skills || []);
+      const skillsAir = r.skillsAir || [];
       const threshold = r.strata === 'Bandar' ? 830 : 677;
       const exitCost = r.exitCost || calculateExitCost(r.strata, r.perCapita, (r.air_count || airList.length) + 1);
 
@@ -1460,13 +1468,6 @@
         `).join('');
       } else {
         helpRowsHtml = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Tiada rekod program bantuan didaftarkan.</td></tr>`;
-      }
-
-      let skillsHtml = '';
-      if (skills.length > 0) {
-        skillsHtml = skills.map(s => `<span class="badge" style="background:#e0f2fe; color:#0369a1; padding:5px 10px; font-size:0.75rem;">✔ ${s}</span>`).join(' ');
-      } else {
-        skillsHtml = '<span style="color:var(--text-muted); font-size:0.8rem;">Tiada kemahiran ditandakan.</span>';
       }
 
       const modalContent = document.getElementById('modalContent');
@@ -1548,19 +1549,26 @@
 
         <div>
           <h4 style="color:var(--johor-blue); margin-bottom:8px;">D. KEMAHIRAN, KECENDERUNGAN & CADANGAN BANTUAN</h4>
-          <div style="display:flex; flex-direction:column; gap:10px;">
-            <div style="display:flex; flex-wrap:wrap; gap:6px; padding:10px; background:#f8fafc; border-radius:8px; border:1px solid var(--border-color);">
-              ${skillsHtml}
+          <div class="detail-grid">
+            <div class="detail-item">
+              <small>Kemahiran KIR</small>
+              <div style="margin-top:4px;">
+                ${skillsKir.length ? skillsKir.map(s => `<span class="badge" style="background:#e0f2fe; color:#0369a1; margin:2px;">${s}</span>`).join(' ') : '<small>Tiada</small>'}
+              </div>
             </div>
-            <div class="detail-grid">
-              <div class="detail-item" style="grid-column:1 / -1;">
-                <small>Ruangan Kecenderungan Minat</small>
-                <p style="margin-top:4px; font-weight:600; color:#1e293b; white-space:pre-wrap;">${r.kecenderungan || 'Tiada maklumat diisi'}</p>
+            <div class="detail-item">
+              <small>Kemahiran Ahli Isi Rumah (AIR)</small>
+              <div style="margin-top:4px;">
+                ${skillsAir.length ? skillsAir.map(s => `<span class="badge" style="background:#fef3c7; color:#b45309; margin:2px;">${s}</span>`).join(' ') : '<small>Tiada</small>'}
               </div>
-              <div class="detail-item" style="grid-column:1 / -1;">
-                <small>Cadangan Bentuk Bantuan / Program Intervensi Diperlukan</small>
-                <p style="margin-top:4px; font-weight:600; color:#1e293b; white-space:pre-wrap;">${r.cadanganBantuan || 'Tiada cadangan diisi'}</p>
-              </div>
+            </div>
+            <div class="detail-item" style="grid-column:1 / -1;">
+              <small>Ruangan Kecenderungan Minat</small>
+              <p style="margin-top:4px; font-weight:600; color:#1e293b; white-space:pre-wrap;">${r.kecenderungan || 'Tiada maklumat diisi'}</p>
+            </div>
+            <div class="detail-item" style="grid-column:1 / -1;">
+              <small>Cadangan Bentuk Bantuan / Program Intervensi Diperlukan</small>
+              <p style="margin-top:4px; font-weight:600; color:#1e293b; white-space:pre-wrap;">${r.cadanganBantuan || 'Tiada cadangan diisi'}</p>
             </div>
           </div>
         </div>
@@ -1571,6 +1579,14 @@
             <div class="detail-item"><small>Nama Pegawai Pengesah</small><strong>${r.kkName || '-'}</strong></div>
             <div class="detail-item"><small>Tarikh Bancian</small><strong>${r.kkDate || '-'}</strong></div>
             <div class="detail-item" style="grid-column:1 / -1;"><small>Ulasan Pegawai</small><p style="margin-top:4px; font-weight:600; color:#1e293b; white-space:pre-wrap;">${r.kkUlasan || 'Tiada ulasan dimasukkan'}</p></div>
+            ${r.buktiImg ? `
+              <div class="detail-item" style="grid-column:1 / -1;">
+                <small>Gambar Bukti Pengesahan</small>
+                <div style="margin-top:8px; max-width:320px; border-radius:8px; overflow:hidden; border:1px solid #cbd5e1;">
+                  <img src="${r.buktiImg}" alt="Bukti" style="width:100%; display:block;">
+                </div>
+              </div>
+            ` : ''}
           </div>
         </div>
       `;
@@ -1643,10 +1659,8 @@
 
         const actionButtons = `
           <button class="btn btn-johor" style="padding:4px 8px; font-size:0.75rem;" onclick="viewRecord('${r.id}')">👁 Paparan</button>
-          ${currentRole === 'admin' ? `
-            <button class="btn btn-amber" style="padding:4px 8px; font-size:0.75rem;" onclick="startEditRecord('${r.id}')">✏️ Kemas Kini</button>
-            <button class="btn btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--johor-red);" onclick="deleteRecord('${r.id}')">Padam</button>
-          ` : ''}
+          <button class="btn btn-amber" style="padding:4px 8px; font-size:0.75rem;" onclick="startEditRecord('${r.id}')">✏️ Kemas Kini</button>
+          <button class="btn btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--johor-red);" onclick="deleteRecord('${r.id}')">Padam</button>
         `;
 
         tbody.innerHTML += `
@@ -1666,9 +1680,6 @@
       });
     }
 
-    // =========================================================================
-    // EKSPORT EXCEL
-    // =========================================================================
     function exportExcel() {
       if (!records.length) {
         alert('Tiada data untuk dieksport.');
@@ -1703,7 +1714,8 @@
           "Anggaran Kos Lepas Miskin (RM/Bulan)": (parseFloat(r.exitCost) || 0).toFixed(2),
           "Jumlah Nilai Bantuan (RM)": (parseFloat(r.helpTotalVal) || 0).toFixed(2),
           "Perincian Bantuan Diterima": assistanceSummary || 'Tiada Bantuan',
-          "Kemahiran Ditandakan": (r.skills || []).join(', ') || 'Tiada',
+          "Kemahiran KIR": (r.skillsKir || r.skills || []).join(', ') || 'Tiada',
+          "Kemahiran AIR": (r.skillsAir || []).join(', ') || 'Tiada',
           "Kecenderungan Minat": r.kecenderungan || 'Tiada',
           "Cadangan Bantuan Diperlukan": r.cadanganBantuan || 'Tiada',
           "Ketua Kampung / Penghulu / Ahli Majlis": r.kkName || '-',
@@ -1754,9 +1766,6 @@
       XLSX.writeFile(wb, fileName);
     }
 
-    // =========================================================================
-    // IMPORT EXCEL
-    // =========================================================================
     function openImportModal() {
       parsedImportRows = [];
       document.getElementById('excelFileInput').value = '';
@@ -1780,42 +1789,20 @@
           "Daerah": "Johor Bahru",
           "Mukim DUN": "Mukim Plentong",
           "Alamat Penuh": "No 12, Jalan Hang Tuah, Kampung Maju Jaya, 81100 Johor Bahru",
-          "Catatan KIR": "Rumah sewa persendirian",
+          "Catatan KIR": "Rumah sewa",
           "No Telefon": "0123456789",
           "Strata": "Bandar",
           "Pekerjaan": "Pemandu Lori",
           "Pendapatan KIR (RM)": 1400,
           "Bilangan AIR": 3,
           "Jumlah Pendapatan AIR (RM)": 300,
-          "Kemahiran Ditandakan": "Pertukangan Kayu & Perabot, Pemanduan & Pengangkutan",
+          "Kemahiran KIR": "Pertukangan Kayu & Perabot, Pemanduan & Pengangkutan",
+          "Kemahiran AIR": "Memasak / Katering Makanan",
           "Kecenderungan Minat": "Memandu kenderaan berat, bertukang kayu",
           "Cadangan Bantuan": "Bantuan modal peralatan pertukangan atau lesen GDL",
           "Nama Pengesah": "Daud Bin Omar",
           "Tarikh Bancian": "2026-09-01",
-          "Ulasan Pengesah": "Keluarga ini amat memerlukan sokongan peningkatan kemahiran untuk menjana pendapatan tambahan."
-        },
-        {
-          "Nama KIR": "Siti Aminah Binti Yusof",
-          "No KP": "830504016122",
-          "Umur": 43,
-          "Jantina": "Perempuan",
-          "Status Kahwin": "Janda",
-          "Daerah": "Kota Tinggi",
-          "Mukim DUN": "Mukim Sedili",
-          "Alamat Penuh": "Batu 4, Kampung Teluk Jerit, 81900 Kota Tinggi",
-          "Catatan KIR": "Ibu tunggal menyara 2 orang anak bersekolah",
-          "No Telefon": "0198765432",
-          "Strata": "Luar Bandar",
-          "Pekerjaan": "Penjual Kuih",
-          "Pendapatan KIR (RM)": 800,
-          "Bilangan AIR": 2,
-          "Jumlah Pendapatan AIR (RM)": 0,
-          "Kemahiran Ditandakan": "Memasak / Katering Makanan, Bakeri & Pembuatan Pastri",
-          "Kecenderungan Minat": "Membuat kek dan pastri",
-          "Cadangan Bantuan": "Mesin pengadun tepung dan ketuhar gas industri",
-          "Nama Pengesah": "Kassim Bin Jamil",
-          "Tarikh Bancian": "2026-09-05",
-          "Ulasan Pengesah": "Disyorkan untuk pemadanan bantuan geran peralatan perniagaan kecil."
+          "Ulasan Pengesah": "Keluarga memerlukan sokongan kemahiran."
         }
       ];
 
@@ -1892,8 +1879,10 @@
         const statusPGK = checkPGK(strata, perCapita);
         const exitCost = calculateExitCost(strata, perCapita, totalPax);
 
-        const skillsRaw = row["Kemahiran Ditandakan"] || row["Kemahiran Dimiliki"] || row["skills"] || '';
-        const skillsList = typeof skillsRaw === 'string' ? skillsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+        const skillsKirRaw = row["Kemahiran KIR"] || row["skillsKir"] || '';
+        const skillsAirRaw = row["Kemahiran AIR"] || row["skillsAir"] || '';
+        const skillsKir = typeof skillsKirRaw === 'string' ? skillsKirRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+        const skillsAir = typeof skillsAirRaw === 'string' ? skillsAirRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
 
         const kecenderungan = row["Kecenderungan Minat"] || row["kecenderungan"] || '';
         const cadanganBantuan = row["Cadangan Bantuan"] || row["cadanganBantuan"] || '';
@@ -1922,13 +1911,14 @@
           exitCost: Number(exitCost),
           help_list: [],
           helpTotalVal: 0,
-          skills: skillsList,
+          skillsKir: skillsKir,
+          skillsAir: skillsAir,
           kecenderungan: String(kecenderungan),
           cadanganBantuan: String(cadanganBantuan),
           kkName: String(row["Nama Pengesah"] || row["Nama Ketua Kampung / Penghulu / Ahli Majlis"] || row["kkName"] || '-'),
           kkDate: String(row["Tarikh Bancian"] || row["kkDate"] || new Date().toISOString().split('T')[0]),
           kkUlasan: String(kkUlasan),
-          recordedBy: `Import (${currentRole})`
+          buktiImg: ''
         };
 
         try {
@@ -1959,7 +1949,7 @@
     }
 
     // Inisialisasi awal
-    initRoleUI();
+    renderSkillTags();
     recalculateForm();
     loadFromFirebase();
   </script>
