@@ -103,6 +103,8 @@
     .btn-red { background: var(--johor-red); color: #fff; }
     .btn-green { background: #16a34a; color: #fff; }
     .btn-green:hover { background: #15803d; }
+    .btn-amber { background: #d97706; color: #fff; }
+    .btn-amber:hover { background: #b45309; }
     .btn-outline { background: #fff; border: 1px solid var(--border-color); color: var(--text-main); }
     .btn-outline:hover { background: #f8fafc; }
 
@@ -160,6 +162,20 @@
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 10px;
+    }
+
+    .edit-banner-info {
+      display: none;
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      padding: 10px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .table-container { width: 100%; overflow-x: auto; border: 1px solid var(--border-color); border-radius: 8px; }
@@ -521,8 +537,16 @@
     <div id="tab-borang" class="tab-content">
       <section class="section-card">
         <div class="section-title" style="border-bottom:2px solid #e2e8f0; padding-bottom:12px;">
-          <span>📝 Borang Bancian Profil & Pemangkasan Kemiskinan</span>
-          <button type="button" class="btn btn-outline" onclick="switchPage('tab-dashboard')">← Kembali ke Dashboard</button>
+          <span id="formTitleText">📝 Borang Bancian Profil & Pemangkasan Kemiskinan</span>
+          <div style="display:flex; gap:8px;">
+            <button type="button" id="btnCancelEdit" class="btn btn-outline" style="display:none; color:var(--johor-red);" onclick="cancelEditMode()">✕ Batal Kemas Kini</button>
+            <button type="button" class="btn btn-outline" onclick="switchPage('tab-dashboard')">← Kembali ke Dashboard</button>
+          </div>
+        </div>
+
+        <div id="editModeNotice" class="edit-banner-info">
+          <span>⚠️ Mod Kemas Kini Aktif: Anda sedang menyunting rekod pendaftaran sedia ada sebagai Pentadbir.</span>
+          <button type="button" class="btn btn-outline" style="padding:2px 8px; font-size:0.75rem;" onclick="cancelEditMode()">Batal</button>
         </div>
 
         <form id="frmBanci" onsubmit="saveBanci(event)">
@@ -774,7 +798,7 @@
           <label style="font-weight:800; font-size:0.85rem; display:flex; align-items:center; gap:6px;">
             <input type="radio" name="accessChoice" value="admin" onchange="togglePasswordField()"> Pentadbir (Admin / SUK Johor)
           </label>
-          <p style="font-size:0.72rem; color:var(--text-muted); margin-top:4px;">Akses penuh: Kemas kini, eksport Excel & kebenaran memadam rekod.</p>
+          <p style="font-size:0.72rem; color:var(--text-muted); margin-top:4px;">Akses penuh: Mengemas kini, eksport Excel & kebenaran memadam rekod.</p>
           
           <div id="adminPassField" style="display:none; margin-top:10px;">
             <input type="password" id="adminPasswordInput" placeholder="Masukkan Kata Laluan Admin" style="width:100%;">
@@ -799,7 +823,6 @@
     const FIREBASE_BACKUP_URL = "https://e-bancian-johor-default-rtdb.asia-southeast1.firebasedatabase.app";
     const SHEETDB_URL = "https://sheetdb.io/api/v1/k4vnnko52f2rg";
 
-    // KATA LALUAN ADMIN DEFAULT (Boleh ditukar mengikut keperluan)
     const ADMIN_PASSWORD = "adminjohor123";
 
     const DISTRICTS_ORDER = [
@@ -811,6 +834,10 @@
     let activeFirebaseUrl = FIREBASE_DB_URL;
     let currentRole = localStorage.getItem('ebancian_user_role') || 'staff';
     let parsedImportRows = [];
+
+    // PEMBOLEHUBAH UNTUK MOD KEMAS KINI
+    let editingRecordId = null;
+    let editingFirebaseKey = null;
 
     function initRoleUI() {
       const badge = document.getElementById('userRoleBadge');
@@ -961,54 +988,54 @@
           <div class="form-group">
             <label>Hubungan dengan KIR *</label>
             <select class="air-rel-field">
-              <option value="Isteri">Isteri</option>
-              <option value="Suami">Suami</option>
-              <option value="Anak Kandung">Anak Kandung</option>
-              <option value="Anak Angkat">Anak Angkat</option>
-              <option value="Ibu / Bapa">Ibu / Bapa</option>
-              <option value="Ibu / Bapa Mertua">Ibu / Bapa Mertua</option>
-              <option value="Cucu">Cucu</option>
-              <option value="Saudara Mara">Saudara Mara</option>
-              <option value="Lain-lain">Lain-lain</option>
+              <option value="Isteri" ${data.hubungan === 'Isteri' ? 'selected' : ''}>Isteri</option>
+              <option value="Suami" ${data.hubungan === 'Suami' ? 'selected' : ''}>Suami</option>
+              <option value="Anak Kandung" ${data.hubungan === 'Anak Kandung' ? 'selected' : ''}>Anak Kandung</option>
+              <option value="Anak Angkat" ${data.hubungan === 'Anak Angkat' ? 'selected' : ''}>Anak Angkat</option>
+              <option value="Ibu / Bapa" ${data.hubungan === 'Ibu / Bapa' ? 'selected' : ''}>Ibu / Bapa</option>
+              <option value="Ibu / Bapa Mertua" ${data.hubungan === 'Ibu / Bapa Mertua' ? 'selected' : ''}>Ibu / Bapa Mertua</option>
+              <option value="Cucu" ${data.hubungan === 'Cucu' ? 'selected' : ''}>Cucu</option>
+              <option value="Saudara Mara" ${data.hubungan === 'Saudara Mara' ? 'selected' : ''}>Saudara Mara</option>
+              <option value="Lain-lain" ${data.hubungan === 'Lain-lain' ? 'selected' : ''}>Lain-lain</option>
             </select>
           </div>
           <div class="form-group">
             <label>Status Perkahwinan</label>
             <select class="air-marital-field">
-              <option value="Belum Berkahwin">Belum Berkahwin</option>
-              <option value="Berkahwin">Berkahwin</option>
-              <option value="Duda / Janda">Duda / Janda</option>
+              <option value="Belum Berkahwin" ${data.kahwin === 'Belum Berkahwin' ? 'selected' : ''}>Belum Berkahwin</option>
+              <option value="Berkahwin" ${data.kahwin === 'Berkahwin' ? 'selected' : ''}>Berkahwin</option>
+              <option value="Duda / Janda" ${data.kahwin === 'Duda / Janda' ? 'selected' : ''}>Duda / Janda</option>
             </select>
           </div>
           <div class="form-group">
             <label>Status Kesihatan / OKU</label>
             <select class="air-health-field">
-              <option value="Sihat">Sihat</option>
-              <option value="Sakit Kronik">Sakit Kronik</option>
-              <option value="OKU Berdaftar">OKU Berdaftar</option>
-              <option value="Terlantar">Terlantar</option>
+              <option value="Sihat" ${data.kesihatan === 'Sihat' ? 'selected' : ''}>Sihat</option>
+              <option value="Sakit Kronik" ${data.kesihatan === 'Sakit Kronik' ? 'selected' : ''}>Sakit Kronik</option>
+              <option value="OKU Berdaftar" ${data.kesihatan === 'OKU Berdaftar' ? 'selected' : ''}>OKU Berdaftar</option>
+              <option value="Terlantar" ${data.kesihatan === 'Terlantar' ? 'selected' : ''}>Terlantar</option>
             </select>
           </div>
           <div class="form-group">
             <label>Tahap Pendidikan</label>
             <select class="air-edu-field">
-              <option value="Tiada Pendidikan">Tiada Pendidikan</option>
-              <option value="Sekolah Rendah">Sekolah Rendah</option>
-              <option value="PMR / PT3">PMR / PT3</option>
-              <option value="SPM">SPM</option>
-              <option value="Sijil / Kemahiran">Sijil / Kemahiran</option>
-              <option value="Diploma / Ijazah">Diploma / Ijazah</option>
+              <option value="Tiada Pendidikan" ${data.pendidikan === 'Tiada Pendidikan' ? 'selected' : ''}>Tiada Pendidikan</option>
+              <option value="Sekolah Rendah" ${data.pendidikan === 'Sekolah Rendah' ? 'selected' : ''}>Sekolah Rendah</option>
+              <option value="PMR / PT3" ${data.pendidikan === 'PMR / PT3' ? 'selected' : ''}>PMR / PT3</option>
+              <option value="SPM" ${data.pendidikan === 'SPM' ? 'selected' : ''}>SPM</option>
+              <option value="Sijil / Kemahiran" ${data.pendidikan === 'Sijil / Kemahiran' ? 'selected' : ''}>Sijil / Kemahiran</option>
+              <option value="Diploma / Ijazah" ${data.pendidikan === 'Diploma / Ijazah' ? 'selected' : ''}>Diploma / Ijazah</option>
             </select>
           </div>
           <div class="form-group">
             <label>Status Pekerjaan</label>
             <select class="air-jobstatus-field">
-              <option value="Bekerja Sepenuh Masa">Bekerja Sepenuh Masa</option>
-              <option value="Bekerja Sendiri / Kampung">Bekerja Sendiri / Kampung</option>
-              <option value="Suri Rumah">Suri Rumah</option>
-              <option value="Pelajar / Kanak-kanak">Pelajar / Kanak-kanak</option>
-              <option value="Tidak Bekerja / Penganggur">Tidak Bekerja / Penganggur</option>
-              <option value="Pesara / Warga Emas">Pesara / Warga Emas</option>
+              <option value="Bekerja Sepenuh Masa" ${data.statusKerja === 'Bekerja Sepenuh Masa' ? 'selected' : ''}>Bekerja Sepenuh Masa</option>
+              <option value="Bekerja Sendiri / Kampung" ${data.statusKerja === 'Bekerja Sendiri / Kampung' ? 'selected' : ''}>Bekerja Sendiri / Kampung</option>
+              <option value="Suri Rumah" ${data.statusKerja === 'Suri Rumah' ? 'selected' : ''}>Suri Rumah</option>
+              <option value="Pelajar / Kanak-kanak" ${data.statusKerja === 'Pelajar / Kanak-kanak' ? 'selected' : ''}>Pelajar / Kanak-kanak</option>
+              <option value="Tidak Bekerja / Penganggur" ${data.statusKerja === 'Tidak Bekerja / Penganggur' ? 'selected' : ''}>Tidak Bekerja / Penganggur</option>
+              <option value="Pesara / Warga Emas" ${data.statusKerja === 'Pesara / Warga Emas' ? 'selected' : ''}>Pesara / Warga Emas</option>
             </select>
           </div>
           <div class="form-group">
@@ -1033,16 +1060,99 @@
         <input type="text" class="help-name-field" value="${data.nama || ''}" placeholder="Nama Program (Cth: STR / JKM / Baitulmal)">
         <input type="text" class="help-agency-field" value="${data.agensi || ''}" placeholder="Agensi (Cth: JKM / MAINJ / YPJ)">
         <select class="help-freq-field">
-          <option value="Bulanan" ${data.freq === 'Bulanan' ? 'selected' : ''}>Bulanan</option>
-          <option value="One-Off" ${data.freq === 'One-Off' ? 'selected' : ''}>One-Off</option>
-          <option value="Tahunan" ${data.freq === 'Tahunan' ? 'selected' : ''}>Tahunan</option>
-          <option value="Barangan / Bakul Makanan" ${data.freq === 'Barangan' ? 'selected' : ''}>Barangan</option>
+          <option value="Bulanan" ${data.kekerapan === 'Bulanan' || data.freq === 'Bulanan' ? 'selected' : ''}>Bulanan</option>
+          <option value="One-Off" ${data.kekerapan === 'One-Off' || data.freq === 'One-Off' ? 'selected' : ''}>One-Off</option>
+          <option value="Tahunan" ${data.kekerapan === 'Tahunan' || data.freq === 'Tahunan' ? 'selected' : ''}>Tahunan</option>
+          <option value="Barangan / Bakul Makanan" ${data.kekerapan === 'Barangan / Bakul Makanan' || data.freq === 'Barangan' ? 'selected' : ''}>Barangan</option>
         </select>
         <input type="number" class="help-val-field" value="${data.nilai || 0}" step="0.01" placeholder="Nilai (RM)" oninput="recalculateForm()">
         <button type="button" class="btn btn-outline" style="color:var(--johor-red); padding:4px 8px;" onclick="this.closest('.help-row-item').remove(); recalculateForm();">&times;</button>
       `;
       container.appendChild(row);
       recalculateForm();
+    }
+
+    // =========================================================================
+    // FUNGSI EDIT REKOD (KHAS UNTUK ADMIN)
+    // =========================================================================
+    function startEditRecord(id) {
+      if (currentRole !== 'admin') {
+        alert('⛔ Akses Ditolak: Hanya Pentadbir (Admin) dibenarkan mengemas kini data.');
+        return;
+      }
+
+      const r = records.find(x => x.id === id);
+      if (!r) return;
+
+      editingRecordId = r.id;
+      editingFirebaseKey = r.firebaseKey || null;
+
+      // Masukkan maklumat Bahagian A
+      document.getElementById('fNama').value = r.nama || '';
+      document.getElementById('fIc').value = r.ic || '';
+      document.getElementById('fUmur').value = r.umur || '';
+      document.getElementById('fJantina').value = r.jantina || 'Lelaki';
+      document.getElementById('fKahwin').value = r.kahwin || 'Berkahwin';
+      document.getElementById('fDaerah').value = r.daerah || 'Johor Bahru';
+      document.getElementById('fDun').value = r.dun || '';
+      document.getElementById('fStrata').value = r.strata || 'Bandar';
+      document.getElementById('fKerja').value = r.kerja || '';
+      document.getElementById('fIncome').value = r.incomeKir || 0;
+      document.getElementById('fPhone').value = r.phone || '';
+      document.getElementById('fAlamat').value = r.alamat || '';
+
+      // Masukkan maklumat Bahagian B (Semua AIR)
+      const airContainer = document.getElementById('airContainer');
+      airContainer.innerHTML = '';
+      if (r.air_list && Array.isArray(r.air_list)) {
+        r.air_list.forEach(a => addAirRow(a));
+      }
+
+      // Masukkan maklumat Bahagian C (Bantuan)
+      const helpContainer = document.getElementById('helpContainer');
+      helpContainer.innerHTML = '';
+      if (r.help_list && Array.isArray(r.help_list)) {
+        r.help_list.forEach(h => addHelpRow(h));
+      }
+
+      // Masukkan maklumat Bahagian D (Kemahiran)
+      const skills = r.skills || [];
+      document.querySelectorAll('input[name="skillCheck"]').forEach(cb => {
+        cb.checked = skills.includes(cb.value);
+      });
+
+      // Masukkan Bahagian F (Pengesahan)
+      document.getElementById('fKkName').value = r.kkName || '';
+      document.getElementById('fKkDate').value = r.kkDate || '';
+
+      // Ubah UI untuk Mod Suntingan
+      document.getElementById('formTitleText').innerText = `✏️ Mengemas Kini Rekod Bancian: ${r.nama}`;
+      document.getElementById('btnSubmit').innerText = '💾 Kemas Kini Rekod';
+      document.getElementById('btnSubmit').className = 'btn btn-amber';
+      document.getElementById('btnCancelEdit').style.display = 'inline-flex';
+      document.getElementById('editModeNotice').style.display = 'flex';
+
+      recalculateForm();
+      switchPage('tab-borang');
+    }
+
+    function cancelEditMode() {
+      editingRecordId = null;
+      editingFirebaseKey = null;
+
+      document.getElementById('frmBanci').reset();
+      document.getElementById('airContainer').innerHTML = '';
+      document.getElementById('helpContainer').innerHTML = '';
+      document.querySelectorAll('input[name="skillCheck"]').forEach(cb => cb.checked = false);
+
+      document.getElementById('formTitleText').innerText = '📝 Borang Bancian Profil & Pemangkasan Kemiskinan';
+      document.getElementById('btnSubmit').innerText = '💾 Simpan Rekod Bancian';
+      document.getElementById('btnSubmit').className = 'btn btn-red';
+      document.getElementById('btnCancelEdit').style.display = 'none';
+      document.getElementById('editModeNotice').style.display = 'none';
+
+      recalculateForm();
+      switchPage('tab-dashboard');
     }
 
     async function tryFetchFirebase(path, options = {}) {
@@ -1105,7 +1215,7 @@
       e.preventDefault();
       const btnSubmit = document.getElementById('btnSubmit');
       btnSubmit.disabled = true;
-      btnSubmit.innerText = '⏳ Menyimpan ke Firebase...';
+      btnSubmit.innerText = editingRecordId ? '⏳ Mengemas kini rekod...' : '⏳ Menyimpan ke Firebase...';
 
       const nama = document.getElementById('fNama').value;
       const ic = document.getElementById('fIc').value;
@@ -1170,8 +1280,10 @@
       const statusPGK = checkPGK(strata, perCapita);
       const exitCost = calculateExitCost(strata, perCapita, totalPax);
 
-      const newRec = {
-        id: 'rec-' + Date.now(),
+      const targetId = editingRecordId || ('rec-' + Date.now());
+
+      const recObj = {
+        id: targetId,
         nama: String(nama),
         ic: String(ic),
         umur: Number(umur),
@@ -1195,50 +1307,54 @@
         skills: selectedSkills,
         kkName: String(document.getElementById('fKkName').value),
         kkDate: String(document.getElementById('fKkDate').value || new Date().toISOString().split('T')[0]),
-        recordedBy: currentRole
+        updatedAt: new Date().toISOString(),
+        lastUpdatedBy: currentRole
       };
 
       try {
-        const res = await tryFetchFirebase('/bancian.json', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newRec)
-        });
-        
-        if (!res.ok) throw new Error('Status: ' + res.status);
-        const savedData = await res.json();
-        newRec.firebaseKey = savedData.name;
+        if (editingFirebaseKey) {
+          // MOD KEMAS KINI REKOD SEDIA ADA (PUT / PATCH)
+          await tryFetchFirebase(`/bancian/${editingFirebaseKey}.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(recObj)
+          });
+          recObj.firebaseKey = editingFirebaseKey;
 
-        if (SHEETDB_URL) {
-          fetch(SHEETDB_URL, {
+          // Kemas kini dalam state records
+          const idx = records.findIndex(x => x.id === editingRecordId);
+          if (idx !== -1) {
+            records[idx] = recObj;
+          }
+          alert(`✅ Rekod ${nama} berjaya dikemas kini oleh Admin!`);
+        } else {
+          // MOD DAFTAR BAHARU (POST)
+          const res = await tryFetchFirebase('/bancian.json', {
             method: 'POST',
-            headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-            body: JSON.stringify([{
-              id: newRec.id, nama, ic, umur, jantina, kahwin, daerah, dun, strata, kerja,
-              incomeKir, alamat, air_count: airList.length, totalInc, perCapita: perCapita.toFixed(2),
-              statusPGK, exitCost: exitCost.toFixed(2), kkDate: newRec.kkDate
-            }])
-          }).catch(e => console.warn('SheetDB sync error:', e));
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(recObj)
+          });
+          
+          if (!res.ok) throw new Error('Status: ' + res.status);
+          const savedData = await res.json();
+          recObj.firebaseKey = savedData.name;
+
+          records.unshift(recObj);
+          alert(`✅ Rekod ${nama} (${daerah}) berjaya disimpan!`);
         }
 
-        records.unshift(newRec);
         localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
 
-        alert('✅ Rekod ' + nama + ' (' + daerah + ') berjaya disimpan!');
-        document.getElementById('frmBanci').reset();
-        document.getElementById('airContainer').innerHTML = '';
-        document.getElementById('helpContainer').innerHTML = '';
-        document.querySelectorAll('input[name="skillCheck"]').forEach(cb => cb.checked = false);
-        recalculateForm();
+        // Reset semula borang & tamatkan mod edit
+        cancelEditMode();
         renderDashboard();
         renderRecordsTable();
-        switchPage('tab-dashboard');
       } catch (err) {
-        console.error("Firebase save error:", err);
-        alert('Ralat semasa menyimpan: ' + err.message);
+        console.error("Firebase save/update error:", err);
+        alert('Ralat semasa memproses data: ' + err.message);
       } finally {
         btnSubmit.disabled = false;
-        btnSubmit.innerText = '💾 Simpan Rekod Bancian';
+        btnSubmit.innerText = editingRecordId ? '💾 Kemas Kini Rekod' : '💾 Simpan Rekod Bancian';
       }
     }
 
@@ -1473,9 +1589,13 @@
         const perCapita = parseFloat(r.perCapita) || 0;
         const exitCost = r.exitCost || calculateExitCost(r.strata, perCapita, airCount + 1);
 
+        // Kawalan butang: Pejabat Daerah hanya lihat "Paparan". Admin ada "Kemas Kini" dan "Padam".
         const actionButtons = `
           <button class="btn btn-johor" style="padding:4px 8px; font-size:0.75rem;" onclick="viewRecord('${r.id}')">👁 Paparan</button>
-          ${currentRole === 'admin' ? `<button class="btn btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--johor-red);" onclick="deleteRecord('${r.id}')">Padam</button>` : ''}
+          ${currentRole === 'admin' ? `
+            <button class="btn btn-amber" style="padding:4px 8px; font-size:0.75rem;" onclick="startEditRecord('${r.id}')">✏️ Kemas Kini</button>
+            <button class="btn btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--johor-red);" onclick="deleteRecord('${r.id}')">Padam</button>
+          ` : ''}
         `;
 
         tbody.innerHTML += `
@@ -1496,7 +1616,7 @@
     }
 
     // =========================================================================
-    // FUNGSI EKSPORT EXCEL BERGANDA (SHEET 1: KIR | SHEET 2: SEMUA AIR)
+    // EKSPORT EXCEL
     // =========================================================================
     function exportExcel() {
       if (!records.length) {
@@ -1579,7 +1699,7 @@
     }
 
     // =========================================================================
-    // FUNGSI IMPORT EXCEL & MUAT TURUN TEMPLAT
+    // IMPORT EXCEL
     // =========================================================================
     function openImportModal() {
       parsedImportRows = [];
