@@ -242,6 +242,29 @@
       border: 1px solid var(--border-color);
     }
 
+    .skills-grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .skill-card-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      padding: 11px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #1e293b;
+      transition: all 0.2s ease;
+    }
+    .skill-card-label:hover { background: #f0fdf4; border-color: #86efac; }
+    .skill-card-label input[type="checkbox"] { width: 17px; height: 17px; cursor: pointer; accent-color: var(--johor-red); }
+
     .calc-banner {
       background: #f0fdf4;
       border: 1px solid #bbf7d0;
@@ -652,20 +675,47 @@
             <span id="liveTotalHelp" style="font-size:1.1rem; font-weight:800; color:#a16207;">RM 0.00</span>
           </div>
 
-          <!-- BAHAGIAN D: KECENDERUNGAN & CADANGAN BANTUAN INTERVENSI (DIUBAH KEPADA RUANGAN BEBAS) -->
-          <div style="margin: 24px 0; background:#f8fafc; padding:18px; border-radius:10px; border:1px solid var(--border-color);">
-            <h4 style="color:var(--johor-blue); font-size:0.95rem; font-weight:800; margin-bottom:4px;">D. KECENDERUNGAN MINAT & CADANGAN BANTUAN INTERVENSI</h4>
-            <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:14px;">Ruangan untuk diisi oleh pegawai bagi tujuan pemadanan program peningkatan taraf hidup:</p>
+          <!-- BAHAGIAN D: KEMAHIRAN, KECENDERUNGAN & CADANGAN BANTUAN -->
+          <div style="margin: 20px 0;">
+            <h4 style="color:var(--johor-blue); font-size:0.95rem; font-weight:800; margin-bottom:4px;">D. KEMAHIRAN YANG DIMILIKI</h4>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px;">Pilih kemahiran yang dimiliki oleh KIR atau AIR untuk tujuan pemadanan program peningkatan pendapatan:</p>
             
-            <div style="display:flex; flex-direction:column; gap:14px;">
+            <div class="skills-grid-container">
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Memasak / Katering Makanan"> Memasak / Katering Makanan</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Menjahit / Mengubah Pakaian"> Menjahit / Mengubah Pakaian</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Bakeri & Pembuatan Pastri"> Bakeri & Pembuatan Pastri</label>
+              
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Pertukangan Kayu & Perabot"> Pertukangan Kayu & Perabot</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Kerja Pembinaan / Ubah Suai Rumah"> Kerja Pembinaan / Ubah Suai Rumah</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Pendawaian Elektrik Domestik"> Pendawaian Elektrik Domestik</label>
+              
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Pemasangan & Servis Paip"> Pemasangan & Servis Paip</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Mekanik Motosikal / Kenderaan"> Mekanik Motosikal / Kenderaan</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Pertanian / Tanaman Kontan"> Pertanian / Tanaman Kontan</label>
+              
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Penternakan Haiwan"> Penternakan Haiwan</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Perikanan / Akuakultur"> Perikanan / Akuakultur</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Perniagaan Runcit / Gerai"> Perniagaan Runcit / Gerai</label>
+              
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Dandanan Rambut / Kecantikan"> Dandanan Rambut / Kecantikan</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Asuhan Kanak-kanak / Pengasuh"> Asuhan Kanak-kanak / Pengasuh</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Pembaikan Barangan Elektrik"> Pembaikan Barangan Elektrik</label>
+              
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Kemahiran Komputer & Media Sosial"> Kemahiran Komputer & Media Sosial</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Kraftangan & Anyaman"> Kraftangan & Anyaman</label>
+              <label class="skill-card-label"><input type="checkbox" name="skillCheck" value="Pemanduan & Pengangkutan"> Pemanduan & Pengangkutan</label>
+            </div>
+
+            <!-- RUANGAN KECENDERUNGAN & CADANGAN BANTUAN YANG DIISI SENDIRI -->
+            <div style="margin-top: 18px; display:flex; flex-direction:column; gap:14px; background:#f8fafc; padding:16px; border-radius:10px; border:1px solid var(--border-color);">
               <div class="form-group">
-                <label>Kecenderungan Minat / Kemahiran Sedia Ada</label>
-                <textarea id="fKecenderungan" rows="3" placeholder="Nyatakan kecenderungan minat, hobi, atau kemahiran yang dimiliki oleh KIR atau ahli keluarga (contoh: Memasak kuih tradisional, membaiki enjin bot, minat berkebun, dsb.)"></textarea>
+                <label>Ruangan Kecenderungan Minat (Diisi Sendiri)</label>
+                <textarea id="fKecenderungan" rows="3" placeholder="Nyatakan kecenderungan minat atau kemahiran yang dimiliki oleh keluarga ini..."></textarea>
               </div>
 
               <div class="form-group">
-                <label>Cadangan Bentuk Bantuan / Program Intervensi</label>
-                <textarea id="fCadanganBantuan" rows="3" placeholder="Cadangan bantuan yang diperlukan untuk membolehkan keluarga keluar daripada kepompong miskin (contoh: Bantuan geran modal perniagaan kecil, kursus pemandu lori berlesen, peralatan mesin jahit, dsb.)"></textarea>
+                <label>Cadangan Bentuk Bantuan / Program Intervensi (Diisi Sendiri)</label>
+                <textarea id="fCadanganBantuan" rows="3" placeholder="Nyatakan cadangan bantuan spesifik yang bersesuaian untuk membantu keluarga ini keluar daripada kepompong miskin..."></textarea>
               </div>
             </div>
           </div>
@@ -1060,7 +1110,7 @@
       document.getElementById('fPhone').value = r.phone || '';
       document.getElementById('fAlamat').value = r.alamat || '';
 
-      // Bahagian B (Semua AIR)
+      // Bahagian B (AIR)
       const airContainer = document.getElementById('airContainer');
       airContainer.innerHTML = '';
       if (r.air_list && Array.isArray(r.air_list)) {
@@ -1074,7 +1124,13 @@
         r.help_list.forEach(h => addHelpRow(h));
       }
 
-      // Bahagian D (Kecenderungan & Cadangan Bantuan)
+      // Bahagian D (Kemahiran Kotak Semak)
+      const skills = r.skills || [];
+      document.querySelectorAll('input[name="skillCheck"]').forEach(cb => {
+        cb.checked = skills.includes(cb.value);
+      });
+
+      // Bahagian D (Kecenderungan & Cadangan Bantuan Textarea)
       document.getElementById('fKecenderungan').value = r.kecenderungan || '';
       document.getElementById('fCadanganBantuan').value = r.cadanganBantuan || '';
 
@@ -1099,6 +1155,7 @@
       document.getElementById('frmBanci').reset();
       document.getElementById('airContainer').innerHTML = '';
       document.getElementById('helpContainer').innerHTML = '';
+      document.querySelectorAll('input[name="skillCheck"]').forEach(cb => cb.checked = false);
       document.getElementById('fKecenderungan').value = '';
       document.getElementById('fCadanganBantuan').value = '';
 
@@ -1226,6 +1283,11 @@
         }
       });
 
+      const selectedSkills = [];
+      document.querySelectorAll('input[name="skillCheck"]:checked').forEach(cb => {
+        selectedSkills.push(cb.value);
+      });
+
       const kecenderungan = document.getElementById('fKecenderungan').value.trim();
       const cadanganBantuan = document.getElementById('fCadanganBantuan').value.trim();
 
@@ -1259,6 +1321,7 @@
         exitCost: Number(exitCost),
         help_list: helpList,
         helpTotalVal: Number(helpTotalVal),
+        skills: selectedSkills,
         kecenderungan: String(kecenderungan),
         cadanganBantuan: String(cadanganBantuan),
         kkName: String(document.getElementById('fKkName').value),
@@ -1339,6 +1402,7 @@
 
       const airList = r.air_list || [];
       const helpList = r.help_list || [];
+      const skills = r.skills || [];
       const threshold = r.strata === 'Bandar' ? 830 : 677;
       const exitCost = r.exitCost || calculateExitCost(r.strata, r.perCapita, (r.air_count || airList.length) + 1);
 
@@ -1373,6 +1437,13 @@
         `).join('');
       } else {
         helpRowsHtml = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Tiada rekod program bantuan didaftarkan.</td></tr>`;
+      }
+
+      let skillsHtml = '';
+      if (skills.length > 0) {
+        skillsHtml = skills.map(s => `<span class="badge" style="background:#e0f2fe; color:#0369a1; padding:5px 10px; font-size:0.75rem;">✔ ${s}</span>`).join(' ');
+      } else {
+        skillsHtml = '<span style="color:var(--text-muted); font-size:0.8rem;">Tiada kemahiran ditandakan.</span>';
       }
 
       const modalContent = document.getElementById('modalContent');
@@ -1451,15 +1522,20 @@
         </div>
 
         <div>
-          <h4 style="color:var(--johor-blue); margin-bottom:8px;">D. KECENDERUNGAN & CADANGAN BANTUAN INTERVENSI</h4>
-          <div class="detail-grid">
-            <div class="detail-item" style="grid-column:1 / -1;">
-              <small>Kecenderungan Minat / Kemahiran</small>
-              <p style="margin-top:4px; font-weight:600; color:#1e293b; white-space:pre-wrap;">${r.kecenderungan || 'Tiada maklumat diisi'}</p>
+          <h4 style="color:var(--johor-blue); margin-bottom:8px;">D. KEMAHIRAN, KECENDERUNGAN & CADANGAN BANTUAN</h4>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; flex-wrap:wrap; gap:6px; padding:10px; background:#f8fafc; border-radius:8px; border:1px solid var(--border-color);">
+              ${skillsHtml}
             </div>
-            <div class="detail-item" style="grid-column:1 / -1;">
-              <small>Cadangan Bantuan / Program Intervensi</small>
-              <p style="margin-top:4px; font-weight:600; color:#1e293b; white-space:pre-wrap;">${r.cadanganBantuan || 'Tiada cadangan diisi'}</p>
+            <div class="detail-grid">
+              <div class="detail-item" style="grid-column:1 / -1;">
+                <small>Ruangan Kecenderungan Minat</small>
+                <p style="margin-top:4px; font-weight:600; color:#1e293b; white-space:pre-wrap;">${r.kecenderungan || 'Tiada maklumat diisi'}</p>
+              </div>
+              <div class="detail-item" style="grid-column:1 / -1;">
+                <small>Cadangan Bantuan / Program Intervensi</small>
+                <p style="margin-top:4px; font-weight:600; color:#1e293b; white-space:pre-wrap;">${r.cadanganBantuan || 'Tiada cadangan diisi'}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -1600,6 +1676,7 @@
           "Anggaran Kos Lepas Miskin (RM/Bulan)": (parseFloat(r.exitCost) || 0).toFixed(2),
           "Jumlah Nilai Bantuan (RM)": (parseFloat(r.helpTotalVal) || 0).toFixed(2),
           "Perincian Bantuan Diterima": assistanceSummary || 'Tiada Bantuan',
+          "Kemahiran Ditandakan": (r.skills || []).join(', ') || 'Tiada',
           "Kecenderungan Minat": r.kecenderungan || 'Tiada',
           "Cadangan Bantuan / Intervensi": r.cadanganBantuan || 'Tiada',
           "Ketua Kampung / Pengesah": r.kkName || '-',
@@ -1680,6 +1757,7 @@
           "Pendapatan KIR (RM)": 1400,
           "Bilangan AIR": 3,
           "Jumlah Pendapatan AIR (RM)": 300,
+          "Kemahiran Ditandakan": "Pertukangan Kayu & Perabot, Pemanduan & Pengangkutan",
           "Kecenderungan Minat": "Memandu kenderaan berat, bertukang kayu",
           "Cadangan Bantuan": "Bantuan modal peralatan pertukangan atau lesen GDL",
           "Nama Pengesah": "Daud Bin Omar",
@@ -1700,6 +1778,7 @@
           "Pendapatan KIR (RM)": 800,
           "Bilangan AIR": 2,
           "Jumlah Pendapatan AIR (RM)": 0,
+          "Kemahiran Ditandakan": "Memasak / Katering Makanan, Bakeri & Pembuatan Pastri",
           "Kecenderungan Minat": "Membuat kek dan pastri",
           "Cadangan Bantuan": "Mesin pengadun tepung dan ketuhar gas industri",
           "Nama Pengesah": "Kassim Bin Jamil",
@@ -1779,6 +1858,9 @@
         const statusPGK = checkPGK(strata, perCapita);
         const exitCost = calculateExitCost(strata, perCapita, totalPax);
 
+        const skillsRaw = row["Kemahiran Ditandakan"] || row["Kemahiran Dimiliki"] || row["skills"] || '';
+        const skillsList = typeof skillsRaw === 'string' ? skillsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+
         const kecenderungan = row["Kecenderungan Minat"] || row["kecenderungan"] || '';
         const cadanganBantuan = row["Cadangan Bantuan"] || row["cadanganBantuan"] || '';
 
@@ -1804,6 +1886,7 @@
           exitCost: Number(exitCost),
           help_list: [],
           helpTotalVal: 0,
+          skills: skillsList,
           kecenderungan: String(kecenderungan),
           cadanganBantuan: String(cadanganBantuan),
           kkName: String(row["Nama Pengesah"] || row["kkName"] || '-'),
