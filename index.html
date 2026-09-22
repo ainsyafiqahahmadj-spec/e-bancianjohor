@@ -69,6 +69,19 @@
       box-shadow: 0 2px 6px rgba(197, 31, 36, 0.35);
     }
 
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .role-staff { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+
     main.container { flex: 1; padding: 24px; max-width: 1400px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 24px; }
 
     .btn {
@@ -224,7 +237,6 @@
       border: 1px solid var(--border-color);
     }
 
-    /* TAG CONTAINER UNTUK KEMAHIRAN */
     .skill-tag-container {
       display: flex;
       flex-wrap: wrap;
@@ -247,11 +259,7 @@
       align-items: center;
       gap: 6px;
     }
-    .skill-chip span.remove-btn {
-      cursor: pointer;
-      color: #0284c7;
-      font-weight: 900;
-    }
+    .skill-chip span.remove-btn { cursor: pointer; color: #0284c7; font-weight: 900; }
     .skill-chip span.remove-btn:hover { color: var(--johor-red); }
 
     .calc-banner {
@@ -286,7 +294,6 @@
 
     @keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
 
-    /* MODAL */
     .modal-backdrop {
       display: none;
       position: fixed;
@@ -660,13 +667,12 @@
             <span id="liveTotalHelp" style="font-size:1.1rem; font-weight:800; color:#a16207;">RM 0.00</span>
           </div>
 
-          <!-- BAHAGIAN D: KEMAHIRAN (ASING KIR & AIR), KECENDERUNGAN & CADANGAN BANTUAN -->
+          <!-- BAHAGIAN D: KEMAHIRAN, KECENDERUNGAN & CADANGAN BANTUAN -->
           <div style="margin: 20px 0; background:#f8fafc; padding:18px; border-radius:10px; border:1px solid var(--border-color);">
             <h4 style="color:var(--johor-blue); font-size:0.95rem; font-weight:800; margin-bottom:4px;">D. KEMAHIRAN, KECENDERUNGAN & INTERVENSI</h4>
             <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:14px;">Pilih kemahiran daripada menu pilihan dropdown atau isi kecenderungan & cadangan bantuan.</p>
             
             <div class="form-grid">
-              <!-- DROPDOWN KEMAHIRAN KIR -->
               <div class="form-group">
                 <label>Pilih Kemahiran Dimiliki (KIR)</label>
                 <select id="ddSkillKir" onchange="addSkillFromDropdown('kir', this.value); this.value='';">
@@ -693,7 +699,6 @@
                 <div id="kirSkillsContainer" class="skill-tag-container"></div>
               </div>
 
-              <!-- DROPDOWN KEMAHIRAN AIR -->
               <div class="form-group">
                 <label>Pilih Kemahiran Dimiliki (Ahli Isi Rumah / AIR)</label>
                 <select id="ddSkillAir" onchange="addSkillFromDropdown('air', this.value); this.value='';">
@@ -721,7 +726,6 @@
               </div>
             </div>
 
-            <!-- RUANGAN KECENDERUNGAN & CADANGAN BANTUAN -->
             <div style="margin-top: 14px; display:flex; flex-direction:column; gap:14px;">
               <div class="form-group">
                 <label>Ruangan Kecenderungan Minat (Diisi Sendiri)</label>
@@ -735,7 +739,7 @@
             </div>
           </div>
 
-          <!-- BAHAGIAN F: PENGESAHAN KETUA KAMPUNG / PENGHULU / AHLI MAJLIS & BUKTI -->
+          <!-- BAHAGIAN F: PENGESAHAN -->
           <h4 style="color:var(--johor-blue); font-size:0.9rem; margin:24px 0 10px;">F. PENGESAHAN KETUA KAMPUNG / PENGHULU / AHLI MAJLIS</h4>
           <div class="form-grid">
             <div class="form-group">
@@ -751,7 +755,6 @@
               <textarea id="fKkUlasan" rows="3" placeholder="Masukkan ulasan atau sokongan daripada Ketua Kampung / Penghulu / Ahli Majlis..."></textarea>
             </div>
             
-            <!-- MUAT NAIK GAMBAR BUKTI PENGESAHAN -->
             <div class="form-group col-span-2">
               <label>Muat Naik Gambar Bukti Pengesahan (Surat Sokongan / Tandatangan / Foto Lawatan)</label>
               <input type="file" id="fBuktiFile" accept="image/*" onchange="handleProofImage(event)">
@@ -795,7 +798,7 @@
       </div>
       <div class="modal-body">
         <p style="font-size:0.8rem; color:var(--text-muted); line-height:1.5;">
-          Muat naik fail Excel untuk mendaftarkan senarai isi rumah secara kelompok (*bulk*). Pendapatan per kapita dan status PGK akan dihitung secara automatik.
+          Muat naik fail Excel untuk mendaftarkan senarai isi rumah secara kelompok (*bulk*). Pendapatan per kapita, status PGK dan senarai semua AIR akan diimport secara automatik.
         </p>
 
         <div style="display:flex; justify-content:flex-end;">
@@ -811,7 +814,8 @@
 
         <div id="importPreview" style="display:none; background:#f8fafc; padding:12px; border-radius:8px; border:1px solid var(--border-color); font-size:0.8rem;">
           <div>Nama Fail: <strong id="importFileName">-</strong></div>
-          <div>Jumlah Rekod Dijumpai: <strong id="importRecordCount" style="color:var(--success);">0</strong></div>
+          <div>Jumlah KIR: <strong id="importRecordCount" style="color:var(--success);">0</strong></div>
+          <div>Jumlah AIR Diimport: <strong id="importAirCount" style="color:var(--johor-blue);">0</strong></div>
         </div>
       </div>
       <div style="padding:14px 20px; background:#f8fafc; border-top:1px solid var(--border-color); display:flex; justify-content:flex-end; gap:10px;">
@@ -838,6 +842,7 @@
     let records = [];
     let activeFirebaseUrl = FIREBASE_DB_URL;
     let parsedImportRows = [];
+    let parsedImportAirMap = {};
 
     let editingRecordId = null;
     let editingFirebaseKey = null;
@@ -948,59 +953,45 @@
           <div class="form-group">
             <label>Hubungan dengan KIR *</label>
             <select class="air-rel-field">
-              <option value="Isteri" ${data.hubungan === 'Isteri' ? 'selected' : ''}>Isteri</option>
-              <option value="Suami" ${data.hubungan === 'Suami' ? 'selected' : ''}>Suami</option>
-              <option value="Anak Kandung" ${data.hubungan === 'Anak Kandung' ? 'selected' : ''}>Anak Kandung</option>
+              <option value="Isteri" ${data.hubungan === 'Isteri' || data.hubungan === 'Isteri / Suami' ? 'selected' : ''}>Isteri / Suami</option>
+              <option value="Anak Kandung" ${data.hubungan === 'Anak Kandung' || data.hubungan === 'Anak' ? 'selected' : ''}>Anak</option>
               <option value="Anak Angkat" ${data.hubungan === 'Anak Angkat' ? 'selected' : ''}>Anak Angkat</option>
-              <option value="Ibu / Bapa" ${data.hubungan === 'Ibu / Bapa' ? 'selected' : ''}>Ibu / Bapa</option>
-              <option value="Ibu / Bapa Mertua" ${data.hubungan === 'Ibu / Bapa Mertua' ? 'selected' : ''}>Ibu / Bapa Mertua</option>
+              <option value="Ibu / Bapa" ${data.hubungan?.includes('Ibu') || data.hubungan?.includes('Bapa') ? 'selected' : ''}>Ibu / Bapa</option>
               <option value="Cucu" ${data.hubungan === 'Cucu' ? 'selected' : ''}>Cucu</option>
-              <option value="Saudara Mara" ${data.hubungan === 'Saudara Mara' ? 'selected' : ''}>Saudara Mara</option>
+              <option value="Saudara Mara" ${data.hubungan?.includes('Saudara') || data.hubungan?.includes('Abang') ? 'selected' : ''}>Saudara Mara</option>
               <option value="Lain-lain" ${data.hubungan === 'Lain-lain' ? 'selected' : ''}>Lain-lain</option>
             </select>
           </div>
           <div class="form-group">
             <label>Status Perkahwinan</label>
             <select class="air-marital-field">
-              <option value="Belum Berkahwin" ${data.kahwin === 'Belum Berkahwin' ? 'selected' : ''}>Belum Berkahwin</option>
+              <option value="Belum pernah berkahwin" ${data.kahwin?.includes('Belum') ? 'selected' : ''}>Belum pernah berkahwin</option>
               <option value="Berkahwin" ${data.kahwin === 'Berkahwin' ? 'selected' : ''}>Berkahwin</option>
-              <option value="Duda / Janda" ${data.kahwin === 'Duda / Janda' ? 'selected' : ''}>Duda / Janda</option>
+              <option value="Duda / Janda" ${data.kahwin?.includes('Bercerai') || data.kahwin?.includes('Balu') ? 'selected' : ''}>Duda / Janda / Balu</option>
             </select>
           </div>
           <div class="form-group">
             <label>Status Kesihatan / OKU</label>
             <select class="air-health-field">
-              <option value="Sihat" ${data.kesihatan === 'Sihat' ? 'selected' : ''}>Sihat</option>
-              <option value="Sakit Kronik" ${data.kesihatan === 'Sakit Kronik' ? 'selected' : ''}>Sakit Kronik</option>
-              <option value="OKU Berdaftar" ${data.kesihatan === 'OKU Berdaftar' ? 'selected' : ''}>OKU Berdaftar</option>
-              <option value="Terlantar" ${data.kesihatan === 'Terlantar' ? 'selected' : ''}>Terlantar</option>
+              <option value="Sihat" ${!data.kesihatan || data.kesihatan === 'Sihat' || data.kesihatan === 'Tiada Kecacatan' ? 'selected' : ''}>Sihat</option>
+              <option value="Fizikal" ${data.kesihatan?.includes('Fizikal') ? 'selected' : ''}>Fizikal</option>
+              <option value="Penglihatan" ${data.kesihatan?.includes('Penglihatan') ? 'selected' : ''}>Penglihatan</option>
+              <option value="Pembelajaran" ${data.kesihatan?.includes('Pembelajaran') ? 'selected' : ''}>Pembelajaran</option>
+              <option value="Sakit Kronik" ${data.kesihatan?.includes('Kronik') ? 'selected' : ''}>Sakit Kronik</option>
+              <option value="OKU Terlantar" ${data.kesihatan?.includes('Terlantar') ? 'selected' : ''}>OKU Terlantar</option>
             </select>
           </div>
           <div class="form-group">
             <label>Tahap Pendidikan</label>
-            <select class="air-edu-field">
-              <option value="Tiada Pendidikan" ${data.pendidikan === 'Tiada Pendidikan' ? 'selected' : ''}>Tiada Pendidikan</option>
-              <option value="Sekolah Rendah" ${data.pendidikan === 'Sekolah Rendah' ? 'selected' : ''}>Sekolah Rendah</option>
-              <option value="PMR / PT3" ${data.pendidikan === 'PMR / PT3' ? 'selected' : ''}>PMR / PT3</option>
-              <option value="SPM" ${data.pendidikan === 'SPM' ? 'selected' : ''}>SPM</option>
-              <option value="Sijil / Kemahiran" ${data.pendidikan === 'Sijil / Kemahiran' ? 'selected' : ''}>Sijil / Kemahiran</option>
-              <option value="Diploma / Ijazah" ${data.pendidikan === 'Diploma / Ijazah' ? 'selected' : ''}>Diploma / Ijazah</option>
-            </select>
+            <input type="text" class="air-edu-field" value="${data.pendidikan || ''}" placeholder="Cth: Menengah Atas (SPM) / Pelajar">
           </div>
           <div class="form-group">
             <label>Status Pekerjaan</label>
-            <select class="air-jobstatus-field">
-              <option value="Bekerja Sepenuh Masa" ${data.statusKerja === 'Bekerja Sepenuh Masa' ? 'selected' : ''}>Bekerja Sepenuh Masa</option>
-              <option value="Bekerja Sendiri / Kampung" ${data.statusKerja === 'Bekerja Sendiri / Kampung' ? 'selected' : ''}>Bekerja Sendiri / Kampung</option>
-              <option value="Suri Rumah" ${data.statusKerja === 'Suri Rumah' ? 'selected' : ''}>Suri Rumah</option>
-              <option value="Pelajar / Kanak-kanak" ${data.statusKerja === 'Pelajar / Kanak-kanak' ? 'selected' : ''}>Pelajar / Kanak-kanak</option>
-              <option value="Tidak Bekerja / Penganggur" ${data.statusKerja === 'Tidak Bekerja / Penganggur' ? 'selected' : ''}>Tidak Bekerja / Penganggur</option>
-              <option value="Pesara / Warga Emas" ${data.statusKerja === 'Pesara / Warga Emas' ? 'selected' : ''}>Pesara / Warga Emas</option>
-            </select>
+            <input type="text" class="air-jobstatus-field" value="${data.statusKerja || data.kerja || ''}" placeholder="Cth: Pelajar / Suri Rumah / Bekerja">
           </div>
           <div class="form-group">
             <label>Pekerjaan Spesifik</label>
-            <input type="text" class="air-job-field" value="${data.kerja || ''}" placeholder="Cth: Pembantu Kedai / Pelajar">
+            <input type="text" class="air-job-field" value="${data.kerja || ''}" placeholder="Cth: Pelajar / Pembantu Kedai">
           </div>
           <div class="form-group">
             <label>Pendapatan Sebulan (RM)</label>
@@ -1008,7 +999,7 @@
           </div>
           <div class="form-group col-span-2">
             <label>Catatan AIR</label>
-            <input type="text" class="air-notes-field" value="${data.catatan || ''}" placeholder="Catatan tambahan mengenai ahli (contoh: persekolahan, rawatan berkala, dll.)">
+            <input type="text" class="air-notes-field" value="${data.catatan || ''}" placeholder="Catatan tambahan mengenai ahli">
           </div>
         </div>
       `;
@@ -1036,7 +1027,6 @@
       recalculateForm();
     }
 
-    // PENGURUSAN DROPDOWN KEMAHIRAN (KIR & AIR)
     function addSkillFromDropdown(type, skill) {
       if (!skill) return;
       if (type === 'kir') {
@@ -1076,7 +1066,6 @@
         `).join('');
     }
 
-    // PEMAMPATAN & PREVIEW GAMBAR PENGESAHAN (BAHAGIAN F)
     function handleProofImage(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -1600,7 +1589,7 @@
 
     function renderDashboard() {
       const totalKir = records.length;
-      const totalAir = records.reduce((acc, r) => acc + (parseInt(r.air_count) || 0), 0);
+      const totalAir = records.reduce((acc, r) => acc + (parseInt(r.air_count) || (r.air_list ? r.air_list.length : 0)), 0);
       const poorUrban = records.filter(r => (r.statusPGK || '').includes('Miskin Bandar')).length;
       const poorRural = records.filter(r => (r.statusPGK || '').includes('Miskin Luar Bandar')).length;
       const above = records.filter(r => (r.statusPGK || '').includes('Terkeluar')).length;
@@ -1617,7 +1606,7 @@
       DISTRICTS_ORDER.forEach(d => {
         const dRecs = records.filter(r => r.daerah === d);
         const dKirCount = dRecs.length;
-        const dAirCount = dRecs.reduce((acc, r) => acc + (parseInt(r.air_count) || 0), 0);
+        const dAirCount = dRecs.reduce((acc, r) => acc + (parseInt(r.air_count) || (r.air_list ? r.air_list.length : 0)), 0);
         const dPoorUrban = dRecs.filter(r => (r.statusPGK || '').includes('Miskin Bandar')).length;
         const dPoorRural = dRecs.filter(r => (r.statusPGK || '').includes('Miskin Luar Bandar')).length;
         const dAbove = dRecs.filter(r => (r.statusPGK || '').includes('Terkeluar')).length;
@@ -1768,6 +1757,7 @@
 
     function openImportModal() {
       parsedImportRows = [];
+      parsedImportAirMap = {};
       document.getElementById('excelFileInput').value = '';
       document.getElementById('importPreview').style.display = 'none';
       document.getElementById('btnConfirmImport').disabled = true;
@@ -1794,8 +1784,8 @@
           "Strata": "Bandar",
           "Pekerjaan": "Pemandu Lori",
           "Pendapatan KIR (RM)": 1400,
-          "Bilangan AIR": 3,
-          "Jumlah Pendapatan AIR (RM)": 300,
+          "Bilangan AIR": 1,
+          "Jumlah Pendapatan AIR (RM)": 0,
           "Kemahiran KIR": "Pertukangan Kayu & Perabot, Pemanduan & Pengangkutan",
           "Kemahiran AIR": "Memasak / Katering Makanan",
           "Kecenderungan Minat": "Memandu kenderaan berat, bertukang kayu",
@@ -1806,12 +1796,31 @@
         }
       ];
 
-      const ws = XLSX.utils.json_to_sheet(templateData);
+      const templateAir = [
+        {
+          "No KP KIR": "750812015643",
+          "Nama Ahli": "Siti Aminah Binti Ahmad",
+          "No KP / MyKid": "080512015678",
+          "Hubungan": "Anak",
+          "Umur": 18,
+          "Jantina": "Perempuan",
+          "Status Kahwin": "Belum pernah berkahwin",
+          "Kesihatan": "Sihat",
+          "Pendidikan": "SPM",
+          "Status Kerja": "Pelajar",
+          "Pekerjaan": "Pelajar",
+          "Pendapatan (RM)": 0,
+          "Catatan": "Tingkatan 5"
+        }
+      ];
+
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Templat_Bancian");
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(templateData), "Ringkasan_KIR");
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(templateAir), "Maklumat_Penuh_AIR");
       XLSX.writeFile(wb, "Templat_Import_eBancian_Johor.xlsx");
     }
 
+    // PENGENDALIAN MEMBACA FAIL EXCEL (KIR & SEMUA LEMBARAN AIR)
     function handleExcelFile(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -1821,23 +1830,69 @@
         try {
           const data = new Uint8Array(evt.target.result);
           const workbook = XLSX.read(data, { type: 'array' });
-          const firstSheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[firstSheetName];
-          const jsonRows = XLSX.utils.sheet_to_json(worksheet);
+          
+          let kirSheetName = workbook.SheetNames[0];
+          let airSheetName = workbook.SheetNames.find(s => s.toLowerCase().includes('air') || s.toLowerCase().includes('maklumat_penuh'));
 
-          if (!jsonRows.length) {
-            alert('Fail Excel kosong atau tiada format data yang sah!');
+          const kirRows = XLSX.utils.sheet_to_json(workbook.Sheets[kirSheetName]);
+          if (!kirRows.length) {
+            alert('Lembaran KIR kosong atau tiada data sah!');
             return;
           }
 
-          parsedImportRows = jsonRows;
+          parsedImportRows = kirRows;
+          parsedImportAirMap = {};
+          let totalAirCount = 0;
+
+          // Baca lembaran kedua AIR jika ada
+          if (airSheetName && workbook.Sheets[airSheetName]) {
+            const airRows = XLSX.utils.sheet_to_json(workbook.Sheets[airSheetName]);
+            airRows.forEach(a => {
+              const kirKey = String(a["No KP KIR"] || a["ID Rekod KIR"] || a["NO.KP KIR"] || a["No KP"] || '').trim();
+              if (kirKey) {
+                if (!parsedImportAirMap[kirKey]) parsedImportAirMap[kirKey] = [];
+                parsedImportAirMap[kirKey].push({
+                  nama: String(a["Nama Ahli"] || a["Nama"] || a["NAMA"] || ''),
+                  ic: String(a["No KP / MyKid"] || a["NO.KP"] || a["No KP"] || ''),
+                  hubungan: String(a["Hubungan"] || a["HUBUNGAN"] || 'Anak'),
+                  umur: parseInt(a["Umur"] || a["UMUR"]) || 0,
+                  jantina: String(a["Jantina"] || a["JANTINA"] || 'Lelaki'),
+                  kahwin: String(a["Status Kahwin"] || a["STATUS PERKAHWINAN"] || 'Belum pernah berkahwin'),
+                  kesihatan: String(a["Kesihatan"] || a["KECACATAN"] || a["PENYAKIT"] || 'Sihat'),
+                  pendidikan: String(a["Pendidikan"] || a["PENDIDIKAN"] || ''),
+                  statusKerja: String(a["Status Kerja"] || a["PEKERJAAN"] || ''),
+                  kerja: String(a["Pekerjaan"] || a["MASCO"] || a["PEKERJAAN"] || ''),
+                  inc: parseFloat(a["Pendapatan (RM)"] || a["PENDAPATAN"]) || 0,
+                  catatan: String(a["Catatan"] || a["CATATAN"] || '')
+                });
+                totalAirCount++;
+              }
+            });
+          }
+
+          // Semak jika ada AIR tersimpan dalam bentuk JSON String pada lajur KIR
+          kirRows.forEach(row => {
+            const jsonAirStr = row["Senarai AIR (JSON)"] || row["air_details"] || row["air_list"];
+            if (jsonAirStr && typeof jsonAirStr === 'string' && jsonAirStr.startsWith('[')) {
+              try {
+                const parsedList = JSON.parse(jsonAirStr);
+                const icKey = String(row["No KP"] || row["No. Kad Pengenalan"] || row["ic"] || '').trim();
+                if (icKey && (!parsedImportAirMap[icKey] || !parsedImportAirMap[icKey].length)) {
+                  parsedImportAirMap[icKey] = parsedList;
+                  totalAirCount += parsedList.length;
+                }
+              } catch(err){}
+            }
+          });
+
           document.getElementById('importFileName').innerText = file.name;
-          document.getElementById('importRecordCount').innerText = jsonRows.length + ' Rekod';
+          document.getElementById('importRecordCount').innerText = kirRows.length + ' Keluarga';
+          document.getElementById('importAirCount').innerText = totalAirCount + ' Orang';
           document.getElementById('importPreview').style.display = 'block';
           document.getElementById('btnConfirmImport').disabled = false;
         } catch (err) {
           console.error(err);
-          alert('Ralat semasa membaca fail Excel. Pastikan format .xlsx/.xls sah.');
+          alert('Ralat membaca fail Excel: ' + err.message);
         }
       };
       reader.readAsArrayBuffer(file);
@@ -1857,7 +1912,8 @@
         const row = parsedImportRows[i];
 
         const nama = row["Nama KIR"] || row["Nama"] || row["nama"] || `KIR-${Date.now()}-${i}`;
-        const ic = String(row["No KP"] || row["No. Kad Pengenalan"] || row["ic"] || '-');
+        const ic = String(row["No KP"] || row["No. Kad Pengenalan"] || row["ic"] || '-').trim();
+        const idKey = String(row["ID Rekod"] || row["ID"] || '').trim();
         const umur = parseInt(row["Umur"] || row["umur"]) || 0;
         const jantina = row["Jantina"] || row["jantina"] || 'Lelaki';
         const kahwin = row["Status Kahwin"] || row["Status Perkahwinan"] || row["kahwin"] || 'Berkahwin';
@@ -1870,8 +1926,14 @@
         const kerja = row["Pekerjaan"] || row["kerja"] || '-';
         const incomeKir = parseFloat(row["Pendapatan KIR (RM)"] || row["incomeKir"]) || 0;
 
-        const airCount = parseInt(row["Bilangan AIR"] || row["air_count"]) || 0;
-        const airIncTotal = parseFloat(row["Jumlah Pendapatan AIR (RM)"] || row["air_income"]) || 0;
+        // Ambil senarai sebenar AIR daripada pemetaan
+        let airList = parsedImportAirMap[ic] || parsedImportAirMap[idKey] || [];
+        if (!airList.length && row["Senarai AIR (JSON)"]) {
+          try { airList = JSON.parse(row["Senarai AIR (JSON)"]); } catch(e){}
+        }
+
+        const airCount = airList.length > 0 ? airList.length : (parseInt(row["Bilangan AIR"] || row["air_count"]) || 0);
+        const airIncTotal = airList.reduce((acc, a) => acc + (parseFloat(a.inc) || 0), 0);
 
         const totalPax = 1 + airCount;
         const totalInc = incomeKir + airIncTotal;
@@ -1879,7 +1941,7 @@
         const statusPGK = checkPGK(strata, perCapita);
         const exitCost = calculateExitCost(strata, perCapita, totalPax);
 
-        const skillsKirRaw = row["Kemahiran KIR"] || row["skillsKir"] || '';
+        const skillsKirRaw = row["Kemahiran KIR"] || row["Kemahiran Ditandakan"] || row["Kemahiran Dimiliki"] || row["skillsKir"] || '';
         const skillsAirRaw = row["Kemahiran AIR"] || row["skillsAir"] || '';
         const skillsKir = typeof skillsKirRaw === 'string' ? skillsKirRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
         const skillsAir = typeof skillsAirRaw === 'string' ? skillsAirRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
@@ -1889,7 +1951,7 @@
         const kkUlasan = row["Ulasan Pengesah"] || row["Ulasan"] || row["kkUlasan"] || '';
 
         const recObj = {
-          id: 'rec-' + Date.now() + '-' + i,
+          id: idKey || ('rec-' + Date.now() + '-' + i),
           nama: String(nama),
           ic: String(ic),
           umur: Number(umur),
@@ -1903,7 +1965,7 @@
           phone: String(phone),
           alamat: String(alamat),
           catatanKir: String(catatanKir),
-          air_list: [],
+          air_list: airList,
           air_count: Number(airCount),
           totalInc: Number(totalInc),
           perCapita: Number(perCapita),
@@ -1942,14 +2004,12 @@
       records = [...newItems.reverse(), ...records];
       localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
 
-      alert(`✅ Berjaya mengimport ${successCount} rekod daripada fail Excel!`);
+      alert(`✅ Berjaya mengimport ${successCount} keluarga berserta semua maklumat AIR ke dalam sistem!`);
       closeImportModal();
       renderDashboard();
       renderRecordsTable();
     }
 
-    // Inisialisasi awal
-    renderSkillTags();
     recalculateForm();
     loadFromFirebase();
   </script>
