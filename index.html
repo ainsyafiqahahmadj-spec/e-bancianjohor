@@ -624,6 +624,10 @@
               <label>Alamat Kediaman Penuh *</label>
               <input type="text" id="fAlamat" required placeholder="No. Rumah, Jalan, Kampung / Taman, Poskod">
             </div>
+            <div class="form-group col-span-2">
+              <label>Catatan KIR</label>
+              <textarea id="fCatatanKir" rows="2" placeholder="Catatan tambahan mengenai KIR (contoh: status kediaman, sewa/milik sendiri, dll.)"></textarea>
+            </div>
           </div>
 
           <!-- BAHAGIAN B -->
@@ -714,22 +718,26 @@
               </div>
 
               <div class="form-group">
-                <label>Cadangan Bentuk Bantuan / Program Intervensi (Diisi Sendiri)</label>
-                <textarea id="fCadanganBantuan" rows="3" placeholder="Nyatakan cadangan bantuan spesifik yang bersesuaian untuk membantu keluarga ini keluar daripada kepompong miskin..."></textarea>
+                <label>Cadangan Bentuk Bantuan / Program Intervensi Diperlukan (Diisi Sendiri)</label>
+                <textarea id="fCadanganBantuan" rows="3" placeholder="Nyatakan cadangan bantuan spesifik yang diperlukan untuk membantu keluarga ini keluar daripada kepompong miskin..."></textarea>
               </div>
             </div>
           </div>
 
-          <!-- BAHAGIAN F: PENGESAHAN -->
-          <h4 style="color:var(--johor-blue); font-size:0.9rem; margin:24px 0 10px;">F. PENGESAHAN KETUA KAMPUNG / PENGHULU</h4>
+          <!-- BAHAGIAN F: PENGESAHAN KETUA KAMPUNG / PENGHULU / AHLI MAJLIS -->
+          <h4 style="color:var(--johor-blue); font-size:0.9rem; margin:24px 0 10px;">F. PENGESAHAN KETUA KAMPUNG / PENGHULU / AHLI MAJLIS</h4>
           <div class="form-grid">
             <div class="form-group">
-              <label>Nama Ketua Kampung / Penghulu</label>
+              <label>Nama Ketua Kampung / Penghulu / Ahli Majlis</label>
               <input type="text" id="fKkName" placeholder="Nama pegawai pengesah">
             </div>
             <div class="form-group">
               <label>Tarikh Bancian</label>
               <input type="date" id="fKkDate">
+            </div>
+            <div class="form-group col-span-2">
+              <label>Ulasan</label>
+              <textarea id="fKkUlasan" rows="3" placeholder="Masukkan ulasan atau sokongan daripada Ketua Kampung / Penghulu / Ahli Majlis..."></textarea>
             </div>
           </div>
 
@@ -1058,6 +1066,10 @@
             <label>Pendapatan Sebulan (RM)</label>
             <input type="number" class="air-inc-field" value="${data.inc || 0}" step="0.01" min="0" oninput="recalculateForm()">
           </div>
+          <div class="form-group col-span-2">
+            <label>Catatan AIR</label>
+            <input type="text" class="air-notes-field" value="${data.catatan || ''}" placeholder="Catatan tambahan mengenai ahli (contoh: persekolahan, rawatan berkala, dll.)">
+          </div>
         </div>
       `;
       container.appendChild(card);
@@ -1109,6 +1121,7 @@
       document.getElementById('fIncome').value = r.incomeKir || 0;
       document.getElementById('fPhone').value = r.phone || '';
       document.getElementById('fAlamat').value = r.alamat || '';
+      document.getElementById('fCatatanKir').value = r.catatanKir || '';
 
       // Bahagian B (AIR)
       const airContainer = document.getElementById('airContainer');
@@ -1137,6 +1150,7 @@
       // Bahagian F (Pengesahan)
       document.getElementById('fKkName').value = r.kkName || '';
       document.getElementById('fKkDate').value = r.kkDate || '';
+      document.getElementById('fKkUlasan').value = r.kkUlasan || '';
 
       document.getElementById('formTitleText').innerText = `✏️ Mengemas Kini Rekod Bancian: ${r.nama}`;
       document.getElementById('btnSubmit').innerText = '💾 Kemas Kini Rekod';
@@ -1156,8 +1170,10 @@
       document.getElementById('airContainer').innerHTML = '';
       document.getElementById('helpContainer').innerHTML = '';
       document.querySelectorAll('input[name="skillCheck"]').forEach(cb => cb.checked = false);
+      document.getElementById('fCatatanKir').value = '';
       document.getElementById('fKecenderungan').value = '';
       document.getElementById('fCadanganBantuan').value = '';
+      document.getElementById('fKkUlasan').value = '';
 
       document.getElementById('formTitleText').innerText = '📝 Borang Bancian Profil & Pemangkasan Kemiskinan';
       document.getElementById('btnSubmit').innerText = '💾 Simpan Rekod Bancian';
@@ -1243,6 +1259,7 @@
       const incomeKir = parseFloat(document.getElementById('fIncome').value) || 0;
       const phone = document.getElementById('fPhone').value;
       const alamat = document.getElementById('fAlamat').value;
+      const catatanKir = document.getElementById('fCatatanKir').value.trim();
 
       const airList = [];
       let airIncTotal = 0;
@@ -1258,12 +1275,14 @@
         const aJobStatus = box.querySelector('.air-jobstatus-field').value;
         const aJob = box.querySelector('.air-job-field').value.trim();
         const aInc = parseFloat(box.querySelector('.air-inc-field').value) || 0;
+        const aNotes = box.querySelector('.air-notes-field') ? box.querySelector('.air-notes-field').value.trim() : '';
 
         if (aName) {
           airList.push({
             nama: aName, ic: aIc, umur: aAge, jantina: aGender,
             hubungan: aRel, kahwin: aMarital, kesihatan: aHealth,
-            pendidikan: aEdu, statusKerja: aJobStatus, kerja: aJob, inc: aInc
+            pendidikan: aEdu, statusKerja: aJobStatus, kerja: aJob, inc: aInc,
+            catatan: aNotes
           });
           airIncTotal += aInc;
         }
@@ -1290,6 +1309,7 @@
 
       const kecenderungan = document.getElementById('fKecenderungan').value.trim();
       const cadanganBantuan = document.getElementById('fCadanganBantuan').value.trim();
+      const kkUlasan = document.getElementById('fKkUlasan').value.trim();
 
       const totalPax = 1 + airList.length;
       const totalInc = incomeKir + airIncTotal;
@@ -1313,6 +1333,7 @@
         incomeKir: Number(incomeKir),
         phone: String(phone),
         alamat: String(alamat),
+        catatanKir: String(catatanKir),
         air_list: airList,
         air_count: Number(airList.length),
         totalInc: Number(totalInc),
@@ -1326,6 +1347,7 @@
         cadanganBantuan: String(cadanganBantuan),
         kkName: String(document.getElementById('fKkName').value),
         kkDate: String(document.getElementById('fKkDate').value || new Date().toISOString().split('T')[0]),
+        kkUlasan: String(kkUlasan),
         updatedAt: new Date().toISOString(),
         lastUpdatedBy: currentRole
       };
@@ -1418,10 +1440,11 @@
             <td>${a.pendidikan || '-'}</td>
             <td>${a.kerja || a.statusKerja || '-'}</td>
             <td style="text-align:right;">RM ${(parseFloat(a.inc) || 0).toFixed(2)}</td>
+            <td><small>${a.catatan || '-'}</small></td>
           </tr>
         `).join('');
       } else {
-        airRowsHtml = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted);">Tiada tanggungan AIR didaftarkan.</td></tr>`;
+        airRowsHtml = `<tr><td colspan="9" style="text-align:center; color:var(--text-muted);">Tiada tanggungan AIR didaftarkan.</td></tr>`;
       }
 
       let helpRowsHtml = '';
@@ -1461,6 +1484,7 @@
             <div class="detail-item"><small>Pendapatan Sebulan KIR</small><strong>RM ${(r.incomeKir || 0).toFixed(2)}</strong></div>
             <div class="detail-item"><small>No. Telefon</small><strong>${r.phone || '-'}</strong></div>
             <div class="detail-item" style="grid-column:1 / -1;"><small>Alamat Kediaman Penuh</small><strong>${r.alamat || 'Tiada rekod alamat'}</strong></div>
+            <div class="detail-item" style="grid-column:1 / -1;"><small>Catatan KIR</small><strong>${r.catatanKir || '-'}</strong></div>
           </div>
         </div>
 
@@ -1478,6 +1502,7 @@
                   <th>Pendidikan</th>
                   <th>Pekerjaan</th>
                   <th style="text-align:right;">Pendapatan</th>
+                  <th>Catatan AIR</th>
                 </tr>
               </thead>
               <tbody>${airRowsHtml}</tbody>
@@ -1533,7 +1558,7 @@
                 <p style="margin-top:4px; font-weight:600; color:#1e293b; white-space:pre-wrap;">${r.kecenderungan || 'Tiada maklumat diisi'}</p>
               </div>
               <div class="detail-item" style="grid-column:1 / -1;">
-                <small>Cadangan Bantuan / Program Intervensi</small>
+                <small>Cadangan Bentuk Bantuan / Program Intervensi Diperlukan</small>
                 <p style="margin-top:4px; font-weight:600; color:#1e293b; white-space:pre-wrap;">${r.cadanganBantuan || 'Tiada cadangan diisi'}</p>
               </div>
             </div>
@@ -1541,10 +1566,11 @@
         </div>
 
         <div>
-          <h4 style="color:var(--johor-blue); margin-bottom:8px;">F. PENGESAHAN KETUA KAMPUNG / PENGHULU</h4>
+          <h4 style="color:var(--johor-blue); margin-bottom:8px;">F. PENGESAHAN KETUA KAMPUNG / PENGHULU / AHLI MAJLIS</h4>
           <div class="detail-grid">
             <div class="detail-item"><small>Nama Pegawai Pengesah</small><strong>${r.kkName || '-'}</strong></div>
             <div class="detail-item"><small>Tarikh Bancian</small><strong>${r.kkDate || '-'}</strong></div>
+            <div class="detail-item" style="grid-column:1 / -1;"><small>Ulasan Pegawai</small><p style="margin-top:4px; font-weight:600; color:#1e293b; white-space:pre-wrap;">${r.kkUlasan || 'Tiada ulasan dimasukkan'}</p></div>
           </div>
         </div>
       `;
@@ -1664,6 +1690,7 @@
           "Daerah": r.daerah,
           "Mukim / DUN": r.dun,
           "Alamat Kediaman Penuh": r.alamat || '-',
+          "Catatan KIR": r.catatanKir || '-',
           "No Telefon": r.phone || '-',
           "Strata": r.strata,
           "Pekerjaan KIR": r.kerja,
@@ -1678,9 +1705,10 @@
           "Perincian Bantuan Diterima": assistanceSummary || 'Tiada Bantuan',
           "Kemahiran Ditandakan": (r.skills || []).join(', ') || 'Tiada',
           "Kecenderungan Minat": r.kecenderungan || 'Tiada',
-          "Cadangan Bantuan / Intervensi": r.cadanganBantuan || 'Tiada',
-          "Ketua Kampung / Pengesah": r.kkName || '-',
-          "Tarikh Bancian": r.kkDate || '-'
+          "Cadangan Bantuan Diperlukan": r.cadanganBantuan || 'Tiada',
+          "Ketua Kampung / Penghulu / Ahli Majlis": r.kkName || '-',
+          "Tarikh Bancian": r.kkDate || '-',
+          "Ulasan Pengesah": r.kkUlasan || '-'
         };
       });
 
@@ -1704,7 +1732,8 @@
             "Tahap Pendidikan": a.pendidikan || '-',
             "Status Pekerjaan": a.statusKerja || '-',
             "Pekerjaan Spesifik": a.kerja || '-',
-            "Pendapatan Sebulan (RM)": (parseFloat(a.inc) || 0).toFixed(2)
+            "Pendapatan Sebulan (RM)": (parseFloat(a.inc) || 0).toFixed(2),
+            "Catatan AIR": a.catatan || '-'
           });
         });
       });
@@ -1751,6 +1780,7 @@
           "Daerah": "Johor Bahru",
           "Mukim DUN": "Mukim Plentong",
           "Alamat Penuh": "No 12, Jalan Hang Tuah, Kampung Maju Jaya, 81100 Johor Bahru",
+          "Catatan KIR": "Rumah sewa persendirian",
           "No Telefon": "0123456789",
           "Strata": "Bandar",
           "Pekerjaan": "Pemandu Lori",
@@ -1761,7 +1791,8 @@
           "Kecenderungan Minat": "Memandu kenderaan berat, bertukang kayu",
           "Cadangan Bantuan": "Bantuan modal peralatan pertukangan atau lesen GDL",
           "Nama Pengesah": "Daud Bin Omar",
-          "Tarikh Bancian": "2026-09-01"
+          "Tarikh Bancian": "2026-09-01",
+          "Ulasan Pengesah": "Keluarga ini amat memerlukan sokongan peningkatan kemahiran untuk menjana pendapatan tambahan."
         },
         {
           "Nama KIR": "Siti Aminah Binti Yusof",
@@ -1772,6 +1803,7 @@
           "Daerah": "Kota Tinggi",
           "Mukim DUN": "Mukim Sedili",
           "Alamat Penuh": "Batu 4, Kampung Teluk Jerit, 81900 Kota Tinggi",
+          "Catatan KIR": "Ibu tunggal menyara 2 orang anak bersekolah",
           "No Telefon": "0198765432",
           "Strata": "Luar Bandar",
           "Pekerjaan": "Penjual Kuih",
@@ -1782,7 +1814,8 @@
           "Kecenderungan Minat": "Membuat kek dan pastri",
           "Cadangan Bantuan": "Mesin pengadun tepung dan ketuhar gas industri",
           "Nama Pengesah": "Kassim Bin Jamil",
-          "Tarikh Bancian": "2026-09-05"
+          "Tarikh Bancian": "2026-09-05",
+          "Ulasan Pengesah": "Disyorkan untuk pemadanan bantuan geran peralatan perniagaan kecil."
         }
       ];
 
@@ -1844,6 +1877,7 @@
         const daerah = row["Daerah"] || row["daerah"] || 'Johor Bahru';
         const dun = row["Mukim DUN"] || row["DUN"] || row["dun"] || '-';
         const alamat = row["Alamat Penuh"] || row["Alamat"] || row["alamat"] || '-';
+        const catatanKir = row["Catatan KIR"] || row["catatanKir"] || '';
         const phone = String(row["No Telefon"] || row["phone"] || '-');
         const strata = (row["Strata"] || row["strata"] || 'Bandar').toLowerCase().includes('luar') ? 'Luar Bandar' : 'Bandar';
         const kerja = row["Pekerjaan"] || row["kerja"] || '-';
@@ -1863,6 +1897,7 @@
 
         const kecenderungan = row["Kecenderungan Minat"] || row["kecenderungan"] || '';
         const cadanganBantuan = row["Cadangan Bantuan"] || row["cadanganBantuan"] || '';
+        const kkUlasan = row["Ulasan Pengesah"] || row["Ulasan"] || row["kkUlasan"] || '';
 
         const recObj = {
           id: 'rec-' + Date.now() + '-' + i,
@@ -1878,6 +1913,7 @@
           incomeKir: Number(incomeKir),
           phone: String(phone),
           alamat: String(alamat),
+          catatanKir: String(catatanKir),
           air_list: [],
           air_count: Number(airCount),
           totalInc: Number(totalInc),
@@ -1889,8 +1925,9 @@
           skills: skillsList,
           kecenderungan: String(kecenderungan),
           cadanganBantuan: String(cadanganBantuan),
-          kkName: String(row["Nama Pengesah"] || row["kkName"] || '-'),
+          kkName: String(row["Nama Pengesah"] || row["Nama Ketua Kampung / Penghulu / Ahli Majlis"] || row["kkName"] || '-'),
           kkDate: String(row["Tarikh Bancian"] || row["kkDate"] || new Date().toISOString().split('T')[0]),
+          kkUlasan: String(kkUlasan),
           recordedBy: `Import (${currentRole})`
         };
 
