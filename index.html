@@ -212,6 +212,20 @@
       gap: 10px;
     }
 
+    .edit-banner-info {
+      display: none;
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      padding: 10px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      align-items: center;
+      justify-content: space-between;
+    }
+
     .table-container { width: 100%; overflow-x: auto; border: 1px solid var(--border-color); border-radius: 8px; }
     table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.82rem; }
     th {
@@ -1002,8 +1016,9 @@
   </footer>
 
   <script>
-    const FIREBASE_DB_URL = "https://e-bancian-johor-default-rtdb.firebaseio.com";
-    const FIREBASE_BACKUP_URL = "https://e-bancian-johor-default-rtdb.asia-southeast1.firebasedatabase.app";
+    // URL PANGKALAN DATA FIREBASE BAHARU ANDA
+    const FIREBASE_DB_URL = "https://e-bancianjohorv2-default-rtdb.asia-southeast1.firebasedatabase.app";
+    const FIREBASE_BACKUP_URL = "https://e-bancianjohorv2-default-rtdb.asia-southeast1.firebasedatabase.app";
     const SHEETDB_URL = "https://sheetdb.io/api/v1/k4vnnko52f2rg";
 
     const DISTRICTS_ORDER = [
@@ -1011,7 +1026,7 @@
       'Batu Pahat', 'Muar', 'Tangkak', 'Segamat', 'Mersing'
     ];
 
-    // SENARAI PENGGUNA DENGAN AKSES ADMIN BPKR BAHARU
+    // SENARAI PENGGUNA DENGAN AKSES ADMIN BPKR
     const DEFAULT_USERS = {
       "bpkradmin": { pass: "bpkr7552", nama: "Pentadbir BPKR Johor", peranan: "admin" },
       "daerah_kluang": { pass: "kluang2026", nama: "Pejabat Daerah Kluang", peranan: "staff" }
@@ -1038,6 +1053,13 @@
         if (data && typeof data === 'object') {
           systemUsers = { ...DEFAULT_USERS, ...data };
           localStorage.setItem('ebancian_users_cache', JSON.stringify(systemUsers));
+        } else {
+          // Jika pangkalan data baru masih kosong, simpan akaun asas ke Firebase
+          await tryFetchFirebase('/pengguna.json', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(DEFAULT_USERS)
+          });
         }
       } catch (e) {
         console.warn('Gagal muat pengguna dari Firebase, guna cache:', e);
@@ -1600,8 +1622,8 @@
         const helpList = r.help_list || [];
         helpList.forEach(h => {
           if (h.tarikhTamat) {
-            const exp = new Date(h.tarikhTamat);
-            const diffDays = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
+            const expDate = new Date(h.tarikhTamat);
+            const diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
             if (diffDays <= 30) {
               expiringCount++;
               r.hasExpiringAid = true;
@@ -2343,7 +2365,7 @@
           skillsAir: skillsAir,
           kecenderungan: String(row["Kecenderungan Minat"] || row["kecenderungan"] || ''),
           cadanganBantuan: String(row["Cadangan Bantuan"] || row["cadanganBantuan"] || ''),
-          kkName: String(row["Nama Pengesah"] || row["kkName"] || '-'),
+          kkName: String(row["Nama Pengesah"] || row["Nama Ketua Kampung / Penghulu / Ahli Majlis"] || row["kkName"] || '-'),
           kkDate: String(row["Tarikh Bancian"] || row["kkDate"] || new Date().toISOString().split('T')[0]),
           kkUlasan: String(row["Ulasan Pengesah"] || row["Ulasan"] || row["kkUlasan"] || ''),
           buktiImg: ''
