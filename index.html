@@ -103,6 +103,20 @@
       box-shadow: 0 2px 6px rgba(197, 31, 36, 0.35);
     }
 
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .role-admin { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
+    .role-staff { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+
     main.container { flex: 1; padding: 20px; max-width: 1400px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 20px; }
 
     .btn {
@@ -424,8 +438,8 @@
       
       <form onsubmit="handleLogin(event)" style="display:flex; flex-direction:column; gap:12px; text-align:left;">
         <div class="form-group">
-          <label>ID Pengguna / Agensi</label>
-          <input type="text" id="loginUserId" required placeholder="Contoh: SUK / Pejabat Daerah" value="Pegawai SUK Johor">
+          <label>ID Pengguna</label>
+          <input type="text" id="loginUserId" required placeholder="Cth: BPKRAdmin / daerah_kluang">
         </div>
         <div class="form-group">
           <label>Kata Laluan Sistem</label>
@@ -464,14 +478,17 @@
       </div>
     </div>
 
-    <!-- 3 TAB NAVIGASI & LOG KELUAR -->
+    <!-- 3 TAB NAVIGASI, TAB ADMIN & LOG KELUAR -->
     <div class="nav-wrap">
       <div class="nav-tabs">
         <button class="nav-tab-btn active" id="btnTabDash" onclick="switchPage('tab-dashboard')">📊 Dashboard</button>
         <button class="nav-tab-btn" id="btnTabRecords" onclick="switchPage('tab-records')">📋 Rekod Bancian</button>
         <button class="nav-tab-btn" id="btnTabForm" onclick="switchPage('tab-borang')">📝 Borang Bancian</button>
       </div>
-      <div style="display:flex; align-items:center; gap:6px;">
+      
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span id="headerUserBadge" class="role-badge role-staff">Pengguna</span>
+        <button class="btn btn-outline" id="btnAdminUsers" style="display:none; padding:5px 10px; font-size:0.75rem;" onclick="switchPage('tab-users')">👥 Pengurusan Pengguna</button>
         <button class="btn btn-outline" style="padding:5px 10px; font-size:0.75rem;" onclick="promptInstallPWA()">📱 Pasang App</button>
         <button class="btn btn-outline" style="padding:5px 10px; font-size:0.75rem; color:var(--johor-red);" onclick="handleLogout()">Keluar</button>
       </div>
@@ -491,7 +508,6 @@
 
     <!-- TAB 1: DASHBOARD -->
     <div id="tab-dashboard" class="tab-content active">
-      
       <section class="kpi-row">
         <div class="kpi-card-box">
           <div class="kpi-icon icon-blue">🏠</div>
@@ -561,10 +577,9 @@
           </table>
         </div>
       </section>
-
     </div>
 
-    <!-- TAB 2: REKOD BANCIAN BERDAFTAR (TAB KHAS) -->
+    <!-- TAB 2: REKOD BANCIAN BERDAFTAR -->
     <div id="tab-records" class="tab-content">
       <section class="section-card">
         <div class="section-title">
@@ -574,7 +589,6 @@
           </div>
         </div>
 
-        <!-- RUANGAN CARIAN NO KAD PENGENALAN & NAMA KHAS -->
         <div style="background:#f8fafc; border:1px solid var(--border-color); border-radius:10px; padding:14px; margin-bottom:16px; display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
           <div class="form-group" style="flex:1; min-width:200px;">
             <label>🔍 Cari No. Kad Pengenalan KIR / AIR</label>
@@ -733,7 +747,7 @@
           </div>
           <div id="airContainer"></div>
 
-          <!-- BAHAGIAN C: MAKLUMAT PROGRAM BANTUAN -->
+          <!-- BAHAGIAN C: BANTUAN -->
           <div style="display:flex; justify-content:space-between; align-items:center; margin:24px 0 8px;">
             <div>
               <h4 style="color:var(--johor-blue); font-size:0.9rem;">C. MAKLUMAT PROGRAM BANTUAN YANG DITERIMA</h4>
@@ -748,7 +762,7 @@
             <span id="liveTotalHelp" style="font-size:1.1rem; font-weight:800; color:#a16207;">RM 0.00</span>
           </div>
 
-          <!-- KOTAK STATUS PGK REAL-TIME (TERMASUK SUMBANGAN BANTUAN) -->
+          <!-- KOTAK STATUS PGK REAL-TIME -->
           <div class="calc-banner">
             <div>
               <small>Jumlah Pendapatan IR (Gaji + Bantuan)</small>
@@ -772,7 +786,7 @@
             </div>
           </div>
 
-          <!-- BAHAGIAN D: KEMAHIRAN, KECENDERUNGAN & CADANGAN BANTUAN -->
+          <!-- BAHAGIAN D: KEMAHIRAN -->
           <div style="margin: 20px 0; background:#f8fafc; padding:16px; border-radius:10px; border:1px solid var(--border-color);">
             <h4 style="color:var(--johor-blue); font-size:0.95rem; font-weight:800; margin-bottom:4px;">D. KEMAHIRAN, KECENDERUNGAN & INTERVENSI</h4>
             <p style="font-size:0.72rem; color:var(--text-muted); margin-bottom:12px;">Pilih kemahiran daripada menu pilihan dropdown atau isi kecenderungan & cadangan bantuan.</p>
@@ -877,6 +891,63 @@
       </section>
     </div>
 
+    <!-- TAB 4: PENGURUSAN PENGGUNA (KHAS UNTUK ADMIN) -->
+    <div id="tab-users" class="tab-content">
+      <section class="section-card">
+        <div class="section-title">
+          <span>👥 Pengurusan Akaun & ID Pengguna Sistem (Akses Pentadbir)</span>
+          <button class="btn btn-outline" onclick="switchPage('tab-dashboard')">← Kembali ke Dashboard</button>
+        </div>
+
+        <!-- BORANG TAMBAH ID PENGGUNA BAHARU -->
+        <div style="background:#f8fafc; border:1px solid var(--border-color); border-radius:10px; padding:18px; margin-bottom:20px;">
+          <h4 style="color:var(--johor-blue); font-size:0.9rem; margin-bottom:12px;">+ Tambah ID Pengguna Baharu</h4>
+          <form onsubmit="handleAddUser(event)" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; align-items:flex-end;">
+            <div class="form-group">
+              <label>ID Pengguna (Username) *</label>
+              <input type="text" id="newUserId" required placeholder="Cth: daerah_kluang / pegawai_jb">
+            </div>
+            <div class="form-group">
+              <label>Nama Penuh / Agensi *</label>
+              <input type="text" id="newUserName" required placeholder="Cth: Pejabat Daerah Kluang">
+            </div>
+            <div class="form-group">
+              <label>Kata Laluan *</label>
+              <input type="text" id="newUserPass" required placeholder="Cth: kluang2026">
+            </div>
+            <div class="form-group">
+              <label>Peranan Akses</label>
+              <select id="newUserRole">
+                <option value="staff">Pengguna Biasa / Pejabat Daerah</option>
+                <option value="admin">Pentadbir (Admin SUK)</option>
+              </select>
+            </div>
+            <div>
+              <button type="submit" class="btn btn-green" style="height:38px; width:100%; justify-content:center;">➕ Tambah Pengguna</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- JADUAL SENARAI PENGGUNA BERDAFTAR -->
+        <h4 style="color:var(--johor-blue); font-size:0.9rem; margin-bottom:10px;">Senarai ID Pengguna Berdaftar</h4>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>ID Pengguna (Username)</th>
+                <th>Nama / Agensi</th>
+                <th>Kata Laluan</th>
+                <th>Peranan</th>
+                <th style="text-align:center;">Tindakan</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
   </main>
 
   <!-- MODAL PAPARAN PROFIL LENGKAP -->
@@ -934,13 +1005,19 @@
     const FIREBASE_DB_URL = "https://e-bancian-johor-default-rtdb.firebaseio.com";
     const FIREBASE_BACKUP_URL = "https://e-bancian-johor-default-rtdb.asia-southeast1.firebasedatabase.app";
     const SHEETDB_URL = "https://sheetdb.io/api/v1/k4vnnko52f2rg";
-    const SYSTEM_PASSWORD = "johor2026"; // KATA LALUAN LOG MASUK
 
     const DISTRICTS_ORDER = [
       'Johor Bahru', 'Kulai', 'Pontian', 'Kota Tinggi', 'Kluang',
       'Batu Pahat', 'Muar', 'Tangkak', 'Segamat', 'Mersing'
     ];
 
+    // SENARAI PENGGUNA DENGAN AKSES ADMIN BPKR BAHARU
+    const DEFAULT_USERS = {
+      "bpkradmin": { pass: "bpkr7552", nama: "Pentadbir BPKR Johor", peranan: "admin" },
+      "daerah_kluang": { pass: "kluang2026", nama: "Pejabat Daerah Kluang", peranan: "staff" }
+    };
+
+    let systemUsers = JSON.parse(localStorage.getItem('ebancian_users_cache')) || DEFAULT_USERS;
     let records = [];
     let activeFirebaseUrl = FIREBASE_DB_URL;
     let parsedImportRows = [];
@@ -953,11 +1030,40 @@
     let selectedSkillsAir = [];
     let currentProofBase64 = "";
 
-    // PENGURUSAN LOG MASUK & SESI
+    // MUAT TURUN SENARAI PENGGUNA DARI FIREBASE
+    async function loadUsersFromFirebase() {
+      try {
+        const res = await tryFetchFirebase('/pengguna.json');
+        const data = await res.json();
+        if (data && typeof data === 'object') {
+          systemUsers = { ...DEFAULT_USERS, ...data };
+          localStorage.setItem('ebancian_users_cache', JSON.stringify(systemUsers));
+        }
+      } catch (e) {
+        console.warn('Gagal muat pengguna dari Firebase, guna cache:', e);
+      }
+      renderUsersTable();
+    }
+
+    // PENGESAHAN LOG MASUK
     function checkLoginStatus() {
       const isAuth = sessionStorage.getItem('ebancian_auth');
+      const userRole = sessionStorage.getItem('ebancian_user_role') || 'staff';
+      const userName = sessionStorage.getItem('ebancian_user_name') || 'Pengguna';
+
       if (isAuth === 'true') {
         document.getElementById('loginScreen').style.display = 'none';
+        
+        const userBadge = document.getElementById('headerUserBadge');
+        if (userBadge) {
+          userBadge.innerText = userName;
+          userBadge.className = `role-badge ${userRole === 'admin' ? 'role-admin' : 'role-staff'}`;
+        }
+
+        const btnAdmin = document.getElementById('btnAdminUsers');
+        if (btnAdmin) {
+          btnAdmin.style.display = (userRole === 'admin') ? 'inline-flex' : 'none';
+        }
       } else {
         document.getElementById('loginScreen').style.display = 'flex';
       }
@@ -965,24 +1071,107 @@
 
     function handleLogin(e) {
       e.preventDefault();
+      const userId = document.getElementById('loginUserId').value.trim().toLowerCase();
       const pass = document.getElementById('loginPass').value;
-      if (pass === SYSTEM_PASSWORD) {
-        sessionStorage.setItem('ebancian_auth', 'true');
-        document.getElementById('loginScreen').style.display = 'none';
-        alert('Selamat Datang ke Sistem e-Bancian Johor.');
+
+      if (systemUsers[userId]) {
+        if (systemUsers[userId].pass === pass) {
+          sessionStorage.setItem('ebancian_auth', 'true');
+          sessionStorage.setItem('ebancian_user_id', userId);
+          sessionStorage.setItem('ebancian_user_name', systemUsers[userId].nama);
+          sessionStorage.setItem('ebancian_user_role', systemUsers[userId].peranan);
+
+          document.getElementById('loginScreen').style.display = 'none';
+          checkLoginStatus();
+          alert(`Selamat Datang, ${systemUsers[userId].nama}!`);
+        } else {
+          alert('Kata laluan tidak sah! Sila semak semula.');
+        }
       } else {
-        alert('Kata laluan tidak sah! Sila masukkan kata laluan yang betul.');
+        alert('ID Pengguna tidak wujud dalam sistem! Sila hubungi Pentadbir BPKR.');
       }
     }
 
     function handleLogout() {
       if (confirm('Adakah anda pasti mahu log keluar daripada sistem?')) {
-        sessionStorage.removeItem('ebancian_auth');
+        sessionStorage.clear();
         window.location.reload();
       }
     }
 
-    // PASANG PWA / MOBILE APP PROMPT
+    // PENGURUSAN TAMBAH PENGGUNA (KHAS UNTUK ADMIN)
+    async function handleAddUser(e) {
+      e.preventDefault();
+      const uId = document.getElementById('newUserId').value.trim().toLowerCase();
+      const uName = document.getElementById('newUserName').value.trim();
+      const uPass = document.getElementById('newUserPass').value.trim();
+      const uRole = document.getElementById('newUserRole').value;
+
+      if (systemUsers[uId]) {
+        alert('ID Pengguna ini sudah wujud! Sila gunakan ID lain.');
+        return;
+      }
+
+      systemUsers[uId] = { pass: uPass, nama: uName, peranan: uRole };
+      localStorage.setItem('ebancian_users_cache', JSON.stringify(systemUsers));
+
+      try {
+        await tryFetchFirebase(`/pengguna/${uId}.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(systemUsers[uId])
+        });
+        alert(`✅ Pengguna baharu [${uId}] berjaya didaftarkan ke pangkalan data!`);
+      } catch (err) {
+        alert('Disimpan ke cache tempatan. Ralat pangkalan data: ' + err.message);
+      }
+
+      document.getElementById('newUserId').value = '';
+      document.getElementById('newUserName').value = '';
+      document.getElementById('newUserPass').value = '';
+      renderUsersTable();
+    }
+
+    async function deleteUser(uId) {
+      if (uId === 'bpkradmin') {
+        alert('Akaun Admin Utama (BPKRAdmin) tidak boleh dipadam!');
+        return;
+      }
+      if (!confirm(`Adakah anda pasti mahu memadam akaun pengguna [${uId}]?`)) return;
+
+      delete systemUsers[uId];
+      localStorage.setItem('ebancian_users_cache', JSON.stringify(systemUsers));
+
+      try {
+        await tryFetchFirebase(`/pengguna/${uId}.json`, { method: 'DELETE' });
+      } catch (err) {}
+
+      renderUsersTable();
+      alert(`Akaun [${uId}] telah dipadam.`);
+    }
+
+    function renderUsersTable() {
+      const tbody = document.getElementById('usersTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      let idx = 1;
+      for (const [uId, uData] of Object.entries(systemUsers)) {
+        tbody.innerHTML += `
+          <tr>
+            <td>${idx++}</td>
+            <td><code>${uId}</code></td>
+            <td><strong>${uData.nama}</strong></td>
+            <td>••••••••</td>
+            <td><span class="badge ${uData.peranan === 'admin' ? 'badge-red' : 'badge-green'}">${uData.peranan === 'admin' ? 'Admin BPKR' : 'Pejabat Daerah / Staf'}</span></td>
+            <td style="text-align:center;">
+              ${uId !== 'bpkradmin' ? `<button class="btn btn-outline" style="padding:2px 8px; font-size:0.75rem; color:var(--johor-red);" onclick="deleteUser('${uId}')">Padam</button>` : '<small style="color:var(--text-muted);">Kekal</small>'}
+            </td>
+          </tr>
+        `;
+      }
+    }
+
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
@@ -1005,7 +1194,8 @@
 
     function switchPage(pageId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.getElementById(pageId).classList.add('active');
+      const targetTab = document.getElementById(pageId);
+      if (targetTab) targetTab.classList.add('active');
 
       document.querySelectorAll('.nav-tab-btn').forEach(btn => btn.classList.remove('active'));
       if (pageId === 'tab-dashboard') document.getElementById('btnTabDash').classList.add('active');
@@ -1015,6 +1205,9 @@
       if (pageId === 'tab-records' || pageId === 'tab-dashboard') {
         renderDashboard();
         renderRecordsTable();
+      }
+      if (pageId === 'tab-users') {
+        renderUsersTable();
       }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -1034,7 +1227,6 @@
       return gapPerCapita * totalPax;
     }
 
-    // KIRAAN REAL-TIME DENGAN PENYATUAN BANTUAN
     function recalculateForm() {
       const strata = document.getElementById('fStrata').value;
       const kirInc = parseFloat(document.getElementById('fIncome').value) || 0;
@@ -1045,7 +1237,6 @@
         airTotalInc += parseFloat(input.value) || 0;
       });
 
-      // KIRA JUMLAH BANTUAN YANG DITERIMA
       let totalHelpVal = 0;
       document.querySelectorAll('.help-row-item').forEach(row => {
         const val = parseFloat(row.querySelector('.help-val-field').value) || 0;
@@ -1055,12 +1246,11 @@
         } else if (freq === 'Tahunan') {
           totalHelpVal += (val / 12);
         } else {
-          totalHelpVal += val; // One-off / Barangan dikira bulan semasa
+          totalHelpVal += val;
         }
       });
       document.getElementById('liveTotalHelp').innerText = 'RM ' + totalHelpVal.toFixed(2);
 
-      // JUMLAH PENDAPATAN = GAJI KIR + GAJI AIR + BANTUAN DITERIMA
       const totalPax = 1 + airIncRows.length;
       const totalHouseholdInc = kirInc + airTotalInc + totalHelpVal;
       const perCapita = totalHouseholdInc / totalPax;
@@ -1169,7 +1359,6 @@
       recalculateForm();
     }
 
-    // TAMBAH BANTUAN DENGAN TARIKH TAMAT
     function addHelpRow(data = {}) {
       const container = document.getElementById('helpContainer');
       const row = document.createElement('div');
@@ -1403,7 +1592,6 @@
       renderRecordsTable();
     }
 
-    // PENYEMAKAN NOTIFIKASI BANTUAN HAMPIR TAMAT (30 HARI)
     function checkExpiringAids() {
       const today = new Date();
       let expiringCount = 0;
@@ -1516,7 +1704,6 @@
       const cadanganBantuan = document.getElementById('fCadanganBantuan').value.trim();
       const kkUlasan = document.getElementById('fKkUlasan').value.trim();
 
-      // GAJI + BANTUAN DIKIRA BERSAMA
       const totalPax = 1 + airList.length;
       const totalInc = incomeKir + airIncTotal + helpTotalVal;
       const perCapita = totalInc / totalPax;
@@ -1793,47 +1980,6 @@
       document.getElementById('viewModal').classList.remove('active');
     }
 
-    function renderDashboard() {
-      const totalKir = records.length;
-      const totalAir = records.reduce((acc, r) => acc + (parseInt(r.air_count) || (r.air_list ? r.air_list.length : 0)), 0);
-      const poorUrban = records.filter(r => (r.statusPGK || '').includes('Miskin Bandar')).length;
-      const poorRural = records.filter(r => (r.statusPGK || '').includes('Miskin Luar Bandar')).length;
-      const above = records.filter(r => (r.statusPGK || '').includes('Terkeluar')).length;
-
-      document.getElementById('statKir').innerText = totalKir;
-      document.getElementById('statAirSub').innerText = totalAir + ' Tanggungan (AIR)';
-      document.getElementById('statPoorUrban').innerText = poorUrban;
-      document.getElementById('statPoorRural').innerText = poorRural;
-      document.getElementById('statAbove').innerText = above;
-
-      const tbody = document.getElementById('districtTableBody');
-      tbody.innerHTML = '';
-
-      DISTRICTS_ORDER.forEach(d => {
-        const dRecs = records.filter(r => r.daerah === d);
-        const dKirCount = dRecs.length;
-        const dAirCount = dRecs.reduce((acc, r) => acc + (parseInt(r.air_count) || (r.air_list ? r.air_list.length : 0)), 0);
-        const dPoorUrban = dRecs.filter(r => (r.statusPGK || '').includes('Miskin Bandar')).length;
-        const dPoorRural = dRecs.filter(r => (r.statusPGK || '').includes('Miskin Luar Bandar')).length;
-        const dAbove = dRecs.filter(r => (r.statusPGK || '').includes('Terkeluar')).length;
-        const totalIncomeAll = dRecs.reduce((acc, r) => acc + (parseFloat(r.totalInc) || 0), 0);
-        const avgIncome = dKirCount > 0 ? (totalIncomeAll / dKirCount) : 0;
-
-        tbody.innerHTML += `
-          <tr>
-            <td><strong>${d}</strong></td>
-            <td style="text-align:center;">${dKirCount}</td>
-            <td style="text-align:center;">${dAirCount}</td>
-            <td style="text-align:center; font-weight:700; color:${dPoorUrban > 0 ? 'var(--johor-red)' : '#991b1b'};">${dPoorUrban}</td>
-            <td style="text-align:center; font-weight:700; color:${dPoorRural > 0 ? '#b45309' : '#b45309'};">${dPoorRural}</td>
-            <td style="text-align:center; font-weight:700; color:#15803d;">${dAbove}</td>
-            <td style="text-align:right;">RM ${avgIncome.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-          </tr>
-        `;
-      });
-    }
-
-    // CARIAN LANJUTAN: NO KAD PENGENALAN, NAMA, DAERAH
     function renderRecordsTable() {
       const searchIc = (document.getElementById('searchIcBox')?.value || '').toLowerCase().trim();
       const searchName = (document.getElementById('searchNameBox')?.value || '').toLowerCase().trim();
@@ -1844,7 +1990,6 @@
       tbody.innerHTML = '';
 
       const filtered = records.filter(r => {
-        // Carian No KP merangkumi KP KIR atau mana-mana KP AIR
         let icMatch = true;
         if (searchIc) {
           const kirIc = String(r.ic || '').toLowerCase();
@@ -1852,7 +1997,6 @@
           icMatch = kirIc.includes(searchIc) || airIcs.includes(searchIc);
         }
 
-        // Carian Nama/Alamat merangkumi KIR & nama semua AIR
         let nameMatch = true;
         if (searchName) {
           const airNames = (r.air_list || []).map(a => String(a.nama || '').toLowerCase()).join(' ');
@@ -1883,7 +2027,6 @@
       const perCapita = parseFloat(r.perCapita) || 0;
       const exitCost = r.exitCost || calculateExitCost(r.strata, perCapita, airCount + 1);
 
-      // Status Bantuan Tamat
       let aidBadge = '<span class="badge" style="background:#f1f5f9; color:#64748b;">Tiada Rekod</span>';
       if (r.help_list && r.help_list.length) {
         let hasExp = false;
@@ -2061,7 +2204,6 @@
             });
           }
 
-          // Semak jika ada JSON string AIR
           kirRows.forEach(row => {
             const jsonAirStr = row["Senarai AIR (JSON)"] || row["air_details"] || row["air_list"];
             if (jsonAirStr && typeof jsonAirStr === 'string' && jsonAirStr.startsWith('[')) {
@@ -2161,7 +2303,7 @@
           skillsAir: skillsAir,
           kecenderungan: String(row["Kecenderungan Minat"] || row["kecenderungan"] || ''),
           cadanganBantuan: String(row["Cadangan Bantuan"] || row["cadanganBantuan"] || ''),
-          kkName: String(row["Nama Pengesah"] || row["kkName"] || '-'),
+          kkName: String(row["Nama Pengesah"] || row["Nama Ketua Kampung / Penghulu / Ahli Majlis"] || row["kkName"] || '-'),
           kkDate: String(row["Tarikh Bancian"] || row["kkDate"] || new Date().toISOString().split('T')[0]),
           kkUlasan: String(row["Ulasan Pengesah"] || row["Ulasan"] || row["kkUlasan"] || ''),
           buktiImg: ''
@@ -2194,6 +2336,7 @@
     }
 
     // MULA SISTEM
+    loadUsersFromFirebase();
     checkLoginStatus();
     renderSkillTags();
     recalculateForm();
