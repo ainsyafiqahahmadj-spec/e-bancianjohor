@@ -343,6 +343,34 @@
 
     @keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
 
+    /* PROGRESS BAR IMPORT PUKAL */
+    .progress-bar-wrap {
+      width: 100%;
+      background: #e2e8f0;
+      border-radius: 10px;
+      height: 12px;
+      overflow: hidden;
+      margin-top: 10px;
+      display: none;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--success);
+      width: 0%;
+      transition: width 0.2s;
+    }
+
+    /* PAGINATION BAR */
+    .pagination-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.8rem;
+    }
+
     .modal-backdrop {
       display: none;
       position: fixed;
@@ -608,15 +636,15 @@
         <div style="background:#f8fafc; border:1px solid var(--border-color); border-radius:10px; padding:14px; margin-bottom:16px; display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
           <div class="form-group" style="flex:1; min-width:200px;">
             <label>🔍 Cari No. Kad Pengenalan KIR / AIR</label>
-            <input type="text" id="searchIcBox" placeholder="Masukkan 12 digit No. KP (Cth: 840416...)" oninput="renderRecordsTable()">
+            <input type="text" id="searchIcBox" placeholder="Masukkan 12 digit No. KP (Cth: 840416...)" oninput="handleFilterChange()">
           </div>
           <div class="form-group" style="flex:1; min-width:200px;">
             <label>🔍 Cari Nama / Alamat / Daerah</label>
-            <input type="text" id="searchNameBox" placeholder="Cari Nama KIR / Ahli / Mukim / Alamat..." oninput="renderRecordsTable()">
+            <input type="text" id="searchNameBox" placeholder="Cari Nama KIR / Ahli / Mukim / Alamat..." oninput="handleFilterChange()">
           </div>
           <div class="form-group" style="min-width:160px;">
             <label>Tapis Mengikut Daerah</label>
-            <select id="filterDistrictSelect" onchange="renderRecordsTable()">
+            <select id="filterDistrictSelect" onchange="handleFilterChange()">
               <option value="">-- Semua Daerah --</option>
               <option value="Johor Bahru">Johor Bahru</option>
               <option value="Kulai">Kulai</option>
@@ -654,6 +682,15 @@
             <tbody id="recordsBody"></tbody>
           </table>
         </div>
+
+        <!-- PAGINASI UNTUK REKOD BANYAK (>500) -->
+        <div class="pagination-wrap">
+          <div id="pageInfoText">Menunjukkan 0 rekod</div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-outline" id="btnPrevPage" onclick="changePage(-1)" disabled>&laquo; Sebelum</button>
+            <button class="btn btn-outline" id="btnNextPage" onclick="changePage(1)" disabled>Seterusnya &raquo;</button>
+          </div>
+        </div>
       </section>
     </div>
 
@@ -674,7 +711,6 @@
         </div>
 
         <form id="frmBanci" onsubmit="saveBanci(event)">
-          <!-- BAHAGIAN A: MAKLUMAT KETUA ISI RUMAH (KIR) -->
           <h4 style="color:var(--johor-blue); font-size:0.95rem; font-weight:800; margin-bottom:12px;">A. MAKLUMAT LENGKAP KETUA ISI RUMAH (KIR)</h4>
           <div class="form-grid">
             <div class="form-group">
@@ -850,7 +886,7 @@
           </div>
           <div id="airContainer"></div>
 
-          <!-- BAHAGIAN C: BANTUAN DENGAN DROPDOWN AGENSI TERKINI -->
+          <!-- BAHAGIAN C: BANTUAN -->
           <div style="display:flex; justify-content:space-between; align-items:center; margin:24px 0 8px;">
             <div>
               <h4 style="color:var(--johor-blue); font-size:0.9rem;">C. MAKLUMAT PROGRAM BANTUAN YANG DITERIMA</h4>
@@ -1076,7 +1112,7 @@
       </div>
       <div class="modal-body">
         <p style="font-size:0.8rem; color:var(--text-muted); line-height:1.5;">
-          Muat naik fail Excel untuk mendaftarkan senarai isi rumah secara kelompok (*bulk*). Semua maklumat KIR, AIR, dan bantuan akan dipadankan secara automatik.
+          Muat naik fail Excel untuk mendaftarkan senarai isi rumah secara kelompok (*bulk*). Semua data akan dihantar secara pakej pantas.
         </p>
 
         <div class="upload-zone" onclick="document.getElementById('excelFileInput').click()">
@@ -1090,6 +1126,11 @@
           <div>Nama Fail: <strong id="importFileName">-</strong></div>
           <div>Jumlah KIR: <strong id="importRecordCount" style="color:var(--success);">0</strong></div>
           <div>Jumlah AIR: <strong id="importAirCount" style="color:var(--johor-blue);">0</strong></div>
+          
+          <div class="progress-bar-wrap" id="importProgressWrap">
+            <div class="progress-bar-fill" id="importProgressBar"></div>
+          </div>
+          <div id="importProgressText" style="margin-top:6px; font-weight:700; color:var(--johor-blue); display:none;"></div>
         </div>
       </div>
       <div style="padding:12px 18px; background:#f8fafc; border-top:1px solid var(--border-color); display:flex; justify-content:flex-end; gap:10px;">
@@ -1114,7 +1155,6 @@
       'Batu Pahat', 'Muar', 'Tangkak', 'Segamat', 'Mersing'
     ];
 
-    // SENARAI PENGGUNA DEFAULT DENGAN PILIHAN PERANAN BARU
     const DEFAULT_USERS = {
       "bpkradmin": { pass: "bpkr7552", nama: "Pentadbir BPKR Johor", peranan: "admin" },
       "daerah_kluang": { pass: "kluang2026", nama: "Pejabat Daerah Kluang", peranan: "daerah" },
@@ -1135,7 +1175,10 @@
     let selectedDisabilityKir = [];
     let currentProofBase64 = "";
 
-    // PENGURUSAN TAG KECACATAN MULTI-SELECT (KIR)
+    // Pembolehubah Paginasi
+    let currentPage = 1;
+    const recordsPerPage = 50;
+
     function addDisabilityTag(target, val) {
       if (!val) return;
       if (target === 'kir') {
@@ -1171,7 +1214,6 @@
       }).join('');
     }
 
-    // PENGURUSAN TAG KECACATAN MULTI-SELECT (AIR)
     function addDisabilityTagAir(box, val) {
       if (!val) return;
       let tags = getAirDisabilityTags(box);
@@ -1216,7 +1258,6 @@
       }
     }
 
-    // TOGGLE RUANGAN AGENSI LAIN-LAIN
     function toggleAgencyCustom(selectEl) {
       const parentRow = selectEl.closest('.help-row-item');
       if (!parentRow) return;
@@ -1496,7 +1537,6 @@
       }
     }
 
-    // TAMBAH KAD AIR
     function addAirRow(data = {}) {
       const container = document.getElementById('airContainer');
       const index = container.children.length + 1;
@@ -1612,7 +1652,6 @@
             <input type="text" class="air-penyakit-field" value="${data.penyakit || ''}" placeholder="Cth: Tiada penyakit / Asma">
           </div>
 
-          <!-- MEDAN KECACATAN MULTI-SELECT AIR -->
           <div class="form-group col-span-2">
             <label>Kecacatan (Boleh pilih lebih daripada 1):</label>
             <input type="hidden" class="air-disability-value" value="${initialDisability}">
@@ -1660,7 +1699,6 @@
       recalculateForm();
     }
 
-    // TAMBAH BANTUAN DENGAN DROPDOWN AGENSI
     function addHelpRow(data = {}) {
       const container = document.getElementById('helpContainer');
       const row = document.createElement('div');
@@ -1927,13 +1965,20 @@
           records = [];
         }
 
-        localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
+        try {
+          localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
+        } catch(e) {
+          console.warn('Saiz cache melebihi kuota pelayar, guna mod memori langsung.');
+        }
+
         syncDot.className = 'sync-dot online';
         syncText.innerText = `Firebase Live (${records.length} rekod)`;
       } catch (err) {
         syncDot.className = 'sync-dot';
-        syncText.innerText = 'Mod Luar Talian (Guna cache)';
-        records = JSON.parse(localStorage.getItem('ebancian_johor_cache')) || [];
+        syncText.innerText = 'Mod Luar Talian';
+        try {
+          records = JSON.parse(localStorage.getItem('ebancian_johor_cache')) || [];
+        } catch(e) { records = []; }
       }
 
       checkExpiringAids();
@@ -1972,6 +2017,7 @@
       switchPage('tab-records');
       document.getElementById('searchNameBox').value = '';
       document.getElementById('searchIcBox').value = '';
+      currentPage = 1;
       
       const tbody = document.getElementById('recordsBody');
       tbody.innerHTML = '';
@@ -1985,7 +2031,6 @@
       filtered.forEach(r => renderSingleRecordRow(tbody, r));
     }
 
-    // SIMPAN DATA KE FIREBASE
     async function saveBanci(e) {
       e.preventDefault();
       const btnSubmit = document.getElementById('btnSubmit');
@@ -2163,7 +2208,7 @@
           alert(`✅ Rekod ${nama} (${daerah}) berjaya disimpan!`);
         }
 
-        localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
+        try { localStorage.setItem('ebancian_johor_cache', JSON.stringify(records)); } catch(e){}
         cancelEditMode();
         checkExpiringAids();
         renderDashboard();
@@ -2185,14 +2230,13 @@
         } catch (err) {}
       }
       records = records.filter(x => x.id !== id);
-      localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
+      try { localStorage.setItem('ebancian_johor_cache', JSON.stringify(records)); } catch(e){}
       checkExpiringAids();
       renderDashboard();
       renderRecordsTable();
       alert('Rekod telah dipadam.');
     }
 
-    // MODAL PAPARAN LENGKAP PROFIL BERSERTA SEMUA MEDAN
     function viewRecord(id) {
       const r = records.find(x => x.id === id);
       if (!r) return;
@@ -2424,6 +2468,17 @@
       });
     }
 
+    function handleFilterChange() {
+      currentPage = 1;
+      renderRecordsTable();
+    }
+
+    function changePage(delta) {
+      currentPage += delta;
+      renderRecordsTable();
+    }
+
+    // PAPARAN JADUAL REKOD DENGAN PAGINASI (CEGAH FREEZE BILA >500)
     function renderRecordsTable() {
       const searchIc = (document.getElementById('searchIcBox')?.value || '').toLowerCase().trim();
       const searchName = (document.getElementById('searchNameBox')?.value || '').toLowerCase().trim();
@@ -2456,12 +2511,31 @@
         return icMatch && nameMatch && districtMatch;
       });
 
-      if (!filtered.length) {
+      const totalFiltered = filtered.length;
+      const totalPages = Math.ceil(totalFiltered / recordsPerPage) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+
+      const startIndex = (currentPage - 1) * recordsPerPage;
+      const endIndex = Math.min(startIndex + recordsPerPage, totalFiltered);
+      const pageRecords = filtered.slice(startIndex, endIndex);
+
+      const pageInfo = document.getElementById('pageInfoText');
+      if (pageInfo) {
+        pageInfo.innerText = totalFiltered === 0 
+          ? 'Tiada rekod ditemui' 
+          : `Menunjukkan ${startIndex + 1} - ${endIndex} daripada ${totalFiltered} rekod (Halaman ${currentPage}/${totalPages})`;
+      }
+
+      document.getElementById('btnPrevPage').disabled = (currentPage <= 1);
+      document.getElementById('btnNextPage').disabled = (currentPage >= totalPages);
+
+      if (!pageRecords.length) {
         tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; padding:24px; color:var(--text-muted);">Tiada rekod bancian ditemui mengikut kriteria carian.</td></tr>`;
         return;
       }
 
-      filtered.forEach(r => renderSingleRecordRow(tbody, r));
+      pageRecords.forEach(r => renderSingleRecordRow(tbody, r));
     }
 
     function renderSingleRecordRow(tbody, r) {
@@ -2510,10 +2584,10 @@
       document.getElementById('searchIcBox').value = '';
       document.getElementById('searchNameBox').value = '';
       document.getElementById('filterDistrictSelect').value = '';
+      currentPage = 1;
       renderRecordsTable();
     }
 
-    // EKSPORT EXCEL
     function exportExcel() {
       if (!records.length) {
         alert('Tiada data untuk dieksport.');
@@ -2614,6 +2688,8 @@
       parsedImportAirMap = {};
       document.getElementById('excelFileInput').value = '';
       document.getElementById('importPreview').style.display = 'none';
+      document.getElementById('importProgressWrap').style.display = 'none';
+      document.getElementById('importProgressText').style.display = 'none';
       document.getElementById('btnConfirmImport').disabled = true;
       document.getElementById('importModal').classList.add('active');
     }
@@ -2622,7 +2698,6 @@
       document.getElementById('importModal').classList.remove('active');
     }
 
-    // PENGENDALIAN MEMBACA FAIL EXCEL
     function handleExcelFile(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -2798,131 +2873,150 @@
       reader.readAsArrayBuffer(file);
     }
 
+    // PROSES IMPORT BATCH PUKAL (CEGAH TIMEOUT & BEKU)
     async function processImportData() {
       if (!parsedImportRows.length) return;
       const btnConfirm = document.getElementById('btnConfirmImport');
       btnConfirm.disabled = true;
-      btnConfirm.innerText = '⏳ Sedang Memuat Naik...';
+      btnConfirm.innerText = '⏳ Sedang Memproses...';
 
+      const progressWrap = document.getElementById('importProgressWrap');
+      const progressBar = document.getElementById('importProgressBar');
+      const progressText = document.getElementById('importProgressText');
+      progressWrap.style.display = 'block';
+      progressText.style.display = 'block';
+
+      const totalRows = parsedImportRows.length;
+      const batchSize = 40; // Simpan 40 rekod dalam satu pakej
       let successCount = 0;
       const newItems = [];
 
-      for (let i = 0; i < parsedImportRows.length; i++) {
-        const row = parsedImportRows[i];
+      for (let i = 0; i < totalRows; i += batchSize) {
+        const batchSlice = parsedImportRows.slice(i, i + batchSize);
+        const batchPayload = {};
 
-        const nama = row["Nama KIR"] || row["Nama"] || row["nama"] || `KIR-${Date.now()}-${i}`;
-        const ic = String(row["No KP"] || row["No. Kad Pengenalan"] || row["ic"] || '-').trim();
-        const idKey = String(row["ID Rekod"] || row["ID"] || '').trim();
-        const tarikhLahir = row["Tarikh Lahir"] || '';
-        const umur = parseInt(row["Umur"] || row["umur"]) || 0;
-        const jantina = row["Jantina"] || row["jantina"] || 'Lelaki';
-        const warganegara = row["Warganegara"] || 'Malaysia';
-        const agama = row["Agama"] || 'Islam';
-        const etnik = row["Kumpulan Etnik"] || 'Melayu';
-        const hubungan = "KIR";
-        const kahwin = row["Status Kahwin"] || row["Status Perkahwinan"] || row["kahwin"] || 'Berkahwin';
-        const pendidikan = row["Tahap Pendidikan"] || row["PENDIDIKAN"] || '';
-        const sijil = row["Sijil Tahap Pendidikan"] || row["SIJIL"] || 'Tiada Sijil';
-        const kerja = row["Pekerjaan"] || row["kerja"] || '-';
-        const penyakit = row["Penyakit"] || '';
-        const kecacatan = row["Kecacatan"] || 'Tiada Kecacatan';
-        const produktif = row["Status Produktif"] || 'PRODUKTIF';
-        const faktor = row["Faktor"] || '';
+        batchSlice.forEach((row, idx) => {
+          const globalIdx = i + idx;
+          const nama = row["Nama KIR"] || row["Nama"] || row["nama"] || `KIR-${Date.now()}-${globalIdx}`;
+          const ic = String(row["No KP"] || row["No. Kad Pengenalan"] || row["ic"] || '-').trim();
+          const idKey = String(row["ID Rekod"] || row["ID"] || '').trim() || ('rec-' + Date.now() + '-' + globalIdx);
+          const tarikhLahir = row["Tarikh Lahir"] || '';
+          const umur = parseInt(row["Umur"] || row["umur"]) || 0;
+          const jantina = row["Jantina"] || row["jantina"] || 'Lelaki';
+          const warganegara = row["Warganegara"] || 'Malaysia';
+          const agama = row["Agama"] || 'Islam';
+          const etnik = row["Kumpulan Etnik"] || 'Melayu';
+          const hubungan = "KIR";
+          const kahwin = row["Status Kahwin"] || row["Status Perkahwinan"] || row["kahwin"] || 'Berkahwin';
+          const pendidikan = row["Tahap Pendidikan"] || row["PENDIDIKAN"] || '';
+          const sijil = row["Sijil Tahap Pendidikan"] || row["SIJIL"] || 'Tiada Sijil';
+          const kerja = row["Pekerjaan"] || row["kerja"] || '-';
+          const penyakit = row["Penyakit"] || '';
+          const kecacatan = row["Kecacatan"] || 'Tiada Kecacatan';
+          const produktif = row["Status Produktif"] || 'PRODUKTIF';
+          const faktor = row["Faktor"] || '';
 
-        const daerah = row["Daerah"] || row["daerah"] || 'Johor Bahru';
-        const dun = row["Mukim DUN"] || row["DUN"] || row["dun"] || '-';
-        const alamat = row["Alamat Penuh"] || row["Alamat"] || row["alamat"] || '-';
-        const catatanKir = row["Catatan KIR"] || row["catatanKir"] || '';
-        const phone = String(row["No Telefon"] || row["phone"] || '-');
-        const strata = (row["Strata"] || row["strata"] || 'Bandar').toLowerCase().includes('luar') ? 'Luar Bandar' : 'Bandar';
-        const incomeKir = parseFloat(row["Pendapatan KIR (RM)"] || row["incomeKir"]) || 0;
+          const daerah = row["Daerah"] || row["daerah"] || 'Johor Bahru';
+          const dun = row["Mukim DUN"] || row["DUN"] || row["dun"] || '-';
+          const alamat = row["Alamat Penuh"] || row["Alamat"] || row["alamat"] || '-';
+          const catatanKir = row["Catatan KIR"] || row["catatanKir"] || '';
+          const phone = String(row["No Telefon"] || row["phone"] || '-');
+          const strata = (row["Strata"] || row["strata"] || 'Bandar').toLowerCase().includes('luar') ? 'Luar Bandar' : 'Bandar';
+          const incomeKir = parseFloat(row["Pendapatan KIR (RM)"] || row["incomeKir"]) || 0;
 
-        let airList = parsedImportAirMap[ic] || parsedImportAirMap[idKey] || [];
-        if (!airList.length && row["Senarai AIR (JSON)"]) {
-          try { airList = JSON.parse(row["Senarai AIR (JSON)"]); } catch(e){}
+          let airList = parsedImportAirMap[ic] || parsedImportAirMap[idKey] || [];
+          if (!airList.length && row["Senarai AIR (JSON)"]) {
+            try { airList = JSON.parse(row["Senarai AIR (JSON)"]); } catch(e){}
+          }
+
+          const airCount = airList.length > 0 ? airList.length : (parseInt(row["Bilangan AIR"] || row["air_count"]) || 0);
+          const airIncTotal = airList.reduce((acc, a) => acc + (parseFloat(a.inc) || 0), 0);
+
+          const totalPax = 1 + airCount;
+          const totalInc = incomeKir + airIncTotal;
+          const perCapita = totalInc / totalPax;
+          const statusPGK = checkPGK(strata, perCapita);
+          const exitCost = calculateExitCost(strata, perCapita, totalPax);
+
+          const skillsKirRaw = row["Kemahiran KIR"] || row["Kemahiran Ditandakan"] || row["Kemahiran Dimiliki"] || row["skillsKir"] || '';
+          const skillsAirRaw = row["Kemahiran AIR"] || row["skillsAir"] || '';
+          const skillsKir = typeof skillsKirRaw === 'string' ? skillsKirRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+          const skillsAir = typeof skillsAirRaw === 'string' ? skillsAirRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+          const recObj = {
+            id: idKey,
+            nama: String(nama),
+            ic: String(ic),
+            tarikhLahir: String(tarikhLahir),
+            umur: Number(umur),
+            jantina: String(jantina),
+            warganegara: String(warganegara),
+            agama: String(agama),
+            etnik: String(etnik),
+            hubungan: String(hubungan),
+            kahwin: String(kahwin),
+            pendidikan: String(pendidikan),
+            sijil: String(sijil),
+            kerja: String(kerja),
+            penyakit: String(penyakit),
+            kecacatan: String(kecacatan),
+            kesihatan: String(kecacatan),
+            produktif: String(produktif),
+            faktor: String(faktor),
+            daerah: String(daerah),
+            dun: String(dun),
+            strata: String(strata),
+            incomeKir: Number(incomeKir),
+            phone: String(phone),
+            alamat: String(alamat),
+            catatanKir: String(catatanKir),
+            air_list: airList,
+            air_count: Number(airCount),
+            totalInc: Number(totalInc),
+            perCapita: Number(perCapita),
+            statusPGK: String(statusPGK),
+            exitCost: Number(exitCost),
+            help_list: [],
+            helpTotalVal: 0,
+            skillsKir: skillsKir,
+            skillsAir: skillsAir,
+            kecenderungan: String(row["Kecenderungan Minat"] || row["kecenderungan"] || ''),
+            cadanganBantuan: String(row["Cadangan Bantuan"] || row["cadanganBantuan"] || ''),
+            kkName: String(row["Nama Pengesah"] || row["kkName"] || '-'),
+            kkDate: String(row["Tarikh Bancian"] || row["kkDate"] || new Date().toISOString().split('T')[0]),
+            kkUlasan: String(row["Ulasan Pengesah"] || row["Ulasan"] || row["kkUlasan"] || ''),
+            buktiImg: ''
+          };
+
+          batchPayload[idKey] = recObj;
+          newItems.push(recObj);
+          successCount++;
+        });
+
+        // Hantar PATCH pukal terus ke Firebase
+        try {
+          await tryFetchFirebase('/bancian.json', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(batchPayload)
+          });
+        } catch(err) {
+          console.warn('Ralat muat naik batch:', err);
         }
 
-        const airCount = airList.length > 0 ? airList.length : (parseInt(row["Bilangan AIR"] || row["air_count"]) || 0);
-        const airIncTotal = airList.reduce((acc, a) => acc + (parseFloat(a.inc) || 0), 0);
-
-        const totalPax = 1 + airCount;
-        const totalInc = incomeKir + airIncTotal;
-        const perCapita = totalInc / totalPax;
-        const statusPGK = checkPGK(strata, perCapita);
-        const exitCost = calculateExitCost(strata, perCapita, totalPax);
-
-        const skillsKirRaw = row["Kemahiran KIR"] || row["Kemahiran Ditandakan"] || row["Kemahiran Dimiliki"] || row["skillsKir"] || '';
-        const skillsAirRaw = row["Kemahiran AIR"] || row["skillsAir"] || '';
-        const skillsKir = typeof skillsKirRaw === 'string' ? skillsKirRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
-        const skillsAir = typeof skillsAirRaw === 'string' ? skillsAirRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
-
-        const recObj = {
-          id: idKey || ('rec-' + Date.now() + '-' + i),
-          nama: String(nama),
-          ic: String(ic),
-          tarikhLahir: String(tarikhLahir),
-          umur: Number(umur),
-          jantina: String(jantina),
-          warganegara: String(warganegara),
-          agama: String(agama),
-          etnik: String(etnik),
-          hubungan: String(hubungan),
-          kahwin: String(kahwin),
-          pendidikan: String(pendidikan),
-          sijil: String(sijil),
-          kerja: String(kerja),
-          penyakit: String(penyakit),
-          kecacatan: String(kecacatan),
-          kesihatan: String(kecacatan),
-          produktif: String(produktif),
-          faktor: String(faktor),
-          daerah: String(daerah),
-          dun: String(dun),
-          strata: String(strata),
-          incomeKir: Number(incomeKir),
-          phone: String(phone),
-          alamat: String(alamat),
-          catatanKir: String(catatanKir),
-          air_list: airList,
-          air_count: Number(airCount),
-          totalInc: Number(totalInc),
-          perCapita: Number(perCapita),
-          statusPGK: String(statusPGK),
-          exitCost: Number(exitCost),
-          help_list: [],
-          helpTotalVal: 0,
-          skillsKir: skillsKir,
-          skillsAir: skillsAir,
-          kecenderungan: String(row["Kecenderungan Minat"] || row["kecenderungan"] || ''),
-          cadanganBantuan: String(row["Cadangan Bantuan"] || row["cadanganBantuan"] || ''),
-          kkName: String(row["Nama Pengesah"] || row["kkName"] || '-'),
-          kkDate: String(row["Tarikh Bancian"] || row["kkDate"] || new Date().toISOString().split('T')[0]),
-          kkUlasan: String(row["Ulasan Pengesah"] || row["Ulasan"] || row["kkUlasan"] || ''),
-          buktiImg: ''
-        };
-
-        try {
-          const res = await tryFetchFirebase('/bancian.json', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(recObj)
-          });
-          if (res.ok) {
-            const resData = await res.json();
-            recObj.firebaseKey = resData.name;
-          }
-        } catch (err) {}
-
-        newItems.push(recObj);
-        successCount++;
+        const pct = Math.round((Math.min(i + batchSize, totalRows) / totalRows) * 100);
+        progressBar.style.width = pct + '%';
+        progressText.innerText = `Memuat naik ${Math.min(i + batchSize, totalRows)} / ${totalRows} keluarga (${pct}%)...`;
       }
 
       records = [...newItems.reverse(), ...records];
-      localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
-      alert(`✅ Berjaya mengimport ${successCount} keluarga berserta semua maklumat AIR ke dalam sistem!`);
+      try { localStorage.setItem('ebancian_johor_cache', JSON.stringify(records)); } catch(e){}
+      
+      alert(`✅ Selesai! Berjaya mengimport ${successCount} keluarga berserta maklumat AIR.`);
       closeImportModal();
       checkExpiringAids();
       renderDashboard();
+      currentPage = 1;
       renderRecordsTable();
       switchPage('tab-records');
     }
