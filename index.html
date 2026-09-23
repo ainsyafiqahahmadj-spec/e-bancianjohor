@@ -158,6 +158,20 @@
     .alert-banner-text strong { color: #92400e; font-size: 0.85rem; }
     .alert-banner-text p { color: #b45309; font-size: 0.75rem; margin-top: 2px; }
 
+    /* BAR TINDAKAN PILIHAN PUKAL (BATCH ACTION) */
+    .batch-action-bar {
+      display: none;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .batch-action-bar.active { display: flex; }
+
     /* KAD KPI */
     .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
     .kpi-card-box {
@@ -343,7 +357,6 @@
 
     @keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
 
-    /* PROGRESS BAR IMPORT PUKAL */
     .progress-bar-wrap {
       width: 100%;
       background: #e2e8f0;
@@ -360,7 +373,6 @@
       transition: width 0.2s;
     }
 
-    /* PAGINATION BAR */
     .pagination-wrap {
       display: flex;
       justify-content: space-between;
@@ -633,6 +645,17 @@
           </div>
         </div>
 
+        <!-- BAR TINDAKAN PADAM PUKAL (MULTI-SELECT) -->
+        <div id="batchActionBar" class="batch-action-bar">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-weight:700; color:var(--johor-blue);">✓ <span id="selectedCountText">0</span> rekod dipilih</span>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="deselectAllRecords()">Batal Pilihan</button>
+            <button class="btn btn-red" style="padding:4px 12px; font-size:0.75rem;" onclick="deleteSelectedRecords()">🗑️ Padam Terpilih</button>
+          </div>
+        </div>
+
         <div style="background:#f8fafc; border:1px solid var(--border-color); border-radius:10px; padding:14px; margin-bottom:16px; display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
           <div class="form-group" style="flex:1; min-width:200px;">
             <label>🔍 Cari No. Kad Pengenalan KIR / AIR</label>
@@ -665,6 +688,9 @@
           <table>
             <thead>
               <tr>
+                <th style="width:36px; text-align:center;">
+                  <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)">
+                </th>
                 <th>Nama KIR</th>
                 <th>No. Kad Pengenalan</th>
                 <th>Daerah</th>
@@ -683,7 +709,7 @@
           </table>
         </div>
 
-        <!-- PAGINASI UNTUK REKOD BANYAK (>500) -->
+        <!-- PAGINASI UNTUK REKOD BANYAK -->
         <div class="pagination-wrap">
           <div id="pageInfoText">Menunjukkan 0 rekod</div>
           <div style="display:flex; gap:6px;">
@@ -1175,9 +1201,10 @@
     let selectedDisabilityKir = [];
     let currentProofBase64 = "";
 
-    // Pembolehubah Paginasi
+    // Pembolehubah Paginasi & Pilihan Pukal
     let currentPage = 1;
     const recordsPerPage = 50;
+    let selectedRecordIds = new Set();
 
     function addDisabilityTag(target, val) {
       if (!val) return;
@@ -1981,6 +2008,8 @@
         } catch(e) { records = []; }
       }
 
+      selectedRecordIds.clear();
+      updateBatchActionBar();
       checkExpiringAids();
       renderDashboard();
       renderRecordsTable();
@@ -2024,13 +2053,14 @@
       const filtered = records.filter(r => r.hasExpiringAid);
 
       if (!filtered.length) {
-        tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; padding:20px; color:var(--text-muted);">Tiada rekod bantuan yang tamat tempoh.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding:20px; color:var(--text-muted);">Tiada rekod bantuan yang tamat tempoh.</td></tr>`;
         return;
       }
 
       filtered.forEach(r => renderSingleRecordRow(tbody, r));
     }
 
+    // SIMPAN DATA KE FIREBASE
     async function saveBanci(e) {
       e.preventDefault();
       const btnSubmit = document.getElementById('btnSubmit');
@@ -2230,11 +2260,103 @@
         } catch (err) {}
       }
       records = records.filter(x => x.id !== id);
+      selectedRecordIds.delete(id);
+      updateBatchActionBar();
       try { localStorage.setItem('ebancian_johor_cache', JSON.stringify(records)); } catch(e){}
       checkExpiringAids();
       renderDashboard();
       renderRecordsTable();
       alert('Rekod telah dipadam.');
+    }
+
+    // PENGENDALIAN PILIHAN PUKAL (MULTI-SELECT CHECKBOX)
+    function toggleSelectRecord(cb, id) {
+      if (cb.checked) {
+        selectedRecordIds.add(id);
+      } else {
+        selectedRecordIds.delete(id);
+      }
+      updateBatchActionBar();
+    }
+
+    function toggleSelectAll(masterCb) {
+      const rowCheckboxes = document.querySelectorAll('.record-checkbox');
+      rowCheckboxes.forEach(cb => {
+        cb.checked = masterCb.checked;
+        const id = cb.getAttribute('data-id');
+        if (masterCb.checked) {
+          selectedRecordIds.add(id);
+        } else {
+          selectedRecordIds.delete(id);
+        }
+      });
+      updateBatchActionBar();
+    }
+
+    function deselectAllRecords() {
+      selectedRecordIds.clear();
+      const masterCb = document.getElementById('selectAllCheckbox');
+      if (masterCb) masterCb.checked = false;
+      document.querySelectorAll('.record-checkbox').forEach(cb => cb.checked = false);
+      updateBatchActionBar();
+    }
+
+    function updateBatchActionBar() {
+      const bar = document.getElementById('batchActionBar');
+      const countEl = document.getElementById('selectedCountText');
+      if (!bar || !countEl) return;
+
+      const count = selectedRecordIds.size;
+      countEl.innerText = count;
+      if (count > 0) {
+        bar.classList.add('active');
+      } else {
+        bar.classList.remove('active');
+      }
+    }
+
+    // PADAM PUKAL TERUS KE FIREBASE
+    async function deleteSelectedRecords() {
+      const count = selectedRecordIds.size;
+      if (count === 0) return;
+
+      if (!confirm(`⚠️ Adakah anda pasti mahu memadamkan ${count} rekod yang dipilih ini secara serentak? Tindakan ini tidak boleh diundur.`)) {
+        return;
+      }
+
+      const keysToDelete = [];
+      records.forEach(r => {
+        if (selectedRecordIds.has(r.id) && r.firebaseKey) {
+          keysToDelete.push(r.firebaseKey);
+        }
+      });
+
+      // Padam daripada Firebase secara berkelompok (multi-path update null)
+      if (keysToDelete.length > 0) {
+        const deletePayload = {};
+        keysToDelete.forEach(k => {
+          deletePayload[k] = null;
+        });
+
+        try {
+          await tryFetchFirebase('/bancian.json', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(deletePayload)
+          });
+        } catch(err) {
+          console.warn('Ralat pemadaman Firebase:', err);
+        }
+      }
+
+      records = records.filter(r => !selectedRecordIds.has(r.id));
+      try { localStorage.setItem('ebancian_johor_cache', JSON.stringify(records)); } catch(e){}
+
+      alert(`✅ Berjaya memadamkan ${count} rekod terpilih!`);
+      deselectAllRecords();
+      checkExpiringAids();
+      renderDashboard();
+      renderRecordsTable();
     }
 
     function viewRecord(id) {
@@ -2478,7 +2600,7 @@
       renderRecordsTable();
     }
 
-    // PAPARAN JADUAL REKOD DENGAN PAGINASI (CEGAH FREEZE BILA >500)
+    // PAPARAN JADUAL REKOD DENGAN KOTAK PILIHAN (CHECKBOX)
     function renderRecordsTable() {
       const searchIc = (document.getElementById('searchIcBox')?.value || '').toLowerCase().trim();
       const searchName = (document.getElementById('searchNameBox')?.value || '').toLowerCase().trim();
@@ -2530,8 +2652,14 @@
       document.getElementById('btnPrevPage').disabled = (currentPage <= 1);
       document.getElementById('btnNextPage').disabled = (currentPage >= totalPages);
 
+      // Semak sama ada semua rekod di halaman ini telah dipilih
+      const masterCb = document.getElementById('selectAllCheckbox');
+      if (masterCb) {
+        masterCb.checked = pageRecords.length > 0 && pageRecords.every(r => selectedRecordIds.has(r.id));
+      }
+
       if (!pageRecords.length) {
-        tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; padding:24px; color:var(--text-muted);">Tiada rekod bancian ditemui mengikut kriteria carian.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding:24px; color:var(--text-muted);">Tiada rekod bancian ditemui mengikut kriteria carian.</td></tr>`;
         return;
       }
 
@@ -2544,6 +2672,7 @@
       const totalIncome = parseFloat(r.totalInc) || 0;
       const perCapita = parseFloat(r.perCapita) || 0;
       const exitCost = r.exitCost || calculateExitCost(r.strata, perCapita, airCount + 1);
+      const isChecked = selectedRecordIds.has(r.id);
 
       let aidBadge = '<span class="badge" style="background:#f1f5f9; color:#64748b;">Tiada Rekod</span>';
       if (r.help_list && r.help_list.length) {
@@ -2560,6 +2689,9 @@
 
       tbody.innerHTML += `
         <tr>
+          <td style="text-align:center;">
+            <input type="checkbox" class="record-checkbox" data-id="${r.id}" ${isChecked ? 'checked' : ''} onchange="toggleSelectRecord(this, '${r.id}')">
+          </td>
           <td><strong>${r.nama || '-'}</strong><br><small style="color:var(--text-muted);">${r.kerja || '-'}</small></td>
           <td><code>${r.ic || '-'}</code></td>
           <td>${r.daerah || '-'}<br><small style="color:var(--text-muted);">${r.dun || '-'}</small></td>
@@ -2873,7 +3005,6 @@
       reader.readAsArrayBuffer(file);
     }
 
-    // PROSES IMPORT BATCH PUKAL (CEGAH TIMEOUT & BEKU)
     async function processImportData() {
       if (!parsedImportRows.length) return;
       const btnConfirm = document.getElementById('btnConfirmImport');
@@ -2887,7 +3018,7 @@
       progressText.style.display = 'block';
 
       const totalRows = parsedImportRows.length;
-      const batchSize = 40; // Simpan 40 rekod dalam satu pakej
+      const batchSize = 40;
       let successCount = 0;
       const newItems = [];
 
@@ -2993,7 +3124,6 @@
           successCount++;
         });
 
-        // Hantar PATCH pukal terus ke Firebase
         try {
           await tryFetchFirebase('/bancian.json', {
             method: 'PATCH',
