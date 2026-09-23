@@ -115,7 +115,8 @@
       letter-spacing: 0.5px;
     }
     .role-admin { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
-    .role-staff { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+    .role-daerah { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+    .role-agensi { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
 
     main.container { flex: 1; padding: 20px; max-width: 1400px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 20px; }
 
@@ -274,12 +275,12 @@
 
     .help-row-item {
       display: grid;
-      grid-template-columns: 2fr 1.5fr 1fr 1fr 1.2fr 36px;
+      grid-template-columns: 1.8fr 1.3fr 1.3fr 1.1fr 1fr 1.1fr 36px;
       gap: 8px;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       background: #f8fafc;
-      padding: 10px;
+      padding: 12px;
       border-radius: 8px;
       border: 1px solid var(--border-color);
     }
@@ -416,7 +417,7 @@
 
     footer.site-footer { background: #fff; border-top: 1px solid var(--border-color); padding: 16px; text-align: center; font-size: 0.74rem; color: var(--text-muted); margin-top: auto; }
 
-    @media (max-width: 820px) {
+    @media (max-width: 900px) {
       .help-row-item { grid-template-columns: 1fr; gap: 6px; }
       .calc-banner { flex-direction: column; }
       header { flex-direction: column; align-items: flex-start; }
@@ -454,7 +455,7 @@
       <form onsubmit="handleLogin(event)" style="display:flex; flex-direction:column; gap:12px; text-align:left;">
         <div class="form-group">
           <label>ID Pengguna</label>
-          <input type="text" id="loginUserId" required placeholder="Cth: BPKRAdmin / daerah_kluang">
+          <input type="text" id="loginUserId" required placeholder="Cth: BPKRAdmin / daerah_kluang / agensi_maij">
         </div>
         <div class="form-group">
           <label>Kata Laluan Sistem</label>
@@ -502,7 +503,7 @@
       </div>
       
       <div style="display:flex; align-items:center; gap:8px;">
-        <span id="headerUserBadge" class="role-badge role-staff">Pengguna</span>
+        <span id="headerUserBadge" class="role-badge role-daerah">Pengguna</span>
         <button class="btn btn-outline" id="btnAdminUsers" style="display:none; padding:5px 10px; font-size:0.75rem;" onclick="switchPage('tab-users')">👥 Pengurusan Pengguna</button>
         <button class="btn btn-outline" style="padding:5px 10px; font-size:0.75rem;" onclick="promptInstallPWA()">📱 Pasang App</button>
         <button class="btn btn-outline" style="padding:5px 10px; font-size:0.75rem; color:var(--johor-red);" onclick="handleLogout()">Keluar</button>
@@ -536,18 +537,18 @@
         <div class="kpi-card-box">
           <div class="kpi-icon icon-pink">🏢</div>
           <div class="kpi-info">
-            <div class="kpi-title">Miskin Bandar (&lt; RM831)</div>
+            <div class="kpi-title">MISKIN BANDAR (830 KEBAWAH)</div>
             <div class="kpi-number red" id="statPoorUrban">0</div>
-            <div class="kpi-desc">Strata Bandar (Ambang RM831)</div>
+            <div class="kpi-desc">Strata Bandar (Ambang RM830 kebawah)</div>
           </div>
         </div>
 
         <div class="kpi-card-box">
           <div class="kpi-icon icon-amber">🌲</div>
           <div class="kpi-info">
-            <div class="kpi-title">Miskin Luar Bandar (&lt; RM678)</div>
+            <div class="kpi-title">MISKIN LUAR BANDAR (677 KEBAWAH)</div>
             <div class="kpi-number amber" id="statPoorRural">0</div>
-            <div class="kpi-desc">Strata Luar Bandar (Ambang RM678)</div>
+            <div class="kpi-desc">Strata Luar Bandar (Ambang RM677 kebawah)</div>
           </div>
         </div>
 
@@ -556,7 +557,7 @@
           <div class="kpi-info">
             <div class="kpi-title">Terkeluar Daripada Miskin</div>
             <div class="kpi-number green" id="statAbove">0</div>
-            <div class="kpi-desc">Per kapita &ge; RM831 / &ge; RM678</div>
+            <div class="kpi-desc">Bandar ≥ RM831 / Luar Bandar ≥ RM678</div>
           </div>
         </div>
       </section>
@@ -582,8 +583,8 @@
                 <th>Daerah</th>
                 <th style="text-align:center;">Jumlah KIR</th>
                 <th style="text-align:center;">Tanggungan</th>
-                <th style="text-align:center;" class="col-red">Miskin Bandar (&lt; RM831)</th>
-                <th style="text-align:center;" class="col-amber">Miskin Luar Bandar (&lt; RM678)</th>
+                <th style="text-align:center;" class="col-red">Miskin Bandar (830 kebawah)</th>
+                <th style="text-align:center;" class="col-amber">Miskin Luar Bandar (677 kebawah)</th>
                 <th style="text-align:center;" class="col-green">Terkeluar Dr Miskin</th>
                 <th style="text-align:right;">Purata Pendapatan IR</th>
               </tr>
@@ -825,8 +826,8 @@
             <div class="form-group">
               <label>Strata * (Penentu PGK)</label>
               <select id="fStrata" onchange="recalculateForm()" required>
-                <option value="Bandar">Bandar (PGK: &lt; RM831)</option>
-                <option value="Luar Bandar">Luar Bandar (PGK: &lt; RM678)</option>
+                <option value="Bandar">Bandar (PGK: 830 kebawah)</option>
+                <option value="Luar Bandar">Luar Bandar (PGK: 677 kebawah)</option>
               </select>
             </div>
             <div class="form-group col-span-2">
@@ -849,7 +850,7 @@
           </div>
           <div id="airContainer"></div>
 
-          <!-- BAHAGIAN C: BANTUAN -->
+          <!-- BAHAGIAN C: BANTUAN DENGAN DROPDOWN AGENSI TERKINI -->
           <div style="display:flex; justify-content:space-between; align-items:center; margin:24px 0 8px;">
             <div>
               <h4 style="color:var(--johor-blue); font-size:0.9rem;">C. MAKLUMAT PROGRAM BANTUAN YANG DITERIMA</h4>
@@ -1039,7 +1040,7 @@
                 <th>ID Pengguna (Username)</th>
                 <th>Nama / Agensi</th>
                 <th>Kata Laluan</th>
-                <th>Peranan</th>
+                <th>Peranan Akses</th>
                 <th style="text-align:center;">Tindakan</th>
               </tr>
             </thead>
@@ -1075,7 +1076,7 @@
       </div>
       <div class="modal-body">
         <p style="font-size:0.8rem; color:var(--text-muted); line-height:1.5;">
-          Muat naik fail Excel untuk mendaftarkan senarai isi rumah secara kelompok (*bulk*). Semua maklumat KIR dan AIR (termasuk pilihan kecacatan) akan dipadankan secara automatik.
+          Muat naik fail Excel untuk mendaftarkan senarai isi rumah secara kelompok (*bulk*). Semua maklumat KIR, AIR, dan bantuan akan dipadankan secara automatik.
         </p>
 
         <div class="upload-zone" onclick="document.getElementById('excelFileInput').click()">
@@ -1113,9 +1114,11 @@
       'Batu Pahat', 'Muar', 'Tangkak', 'Segamat', 'Mersing'
     ];
 
+    // SENARAI PENGGUNA DEFAULT DENGAN PILIHAN PERANAN BARU
     const DEFAULT_USERS = {
       "bpkradmin": { pass: "bpkr7552", nama: "Pentadbir BPKR Johor", peranan: "admin" },
-      "daerah_kluang": { pass: "kluang2026", nama: "Pejabat Daerah Kluang", peranan: "staff" }
+      "daerah_kluang": { pass: "kluang2026", nama: "Pejabat Daerah Kluang", peranan: "daerah" },
+      "agensi_maij": { pass: "maij2026", nama: "Majlis Agama Islam Negeri Johor", peranan: "agensi" }
     };
 
     let systemUsers = JSON.parse(localStorage.getItem('ebancian_users_cache')) || DEFAULT_USERS;
@@ -1129,7 +1132,7 @@
 
     let selectedSkillsKir = [];
     let selectedSkillsAir = [];
-    let selectedDisabilityKir = []; // Senarai kecacatan KIR (pilih lebih dr 1)
+    let selectedDisabilityKir = [];
     let currentProofBase64 = "";
 
     // PENGURUSAN TAG KECACATAN MULTI-SELECT (KIR)
@@ -1213,6 +1216,34 @@
       }
     }
 
+    // TOGGLE RUANGAN AGENSI LAIN-LAIN
+    function toggleAgencyCustom(selectEl) {
+      const parentRow = selectEl.closest('.help-row-item');
+      if (!parentRow) return;
+      const customInput = parentRow.querySelector('.help-agency-custom');
+      if (customInput) {
+        if (selectEl.value === 'Lain-lain') {
+          customInput.style.display = 'block';
+          customInput.focus();
+        } else {
+          customInput.style.display = 'none';
+          customInput.value = '';
+        }
+      }
+    }
+
+    function getRoleDisplayName(roleKey) {
+      if (roleKey === 'admin') return 'Pentadbir (Admin BPKR)';
+      if (roleKey === 'agensi') return 'Agensi';
+      return 'Pejabat Daerah';
+    }
+
+    function getRoleBadgeClass(roleKey) {
+      if (roleKey === 'admin') return 'role-admin';
+      if (roleKey === 'agensi') return 'role-agensi';
+      return 'role-daerah';
+    }
+
     async function loadUsersFromFirebase() {
       try {
         const res = await tryFetchFirebase('/pengguna.json');
@@ -1235,7 +1266,7 @@
 
     function checkLoginStatus() {
       const isAuth = sessionStorage.getItem('ebancian_auth');
-      const userRole = sessionStorage.getItem('ebancian_user_role') || 'staff';
+      const userRole = sessionStorage.getItem('ebancian_user_role') || 'daerah';
       const userName = sessionStorage.getItem('ebancian_user_name') || 'Pengguna';
 
       if (isAuth === 'true') {
@@ -1243,8 +1274,8 @@
         
         const userBadge = document.getElementById('headerUserBadge');
         if (userBadge) {
-          userBadge.innerText = userName;
-          userBadge.className = `role-badge ${userRole === 'admin' ? 'role-admin' : 'role-staff'}`;
+          userBadge.innerText = `${userName} (${getRoleDisplayName(userRole)})`;
+          userBadge.className = `role-badge ${getRoleBadgeClass(userRole)}`;
         }
 
         const btnAdmin = document.getElementById('btnAdminUsers');
@@ -1343,13 +1374,17 @@
 
       let idx = 1;
       for (const [uId, uData] of Object.entries(systemUsers)) {
+        let badgeClass = 'badge-green';
+        if (uData.peranan === 'admin') badgeClass = 'badge-red';
+        else if (uData.peranan === 'agensi') badgeClass = 'badge-warning';
+
         tbody.innerHTML += `
           <tr>
             <td>${idx++}</td>
             <td><code>${uId}</code></td>
             <td><strong>${uData.nama}</strong></td>
             <td>••••••••</td>
-            <td><span class="badge ${uData.peranan === 'admin' ? 'badge-red' : 'badge-green'}">${uData.peranan === 'admin' ? 'Admin BPKR' : 'Pejabat Daerah / Staf'}</span></td>
+            <td><span class="badge ${badgeClass}">${getRoleDisplayName(uData.peranan)}</span></td>
             <td style="text-align:center;">
               ${uId !== 'bpkradmin' ? `<button class="btn btn-outline" style="padding:2px 8px; font-size:0.75rem; color:var(--johor-red);" onclick="deleteUser('${uId}')">Padam</button>` : '<small style="color:var(--text-muted);">Kekal</small>'}
             </td>
@@ -1398,12 +1433,12 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // LOGIK PENENTUAN STATUS PGK (BANDAR: >= RM831, LUAR BANDAR: >= RM678)
+    // LOGIK PENENTUAN STATUS PGK (830 KEBAWAH / 677 KEBAWAH)
     function checkPGK(strata, perCapita) {
       if (strata === 'Bandar') {
-        return perCapita >= 831 ? 'Terkeluar Dr Miskin' : 'Miskin Bandar (< RM831)';
+        return perCapita >= 831 ? 'Terkeluar Dr Miskin' : 'Miskin Bandar (830 kebawah)';
       } else {
-        return perCapita >= 678 ? 'Terkeluar Dr Miskin' : 'Miskin Luar Bandar (< RM678)';
+        return perCapita >= 678 ? 'Terkeluar Dr Miskin' : 'Miskin Luar Bandar (677 kebawah)';
       }
     }
 
@@ -1461,7 +1496,7 @@
       }
     }
 
-    // TAMBAH KAD AIR DENGAN PILIHAN MULTI-SELECT KECACATAN (KEMAHIRAN DIBUANG)
+    // TAMBAH KAD AIR
     function addAirRow(data = {}) {
       const container = document.getElementById('airContainer');
       const index = container.children.length + 1;
@@ -1625,13 +1660,44 @@
       recalculateForm();
     }
 
+    // TAMBAH BANTUAN DENGAN DROPDOWN AGENSI
     function addHelpRow(data = {}) {
       const container = document.getElementById('helpContainer');
       const row = document.createElement('div');
       row.className = 'help-row-item';
+
+      const predefinedAgencies = ['MAIJ', 'JKM', 'MOF', 'PERKESO', 'FELCRA', 'BKJ', 'LKIM', 'Jab. Perikanan', 'YPKDT'];
+      let currentAgency = data.agensi || 'JKM';
+      let isOther = false;
+      let otherText = '';
+
+      if (currentAgency && !predefinedAgencies.includes(currentAgency)) {
+        isOther = true;
+        otherText = currentAgency;
+        currentAgency = 'Lain-lain';
+      } else if (currentAgency === 'Lain-lain') {
+        isOther = true;
+        otherText = data.agensiLain || '';
+      }
+
       row.innerHTML = `
-        <input type="text" class="help-name-field" value="${data.nama || ''}" placeholder="Nama Program (Cth: STR / JKM)" required>
-        <input type="text" class="help-agency-field" value="${data.agensi || ''}" placeholder="Agensi (Cth: JKM / MAINJ)">
+        <input type="text" class="help-name-field" value="${data.nama || ''}" placeholder="Nama Program (Cth: STR / Bantuan Kanak-kanak)" required>
+        
+        <select class="help-agency-select" onchange="toggleAgencyCustom(this)">
+          <option value="MAIJ" ${currentAgency === 'MAIJ' ? 'selected' : ''}>MAIJ</option>
+          <option value="JKM" ${currentAgency === 'JKM' ? 'selected' : ''}>JKM</option>
+          <option value="MOF" ${currentAgency === 'MOF' ? 'selected' : ''}>MOF</option>
+          <option value="PERKESO" ${currentAgency === 'PERKESO' ? 'selected' : ''}>PERKESO</option>
+          <option value="FELCRA" ${currentAgency === 'FELCRA' ? 'selected' : ''}>FELCRA</option>
+          <option value="BKJ" ${currentAgency === 'BKJ' ? 'selected' : ''}>BKJ</option>
+          <option value="LKIM" ${currentAgency === 'LKIM' ? 'selected' : ''}>LKIM</option>
+          <option value="Jab. Perikanan" ${currentAgency === 'Jab. Perikanan' ? 'selected' : ''}>Jab. Perikanan</option>
+          <option value="YPKDT" ${currentAgency === 'YPKDT' ? 'selected' : ''}>YPKDT</option>
+          <option value="Lain-lain" ${currentAgency === 'Lain-lain' ? 'selected' : ''}>Lain-lain</option>
+        </select>
+
+        <input type="text" class="help-agency-custom" value="${otherText}" placeholder="Nyatakan Agensi..." style="display:${isOther ? 'block' : 'none'};">
+
         <select class="help-freq-field" onchange="recalculateForm()">
           <option value="Bulanan" ${data.kekerapan === 'Bulanan' || data.freq === 'Bulanan' ? 'selected' : ''}>Bulanan</option>
           <option value="One-Off" ${data.kekerapan === 'One-Off' || data.freq === 'One-Off' ? 'selected' : ''}>One-Off</option>
@@ -1720,7 +1786,6 @@
       editingRecordId = r.id;
       editingFirebaseKey = r.firebaseKey || null;
 
-      // Medan KIR Lengkap
       document.getElementById('fNama').value = r.nama || '';
       document.getElementById('fIc').value = r.ic || '';
       document.getElementById('fDobKir').value = r.tarikhLahir || '';
@@ -1735,7 +1800,6 @@
       document.getElementById('fKerja').value = r.kerja || '';
       document.getElementById('fPenyakitKir').value = r.penyakit || '';
 
-      // Set kecacatan KIR
       const disKirStr = r.kecacatan || 'Tiada Kecacatan';
       selectedDisabilityKir = disKirStr.split(',').map(s => s.trim()).filter(Boolean);
       renderDisabilityTagsKir();
@@ -1928,7 +1992,6 @@
       btnSubmit.disabled = true;
       btnSubmit.innerText = '⏳ Menyimpan data...';
 
-      // Maklumat KIR
       const nama = document.getElementById('fNama').value;
       const ic = document.getElementById('fIc').value;
       const tarikhLahir = document.getElementById('fDobKir').value;
@@ -1955,7 +2018,6 @@
       const alamat = document.getElementById('fAlamat').value;
       const catatanKir = document.getElementById('fCatatanKir').value.trim();
 
-      // Maklumat AIR Lengkap
       const airList = [];
       let airIncTotal = 0;
       document.querySelectorAll('.air-card-box').forEach(box => {
@@ -1992,18 +2054,28 @@
         }
       });
 
-      // Maklumat Bantuan
       const helpList = [];
       let helpTotalVal = 0;
       document.querySelectorAll('.help-row-item').forEach(row => {
         const hName = row.querySelector('.help-name-field').value.trim();
-        const hAgency = row.querySelector('.help-agency-field').value.trim();
+        const hAgencySelect = row.querySelector('.help-agency-select').value;
+        const hAgencyCustom = row.querySelector('.help-agency-custom').value.trim();
+        const hAgency = (hAgencySelect === 'Lain-lain' && hAgencyCustom) ? hAgencyCustom : hAgencySelect;
+
         const hFreq = row.querySelector('.help-freq-field').value;
         const hVal = parseFloat(row.querySelector('.help-val-field').value) || 0;
         const hExp = row.querySelector('.help-expiry-field').value;
 
         if (hName) {
-          helpList.push({ nama: hName, agensi: hAgency, kekerapan: hFreq, nilai: hVal, tarikhTamat: hExp });
+          helpList.push({ 
+            nama: hName, 
+            agensi: hAgency, 
+            agensiPilihan: hAgencySelect,
+            agensiLain: hAgencyCustom,
+            kekerapan: hFreq, 
+            nilai: hVal, 
+            tarikhTamat: hExp 
+          });
           if (hFreq === 'Bulanan') helpTotalVal += hVal;
           else if (hFreq === 'Tahunan') helpTotalVal += (hVal / 12);
           else helpTotalVal += hVal;
@@ -2169,7 +2241,7 @@
             <tr>
               <td>${i + 1}</td>
               <td><strong>${h.nama || '-'}</strong></td>
-              <td>${h.agensi || '-'}</td>
+              <td><span class="badge" style="background:#e0f2fe; color:#0369a1;">${h.agensi || '-'}</span></td>
               <td>${h.kekerapan || '-'}</td>
               <td style="text-align:right;">RM ${(parseFloat(h.nilai) || 0).toFixed(2)}</td>
               <td>${expiryBadge}</td>
@@ -2441,7 +2513,7 @@
       renderRecordsTable();
     }
 
-    // EKSPORT EXCEL LENGKAP BERSAMA SEMUA MEDAN
+    // EKSPORT EXCEL
     function exportExcel() {
       if (!records.length) {
         alert('Tiada data untuk dieksport.');
@@ -2550,7 +2622,7 @@
       document.getElementById('importModal').classList.remove('active');
     }
 
-    // PENGENDALIAN MEMBACA FAIL EXCEL (AUTO-PARSE UNTUK FAIL ASAL MAUPUN TEMPLAT)
+    // PENGENDALIAN MEMBACA FAIL EXCEL
     function handleExcelFile(e) {
       const file = e.target.files[0];
       if (!file) return;
