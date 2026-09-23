@@ -919,7 +919,7 @@
               <label>Peranan Akses</label>
               <select id="newUserRole">
                 <option value="staff">Pengguna Biasa / Pejabat Daerah</option>
-                <option value="admin">Pentadbir (Admin SUK)</option>
+                <option value="admin">Pentadbir (Admin BPKR)</option>
               </select>
             </div>
             <div>
@@ -1600,8 +1600,8 @@
         const helpList = r.help_list || [];
         helpList.forEach(h => {
           if (h.tarikhTamat) {
-            const expDate = new Date(h.tarikhTamat);
-            const diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+            const exp = new Date(h.tarikhTamat);
+            const diffDays = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
             if (diffDays <= 30) {
               expiringCount++;
               r.hasExpiringAid = true;
@@ -1980,6 +1980,46 @@
       document.getElementById('viewModal').classList.remove('active');
     }
 
+    function renderDashboard() {
+      const totalKir = records.length;
+      const totalAir = records.reduce((acc, r) => acc + (parseInt(r.air_count) || (r.air_list ? r.air_list.length : 0)), 0);
+      const poorUrban = records.filter(r => (r.statusPGK || '').includes('Miskin Bandar')).length;
+      const poorRural = records.filter(r => (r.statusPGK || '').includes('Miskin Luar Bandar')).length;
+      const above = records.filter(r => (r.statusPGK || '').includes('Terkeluar')).length;
+
+      document.getElementById('statKir').innerText = totalKir;
+      document.getElementById('statAirSub').innerText = totalAir + ' Tanggungan (AIR)';
+      document.getElementById('statPoorUrban').innerText = poorUrban;
+      document.getElementById('statPoorRural').innerText = poorRural;
+      document.getElementById('statAbove').innerText = above;
+
+      const tbody = document.getElementById('districtTableBody');
+      tbody.innerHTML = '';
+
+      DISTRICTS_ORDER.forEach(d => {
+        const dRecs = records.filter(r => r.daerah === d);
+        const dKirCount = dRecs.length;
+        const dAirCount = dRecs.reduce((acc, r) => acc + (parseInt(r.air_count) || (r.air_list ? r.air_list.length : 0)), 0);
+        const dPoorUrban = dRecs.filter(r => (r.statusPGK || '').includes('Miskin Bandar')).length;
+        const dPoorRural = dRecs.filter(r => (r.statusPGK || '').includes('Miskin Luar Bandar')).length;
+        const dAbove = dRecs.filter(r => (r.statusPGK || '').includes('Terkeluar')).length;
+        const totalIncomeAll = dRecs.reduce((acc, r) => acc + (parseFloat(r.totalInc) || 0), 0);
+        const avgIncome = dKirCount > 0 ? (totalIncomeAll / dKirCount) : 0;
+
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${d}</strong></td>
+            <td style="text-align:center;">${dKirCount}</td>
+            <td style="text-align:center;">${dAirCount}</td>
+            <td style="text-align:center; font-weight:700; color:${dPoorUrban > 0 ? 'var(--johor-red)' : '#991b1b'};">${dPoorUrban}</td>
+            <td style="text-align:center; font-weight:700; color:${dPoorRural > 0 ? '#b45309' : '#b45309'};">${dPoorRural}</td>
+            <td style="text-align:center; font-weight:700; color:#15803d;">${dAbove}</td>
+            <td style="text-align:right;">RM ${avgIncome.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+          </tr>
+        `;
+      });
+    }
+
     function renderRecordsTable() {
       const searchIc = (document.getElementById('searchIcBox')?.value || '').toLowerCase().trim();
       const searchName = (document.getElementById('searchNameBox')?.value || '').toLowerCase().trim();
@@ -2303,7 +2343,7 @@
           skillsAir: skillsAir,
           kecenderungan: String(row["Kecenderungan Minat"] || row["kecenderungan"] || ''),
           cadanganBantuan: String(row["Cadangan Bantuan"] || row["cadanganBantuan"] || ''),
-          kkName: String(row["Nama Pengesah"] || row["Nama Ketua Kampung / Penghulu / Ahli Majlis"] || row["kkName"] || '-'),
+          kkName: String(row["Nama Pengesah"] || row["kkName"] || '-'),
           kkDate: String(row["Tarikh Bancian"] || row["kkDate"] || new Date().toISOString().split('T')[0]),
           kkUlasan: String(row["Ulasan Pengesah"] || row["Ulasan"] || row["kkUlasan"] || ''),
           buktiImg: ''
