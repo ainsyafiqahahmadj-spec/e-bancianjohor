@@ -910,7 +910,7 @@
           <div style="display:flex; justify-content:space-between; align-items:center; margin:24px 0 8px;">
             <div>
               <h4 style="color:var(--johor-blue); font-size:0.9rem;">C. MAKLUMAT PROGRAM BANTUAN YANG DITERIMA</h4>
-              <p style="font-size:0.72rem; color:var(--text-muted);">Nilai bantuan bulanan/berkala yang dimasukkan akan <strong>terus dikira ke dalam jumlah pendapatan isi rumah</strong>.</p>
+              <p style="font-size:0.72rem; color:var(--text-muted);">Nilai bantuan bulanan/berkala yang dimasukkan akan terus dikira ke dalam jumlah pendapatan isi rumah.</p>
             </div>
             <button type="button" class="btn btn-outline" onclick="addHelpRow()">+ Tambah Bantuan</button>
           </div>
@@ -948,9 +948,7 @@
           <!-- BAHAGIAN D: KECENDERUNGAN & CADANGAN BANTUAN -->
           <div style="margin: 20px 0; background:#f8fafc; padding:16px; border-radius:10px; border:1px solid var(--border-color);">
             <h4 style="color:var(--johor-blue); font-size:0.95rem; font-weight:800; margin-bottom:4px;">D. KECENDERUNGAN & INTERVENSI</h4>
-            <p style="font-size:0.72rem; color:var(--text-muted); margin-bottom:12px;">Isi kecenderungan minat dan cadangan bantuan.</p>
-            
-            <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; flex-direction:column; gap:12px; margin-top:8px;">
               <div class="form-group">
                 <label>Ruangan Kecenderungan Minat (Diisi Sendiri)</label>
                 <textarea id="fKecenderungan" rows="2" placeholder="Nyatakan kecenderungan minat atau kemahiran keluarga ini..."></textarea>
@@ -1441,15 +1439,17 @@
 
     // LOGIK PENENTUAN STATUS PGK (IKUT NOTA PELEKAT: <= RM830, <= RM677, >= RM831, >= RM678)
     function checkPGK(strata, perCapita) {
-      if (strata === 'Bandar') {
-        return perCapita >= 831 ? 'Terkeluar Dr Miskin' : 'Miskin Bandar (≤ RM830)';
-      } else {
+      const isRural = String(strata || '').toUpperCase().includes('LUAR');
+      if (isRural) {
         return perCapita >= 678 ? 'Terkeluar Dr Miskin' : 'Miskin Luar Bandar (≤ RM677)';
+      } else {
+        return perCapita >= 831 ? 'Terkeluar Dr Miskin' : 'Miskin Bandar (≤ RM830)';
       }
     }
 
     function calculateExitCost(strata, perCapita, totalPax) {
-      const threshold = (strata === 'Bandar') ? 831 : 678;
+      const isRural = String(strata || '').toUpperCase().includes('LUAR');
+      const threshold = isRural ? 678 : 831;
       if (perCapita >= threshold) return 0;
       const gapPerCapita = threshold - perCapita;
       return gapPerCapita * totalPax;
@@ -1777,7 +1777,7 @@
       document.getElementById('fPhone').value = r.phone || '';
       document.getElementById('fDaerah').value = r.daerah || 'Johor Bahru';
       document.getElementById('fDun').value = r.dun || '';
-      document.getElementById('fStrata').value = r.strata || 'Bandar';
+      document.getElementById('fStrata').value = (String(r.strata || '').toUpperCase().includes('LUAR')) ? 'Luar Bandar' : 'Bandar';
       document.getElementById('fAlamat').value = r.alamat || '';
       document.getElementById('fCatatanKir').value = r.catatanKir || '';
 
@@ -1876,7 +1876,8 @@
           records = Object.keys(data).map(key => {
             const item = data[key];
             const airCount = parseInt(item.air_count) || (item.air_list ? item.air_list.length : 0);
-            const strata = item.strata || 'Bandar';
+            const strataRaw = String(item.strata || '').toUpperCase();
+            const strata = strataRaw.includes('LUAR') ? 'Luar Bandar' : 'Bandar';
             const perCapita = parseFloat(item.perCapita) || 0;
             const statusPGK = checkPGK(strata, perCapita);
 
@@ -2364,6 +2365,8 @@
                 if (kirDis === '0' || !kirDis || kirDis === 'Sihat') kirDis = 'Tiada Kecacatan';
 
                 const daerahNama = findColumnValue(row, ['DAERAH', 'Daerah'], file.name.replace(/\.[^/.]+$/, '').toUpperCase());
+                const rawStrata = findColumnValue(row, ['STRATA', 'Strata'], 'Bandar');
+                const cleanStrata = String(rawStrata).toUpperCase().includes('LUAR') ? 'Luar Bandar' : 'Bandar';
 
                 currentKirObj = {
                   "Nama KIR": namaRaw,
@@ -2388,7 +2391,7 @@
                   "Alamat Penuh": findColumnValue(row, ['ALAMAT ', 'ALAMAT', 'Alamat', 'Alamat Penuh']),
                   "Catatan KIR": findColumnValue(row, ['CATATAN', 'Catatan', 'Catatan KIR']),
                   "No Telefon": findColumnValue(row, ['NO. TELEFON BIMBIT', 'NO. TELEFON TETAP', 'No Telefon', 'phone']),
-                  "Strata": findColumnValue(row, ['STRATA', 'Strata'], 'Bandar'),
+                  "Strata": cleanStrata,
                   "Pendapatan KIR (RM)": parseFloat(findColumnValue(row, ['PENDAPATAN SEBULAN', 'Pendapatan KIR (RM)', 'incomeKir', 'PENDAPATAN'])) || 0,
                   "Kecenderungan Minat": `Status: ${findColumnValue(row, ['KIR PRODUKTIF', 'Status Produktif'], '-')} | Faktor: ${findColumnValue(row, ['FAKTOR', 'Faktor'], '-')}`,
                   "Cadangan Bantuan": `Anggaran Jurang: RM${Math.abs(parseFloat(findColumnValue(row, ['COSTING', 'Costing'])) || 0).toFixed(2)}`,
@@ -2506,7 +2509,7 @@
           const alamat = row["Alamat Penuh"] || '-';
           const catatanKir = row["Catatan KIR"] || '';
           const phone = String(row["No Telefon"] || '-');
-          const strata = (row["Strata"] || 'Bandar').toLowerCase().includes('luar') ? 'Luar Bandar' : 'Bandar';
+          const strata = (String(row["Strata"] || '').toUpperCase().includes('LUAR')) ? 'Luar Bandar' : 'Bandar';
           const incomeKir = parseFloat(row["Pendapatan KIR (RM)"]) || 0;
 
           let airList = parsedImportAirMap[ic] || parsedImportAirMap[idKey] || [];
@@ -2605,7 +2608,8 @@
 
       const airList = r.air_list || [];
       const helpList = r.help_list || [];
-      const threshold = r.strata === 'Bandar' ? 831 : 678;
+      const isRural = String(r.strata || '').toUpperCase().includes('LUAR');
+      const threshold = isRural ? 678 : 831;
       const exitCost = r.exitCost || calculateExitCost(r.strata, r.perCapita, (r.air_count || airList.length) + 1);
 
       let airRowsHtml = '';
@@ -2661,7 +2665,7 @@
             <div class="detail-item"><small>Penyakit</small><strong>${r.penyakit || 'Tiada'}</strong></div>
             <div class="detail-item"><small>Kecacatan (OKU)</small><strong>${r.kecacatan || 'Tiada Kecacatan'}</strong></div>
             <div class="detail-item"><small>Daerah / Mukim / DUN</small><strong>${r.daerah} (${r.dun || '-'})</strong></div>
-            <div class="detail-item"><small>Kawasan Strata</small><strong>${r.strata} (Ambang PGK: RM ${threshold})</strong></div>
+            <div class="detail-item"><small>Kawasan Strata</small><strong>${r.strata} (Ambang Pelepasan: RM ${threshold})</strong></div>
             <div class="detail-item"><small>Pendapatan Asas KIR</small><strong>RM ${(r.incomeKir || 0).toFixed(2)}</strong></div>
             <div class="detail-item"><small>No. Telefon</small><strong>${r.phone || '-'}</strong></div>
             <div class="detail-item" style="grid-column:1 / -1;"><small>Alamat Kediaman Penuh</small><strong>${r.alamat || 'Tiada rekod alamat'}</strong></div>
@@ -2769,6 +2773,7 @@
       document.getElementById('viewModal').classList.remove('active');
     }
 
+    // PENGIRAAN TEPAT DASHBOARD (MEMPERBAIKI MASALAH KOSONG DI LUAR BANDAR)
     function renderDashboard() {
       const totalKir = records.length;
       let totalAir = 0;
@@ -2779,10 +2784,16 @@
       for (let i = 0; i < records.length; i++) {
         const r = records[i];
         totalAir += (r.air_count || (r.air_list ? r.air_list.length : 0));
-        const st = r.statusPGK || '';
-        if (st.includes('Bandar') && st.includes('Miskin')) poorUrban++;
-        else if (st.includes('Luar Bandar') && st.includes('Miskin')) poorRural++;
-        else if (st.includes('Terkeluar')) above++;
+        const st = String(r.statusPGK || '');
+        const isRural = String(r.strata || '').toUpperCase().includes('LUAR');
+
+        if (st.includes('Terkeluar')) {
+          above++;
+        } else if (isRural || st.includes('Luar Bandar')) {
+          poorRural++;
+        } else {
+          poorUrban++;
+        }
       }
 
       document.getElementById('statKir').innerText = totalKir;
@@ -2796,12 +2807,22 @@
       tbody.innerHTML = '';
 
       DISTRICTS_ORDER.forEach(d => {
-        const dRecs = records.filter(r => r.daerah === d);
+        const dRecs = records.filter(r => String(r.daerah || '').trim().toUpperCase() === d.toUpperCase());
         const dKirCount = dRecs.length;
         const dAirCount = dRecs.reduce((acc, r) => acc + (parseInt(r.air_count) || (r.air_list ? r.air_list.length : 0)), 0);
-        const dPoorUrban = dRecs.filter(r => (r.statusPGK || '').includes('Miskin Bandar')).length;
-        const dPoorRural = dRecs.filter(r => (r.statusPGK || '').includes('Miskin Luar Bandar')).length;
-        const dAbove = dRecs.filter(r => (r.statusPGK || '').includes('Terkeluar')).length;
+
+        let dPoorUrban = 0;
+        let dPoorRural = 0;
+        let dAbove = 0;
+
+        dRecs.forEach(r => {
+          const st = String(r.statusPGK || '');
+          const isRural = String(r.strata || '').toUpperCase().includes('LUAR');
+          if (st.includes('Terkeluar')) dAbove++;
+          else if (isRural || st.includes('Luar Bandar')) dPoorRural++;
+          else dPoorUrban++;
+        });
+
         const totalIncomeAll = dRecs.reduce((acc, r) => acc + (parseFloat(r.totalInc) || 0), 0);
         const avgIncome = dKirCount > 0 ? (totalIncomeAll / dKirCount) : 0;
 
@@ -2855,7 +2876,7 @@
 
         let districtMatch = true;
         if (filterDistrict) {
-          districtMatch = r.daerah === filterDistrict;
+          districtMatch = String(r.daerah || '').trim().toUpperCase() === filterDistrict.trim().toUpperCase();
         }
 
         return icMatch && nameMatch && districtMatch;
