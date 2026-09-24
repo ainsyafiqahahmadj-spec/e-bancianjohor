@@ -909,7 +909,7 @@
           </div>
           <div id="airContainer"></div>
 
-          <!-- BAHAGIAN C: BANTUAN -->
+          <!-- BAHAGIAN C: BANTUAN DENGAN DROPDOWN AGENSI TERKINI -->
           <div style="display:flex; justify-content:space-between; align-items:center; margin:24px 0 8px;">
             <div>
               <h4 style="color:var(--johor-blue); font-size:0.9rem;">C. MAKLUMAT PROGRAM BANTUAN YANG DITERIMA</h4>
@@ -2208,7 +2208,7 @@
         helpTotalVal: Number(helpTotalVal),
         skillsKir: selectedSkillsKir,
         skillsAir: selectedSkillsAir,
-        kecenderungan: String(kecenderungan),
+        kecenderungan: String(row => row.kecenderungan || kecenderungan),
         cadanganBantuan: String(cadanganBantuan),
         kkName: String(document.getElementById('fKkName').value),
         kkDate: String(document.getElementById('fKkDate').value || new Date().toISOString().split('T')[0]),
@@ -2359,6 +2359,7 @@
     }
 
     function findColumnValue(row, possibleNames, defaultVal = '') {
+      if (!row || typeof row !== 'object') return defaultVal;
       const keys = Object.keys(row);
       for (const p of possibleNames) {
         const pNorm = p.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
@@ -2372,7 +2373,6 @@
       return defaultVal;
     }
 
-    // PENGESAN KELUARGA PINTAR (MENYELESAIKAN MASALAH PECAHAN KIR & AIR)
     function handleExcelFile(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -2447,7 +2447,6 @@
               }
             });
           } else {
-            // FORMAT BARIS TUNGGAL: KELOMPOKKAN SECARA PINTAR MENGIKUT STATUS KIR
             let currentKirObj = null;
             let currentKirIc = '';
 
@@ -2459,7 +2458,6 @@
 
               if (!namaRaw && !icRaw) continue;
 
-              // Penentu sama ada baris ini ialah KIR atau AIR
               const isKir = (hubRaw === 'KIR' || hubRaw.includes('KETUA') || (!hubRaw && !currentKirObj));
 
               if (isKir) {
@@ -2504,7 +2502,6 @@
                 parsedImportRows.push(currentKirObj);
                 parsedImportAirMap[currentKirIc] = [];
               } else {
-                // Baris ini adalah AIR bagi KIR semasa
                 let airDis = findColumnValue(row, ['KECACATAN', 'Kecacatan', 'Status Kesihatan / OKU'], 'Tiada Kecacatan');
                 if (airDis === '0' || !airDis || airDis === 'Sihat') airDis = 'Tiada Kecacatan';
 
@@ -2551,7 +2548,6 @@
       reader.readAsArrayBuffer(file);
     }
 
-    // PROSES IMPORT PUKAL
     async function processImportData() {
       if (!parsedImportRows.length) return;
       const btnConfirm = document.getElementById('btnConfirmImport');
@@ -2707,6 +2703,406 @@
       switchPage('tab-records');
     }
 
+    // PAPARAN PROFIL MODAL
+    function viewRecord(id) {
+      const r = records.find(x => x.id === id);
+      if (!r) return;
+
+      const airList = r.air_list || [];
+      const helpList = r.help_list || [];
+      const threshold = r.strata === 'Bandar' ? 831 : 678;
+      const exitCost = r.exitCost || calculateExitCost(r.strata, r.perCapita, (r.air_count || airList.length) + 1);
+
+      let airRowsHtml = '';
+      if (airList.length > 0) {
+        airRowsHtml = airList.map((a, i) => `
+          <tr>
+            <td>${i + 1}</td>
+            <td><strong>${a.nama || '-'}</strong><br><small style="color:var(--text-muted);">${a.ic || 'Tiada No. KP'}</small></td>
+            <td>${a.hubungan || '-'}</td>
+            <td>${a.tarikhLahir || '-'} (${a.umur ? a.umur + ' thn' : '-'})<br><small>${a.jantina || '-'}</small></td>
+            <td>${a.warganegara || 'Malaysia'} / ${a.agama || 'Islam'}<br><small>${a.etnik || 'Melayu'}</small></td>
+            <td>${a.pendidikan || '-'}<br><small><strong>Sijil:</strong> ${a.sijil || 'Tiada'}</small></td>
+            <td>${a.kerja || a.statusKerja || '-'}</td>
+            <td><span class="badge ${a.produktif === 'PRODUKTIF' ? 'badge-green' : 'badge-red'}">${a.produktif || 'PRODUKTIF'}</span><br><small>Faktor: ${a.faktor || '-'}</small></td>
+            <td>${a.penyakit || 'Tiada'}<br><small><strong>Kecacatan:</strong> ${a.kecacatan || a.kesihatan || 'Tiada'}</small></td>
+            <td style="text-align:right;">RM ${(parseFloat(a.inc) || 0).toFixed(2)}</td>
+            <td><small>${a.catatan || '-'}</small></td>
+          </tr>
+        `).join('');
+      } else {
+        airRowsHtml = `<tr><td colspan="11" style="text-align:center; color:var(--text-muted);">Tiada tanggungan AIR didaftarkan.</td></tr>`;
+      }
+
+      let helpRowsHtml = '';
+      if (helpList.length > 0) {
+        helpRowsHtml = helpList.map((h, i) => `
+          <tr>
+            <td>${i + 1}</td>
+            <td><strong>${h.nama || '-'}</strong></td>
+            <td><span class="badge" style="background:#e0f2fe; color:#0369a1;">${h.agensi || '-'}</span></td>
+            <td>${h.kekerapan || '-'}</td>
+            <td style="text-align:right;">RM ${(parseFloat(h.nilai) || 0).toFixed(2)}</td>
+            <td>${h.tarikhTamat || '-'}</td>
+          </tr>
+        `).join('');
+      } else {
+        helpRowsHtml = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Tiada rekod program bantuan didaftarkan.</td></tr>`;
+      }
+
+      const modalContent = document.getElementById('modalContent');
+      modalContent.innerHTML = `
+        <div>
+          <h4 style="color:var(--johor-blue); margin-bottom:8px;">A. MAKLUMAT KETUA ISI RUMAH (KIR)</h4>
+          <div class="detail-grid">
+            <div class="detail-item"><small>Nama Penuh</small><strong>${r.nama}</strong></div>
+            <div class="detail-item"><small>No. Kad Pengenalan</small><strong>${r.ic}</strong></div>
+            <div class="detail-item"><small>Tarikh Lahir / Umur</small><strong>${r.tarikhLahir || '-'} (${r.umur || '-'} Tahun)</strong></div>
+            <div class="detail-item"><small>Jantina / Perkahwinan</small><strong>${r.jantina || '-'} / ${r.kahwin || '-'}</strong></div>
+            <div class="detail-item"><small>Warganegara / Agama / Etnik</small><strong>${r.warganegara || 'Malaysia'} / ${r.agama || 'Islam'} / ${r.etnik || 'Melayu'}</strong></div>
+            <div class="detail-item"><small>Tahap Pendidikan / Sijil</small><strong>${r.pendidikan || '-'} (${r.sijil || 'Tiada Sijil'})</strong></div>
+            <div class="detail-item"><small>Pekerjaan</small><strong>${r.kerja || '-'}</strong></div>
+            <div class="detail-item"><small>Status Produktif</small><strong><span class="badge ${r.produktif === 'PRODUKTIF' ? 'badge-green' : 'badge-red'}">${r.produktif || 'PRODUKTIF'}</span> (Faktor: ${r.faktor || '-'})</strong></div>
+            <div class="detail-item"><small>Penyakit</small><strong>${r.penyakit || 'Tiada'}</strong></div>
+            <div class="detail-item"><small>Kecacatan (OKU)</small><strong>${r.kecacatan || 'Tiada Kecacatan'}</strong></div>
+            <div class="detail-item"><small>Daerah / Mukim / DUN</small><strong>${r.daerah} (${r.dun || '-'})</strong></div>
+            <div class="detail-item"><small>Kawasan Strata</small><strong>${r.strata} (Ambang PGK: RM ${threshold})</strong></div>
+            <div class="detail-item"><small>Pendapatan Asas KIR</small><strong>RM ${(r.incomeKir || 0).toFixed(2)}</strong></div>
+            <div class="detail-item"><small>No. Telefon</small><strong>${r.phone || '-'}</strong></div>
+            <div class="detail-item" style="grid-column:1 / -1;"><small>Alamat Kediaman Penuh</small><strong>${r.alamat || 'Tiada rekod alamat'}</strong></div>
+            <div class="detail-item" style="grid-column:1 / -1;"><small>Catatan KIR</small><strong>${r.catatanKir || '-'}</strong></div>
+          </div>
+        </div>
+
+        <div>
+          <h4 style="color:var(--johor-blue); margin-bottom:8px;">B. MAKLUMAT LENGKAP SEMUA AIR (${airList.length} Orang)</h4>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nama & No. KP</th>
+                  <th>Hubungan</th>
+                  <th>T.Lahir (Umur) / Jantina</th>
+                  <th>Warganegara / Agama / Etnik</th>
+                  <th>Pendidikan / Sijil</th>
+                  <th>Pekerjaan</th>
+                  <th>Status Produktif</th>
+                  <th>Penyakit / Kecacatan</th>
+                  <th style="text-align:right;">Pendapatan</th>
+                  <th>Catatan</th>
+                </tr>
+              </thead>
+              <tbody>${airRowsHtml}</tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="cost-card">
+          <div>
+            <div style="font-size:0.72rem; color:#9a3412; font-weight:700; text-transform:uppercase;">Status & Analisis Pendapatan Keluarga (Gaji + Bantuan)</div>
+            <div style="font-size:1.1rem; font-weight:800; color:#7c2d12; margin-top:2px;">
+              ${r.statusPGK} &bull; Per Kapita: RM ${(r.perCapita || 0).toFixed(2)}
+            </div>
+            <div style="font-size:0.75rem; color:#9a3412; margin-top:4px;">
+              Pendapatan Kasar: <strong>RM ${(r.totalInc || 0).toFixed(2)}</strong> | Saiz Keluarga: <strong>${(r.air_count || airList.length) + 1} Orang</strong>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:0.72rem; color:#9a3412; font-weight:700; text-transform:uppercase;">Anggaran Kos Terkeluar PGK</div>
+            <div style="font-size:1.25rem; font-weight:900; color:var(--johor-red); margin-top:2px;">
+              ${exitCost > 0 ? 'RM ' + exitCost.toFixed(2) + ' / Bulan' : '<span style="color:var(--success);">RM 0.00 (Lepas PGK)</span>'}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 style="color:var(--johor-blue); margin-bottom:8px;">C. PROGRAM BANTUAN YANG DITERIMA (${helpList.length} Bantuan)</h4>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Program Bantuan</th>
+                  <th>Agensi</th>
+                  <th>Kekerapan</th>
+                  <th style="text-align:right;">Nilai</th>
+                  <th>Tempoh Sah</th>
+                </tr>
+              </thead>
+              <tbody>${helpRowsHtml}</tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <h4 style="color:var(--johor-blue); margin-bottom:8px;">D. KECENDERUNGAN & CADANGAN BANTUAN</h4>
+          <div class="detail-grid">
+            <div class="detail-item" style="grid-column:1 / -1;">
+              <small>Kecenderungan Minat</small>
+              <p style="margin-top:4px; font-weight:600; color:#1e293b; white-space:pre-wrap;">${r.kecenderungan || 'Tiada maklumat diisi'}</p>
+            </div>
+            <div class="detail-item" style="grid-column:1 / -1;">
+              <small>Cadangan Bentuk Bantuan / Program Intervensi Diperlukan</small>
+              <p style="margin-top:4px; font-weight:600; color:#1e293b; white-space:pre-wrap;">${r.cadanganBantuan || 'Tiada cadangan diisi'}</p>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 style="color:var(--johor-blue); margin-bottom:8px;">F. PENGESAHAN KETUA KAMPUNG / PENGHULU / AHLI MAJLIS</h4>
+          <div class="detail-grid">
+            <div class="detail-item"><small>Nama Pegawai</small><strong>${r.kkName || '-'}</strong></div>
+            <div class="detail-item"><small>Tarikh Bancian</small><strong>${r.kkDate || '-'}</strong></div>
+            <div class="detail-item" style="grid-column:1 / -1;"><small>Ulasan Pegawai</small><p style="margin-top:4px; font-weight:600; color:#1e293b; white-space:pre-wrap;">${r.kkUlasan || 'Tiada ulasan dimasukkan'}</p></div>
+            ${r.buktiImg ? `
+              <div class="detail-item" style="grid-column:1 / -1;">
+                <small>Bukti Pengesahan</small>
+                <div style="margin-top:6px; max-width:280px; border-radius:8px; overflow:hidden; border:1px solid #cbd5e1;">
+                  <img src="${r.buktiImg}" alt="Bukti" style="width:100%; display:block;">
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+
+      document.getElementById('viewModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('viewModal').classList.remove('active');
+    }
+
+    function renderDashboard() {
+      const totalKir = records.length;
+      const totalAir = records.reduce((acc, r) => acc + (parseInt(r.air_count) || (r.air_list ? r.air_list.length : 0)), 0);
+      const poorUrban = records.filter(r => (r.statusPGK || '').includes('Miskin Bandar')).length;
+      const poorRural = records.filter(r => (r.statusPGK || '').includes('Miskin Luar Bandar')).length;
+      const above = records.filter(r => (r.statusPGK || '').includes('Terkeluar')).length;
+
+      document.getElementById('statKir').innerText = totalKir;
+      document.getElementById('statAirSub').innerText = totalAir + ' Tanggungan (AIR)';
+      document.getElementById('statPoorUrban').innerText = poorUrban;
+      document.getElementById('statPoorRural').innerText = poorRural;
+      document.getElementById('statAbove').innerText = above;
+
+      const tbody = document.getElementById('districtTableBody');
+      tbody.innerHTML = '';
+
+      DISTRICTS_ORDER.forEach(d => {
+        const dRecs = records.filter(r => r.daerah === d);
+        const dKirCount = dRecs.length;
+        const dAirCount = dRecs.reduce((acc, r) => acc + (parseInt(r.air_count) || (r.air_list ? r.air_list.length : 0)), 0);
+        const dPoorUrban = dRecs.filter(r => (r.statusPGK || '').includes('Miskin Bandar')).length;
+        const dPoorRural = dRecs.filter(r => (r.statusPGK || '').includes('Miskin Luar Bandar')).length;
+        const dAbove = dRecs.filter(r => (r.statusPGK || '').includes('Terkeluar')).length;
+        const totalIncomeAll = dRecs.reduce((acc, r) => acc + (parseFloat(r.totalInc) || 0), 0);
+        const avgIncome = dKirCount > 0 ? (totalIncomeAll / dKirCount) : 0;
+
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${d}</strong></td>
+            <td style="text-align:center;">${dKirCount}</td>
+            <td style="text-align:center;">${dAirCount}</td>
+            <td style="text-align:center; font-weight:700; color:${dPoorUrban > 0 ? 'var(--johor-red)' : '#991b1b'};">${dPoorUrban}</td>
+            <td style="text-align:center; font-weight:700; color:${dPoorRural > 0 ? '#b45309' : '#b45309'};">${dPoorRural}</td>
+            <td style="text-align:center; font-weight:700; color:#15803d;">${dAbove}</td>
+            <td style="text-align:right;">RM ${avgIncome.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function handleFilterChange() {
+      currentPage = 1;
+      renderRecordsTable();
+    }
+
+    function changePage(delta) {
+      currentPage += delta;
+      renderRecordsTable();
+    }
+
+    function renderRecordsTable() {
+      const searchIc = (document.getElementById('searchIcBox')?.value || '').toLowerCase().trim();
+      const searchName = (document.getElementById('searchNameBox')?.value || '').toLowerCase().trim();
+      const filterDistrict = document.getElementById('filterDistrictSelect')?.value || '';
+
+      const tbody = document.getElementById('recordsBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const filtered = records.filter(r => {
+        let icMatch = true;
+        if (searchIc) {
+          const kirIc = String(r.ic || '').toLowerCase();
+          const airIcs = (r.air_list || []).map(a => String(a.ic || '').toLowerCase()).join(' ');
+          icMatch = kirIc.includes(searchIc) || airIcs.includes(searchIc);
+        }
+
+        let nameMatch = true;
+        if (searchName) {
+          const airNames = (r.air_list || []).map(a => String(a.nama || '').toLowerCase()).join(' ');
+          const combo = [r.nama, r.daerah, r.dun, r.alamat, airNames].join(' ').toLowerCase();
+          nameMatch = combo.includes(searchName);
+        }
+
+        let districtMatch = true;
+        if (filterDistrict) {
+          districtMatch = r.daerah === filterDistrict;
+        }
+
+        return icMatch && nameMatch && districtMatch;
+      });
+
+      const totalFiltered = filtered.length;
+      const totalPages = Math.ceil(totalFiltered / recordsPerPage) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+
+      const startIndex = (currentPage - 1) * recordsPerPage;
+      const endIndex = Math.min(startIndex + recordsPerPage, totalFiltered);
+      const pageRecords = filtered.slice(startIndex, endIndex);
+
+      const pageInfo = document.getElementById('pageInfoText');
+      if (pageInfo) {
+        pageInfo.innerText = totalFiltered === 0 
+          ? 'Tiada rekod ditemui' 
+          : `Menunjukkan ${startIndex + 1} - ${endIndex} daripada ${totalFiltered} rekod (Halaman ${currentPage}/${totalPages})`;
+      }
+
+      document.getElementById('btnPrevPage').disabled = (currentPage <= 1);
+      document.getElementById('btnNextPage').disabled = (currentPage >= totalPages);
+
+      const masterCb = document.getElementById('selectAllCheckbox');
+      if (masterCb) {
+        masterCb.checked = pageRecords.length > 0 && pageRecords.every(r => selectedRecordIds.has(r.id));
+      }
+
+      if (!pageRecords.length) {
+        tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding:24px; color:var(--text-muted);">Tiada rekod bancian ditemui mengikut kriteria carian.</td></tr>`;
+        return;
+      }
+
+      pageRecords.forEach(r => renderSingleRecordRow(tbody, r));
+    }
+
+    function renderSingleRecordRow(tbody, r) {
+      const isPoor = (r.statusPGK || '').includes('Miskin');
+      const airCount = parseInt(r.air_count) || (r.air_list ? r.air_list.length : 0);
+      const totalIncome = parseFloat(r.totalInc) || 0;
+      const perCapita = parseFloat(r.perCapita) || 0;
+      const exitCost = r.exitCost || calculateExitCost(r.strata, perCapita, airCount + 1);
+      const isChecked = selectedRecordIds.has(r.id);
+
+      tbody.innerHTML += `
+        <tr>
+          <td style="text-align:center;">
+            <input type="checkbox" class="record-checkbox" data-id="${r.id}" ${isChecked ? 'checked' : ''} onchange="toggleSelectRecord(this, '${r.id}')">
+          </td>
+          <td><strong>${r.nama || '-'}</strong><br><small style="color:var(--text-muted);">${r.kerja || '-'}</small></td>
+          <td><code>${r.ic || '-'}</code></td>
+          <td>${r.daerah || '-'}<br><small style="color:var(--text-muted);">${r.dun || '-'}</small></td>
+          <td>${r.strata || '-'}</td>
+          <td style="text-align:center;">${airCount + 1}</td>
+          <td><span class="badge ${r.produktif === 'PRODUKTIF' ? 'badge-green' : 'badge-red'}">${r.produktif || 'PRODUKTIF'}</span></td>
+          <td>RM ${totalIncome.toFixed(2)}</td>
+          <td><strong>RM ${perCapita.toFixed(2)}</strong></td>
+          <td><span class="badge ${isPoor ? 'badge-red' : 'badge-green'}">${r.statusPGK || '-'}</span></td>
+          <td><strong>${exitCost > 0 ? 'RM ' + exitCost.toFixed(2) : '<span style="color:var(--success);">RM 0.00</span>'}</strong></td>
+          <td><span class="badge badge-green">Aktif</span></td>
+          <td style="text-align:center; white-space:nowrap;">
+            <button class="btn btn-johor" style="padding:4px 8px; font-size:0.75rem;" onclick="viewRecord('${r.id}')">👁 Paparan</button>
+            <button class="btn btn-amber" style="padding:4px 8px; font-size:0.75rem;" onclick="startEditRecord('${r.id}')">✏️ Kemas Kini</button>
+            <button class="btn btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--johor-red);" onclick="deleteRecord('${r.id}')">Padam</button>
+          </td>
+        </tr>
+      `;
+    }
+
+    function resetSearchFilters() {
+      document.getElementById('searchIcBox').value = '';
+      document.getElementById('searchNameBox').value = '';
+      document.getElementById('filterDistrictSelect').value = '';
+      currentPage = 1;
+      renderRecordsTable();
+    }
+
+    function exportExcel() {
+      if (!records.length) {
+        alert('Tiada data untuk dieksport.');
+        return;
+      }
+
+      const rowsKIR = records.map(r => {
+        const airList = r.air_list || [];
+        const helpList = r.help_list || [];
+        const assistanceSummary = helpList.map(h => `${h.nama || '-'} (${h.agensi || '-'}, RM${(parseFloat(h.nilai) || 0).toFixed(2)})`).join('; ');
+
+        return {
+          "ID Rekod": r.id,
+          "Nama KIR": r.nama,
+          "No. Kad Pengenalan": r.ic,
+          "Tarikh Lahir": r.tarikhLahir || '-',
+          "Umur": r.umur,
+          "Jantina": r.jantina,
+          "Warganegara": r.warganegara || 'Malaysia',
+          "Agama": r.agama || 'Islam',
+          "Kumpulan Etnik": r.etnik || 'Melayu',
+          "Hubungan": "KIR",
+          "Status Perkahwinan": r.kahwin,
+          "Tahap Pendidikan": r.pendidikan || '-',
+          "Sijil Tahap Pendidikan": r.sijil || 'Tiada Sijil',
+          "Pekerjaan": r.kerja || '-',
+          "Penyakit": r.penyakit || 'Tiada penyakit',
+          "Kecacatan": r.kecacatan || 'Tiada Kecacatan',
+          "Status Produktif": r.produktif || 'PRODUKTIF',
+          "Faktor": r.faktor || '-',
+          "Daerah": r.daerah,
+          "Mukim / DUN": r.dun,
+          "Alamat Kediaman Penuh": r.alamat || '-',
+          "Catatan KIR": r.catatanKir || '-',
+          "No Telefon": r.phone || '-',
+          "Strata": r.strata,
+          "Pendapatan Asas KIR (RM)": (parseFloat(r.incomeKir) || 0).toFixed(2),
+          "Bilangan Tanggungan (AIR)": r.air_count || airList.length,
+          "Jumlah Ahli Keluarga": (parseInt(r.air_count) || airList.length) + 1,
+          "Jumlah Pendapatan Kasar IR (Gaji + Bantuan) (RM)": (parseFloat(r.totalInc) || 0).toFixed(2),
+          "Pendapatan Per Kapita (RM)": (parseFloat(r.perCapita) || 0).toFixed(2),
+          "Status PGK": r.statusPGK,
+          "Anggaran Kos Lepas Miskin (RM/Bulan)": (parseFloat(r.exitCost) || 0).toFixed(2),
+          "Jumlah Nilai Bantuan Bulanan (RM)": (parseFloat(r.helpTotalVal) || 0).toFixed(2),
+          "Perincian Bantuan Diterima": assistanceSummary || 'Tiada Bantuan',
+          "Kecenderungan Minat": r.kecenderungan || 'Tiada',
+          "Cadangan Bantuan Diperlukan": r.cadanganBantuan || 'Tiada',
+          "Ketua Kampung / Penghulu / Ahli Majlis": r.kkName || '-',
+          "Tarikh Bancian": r.kkDate || '-',
+          "Ulasan Pengesah": r.kkUlasan || '-'
+        };
+      });
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rowsKIR), "Ringkasan_KIR");
+      XLSX.writeFile(wb, `eBancian_Johor_${new Date().toISOString().split('T')[0]}.xlsx`);
+    }
+
+    function openImportModal() {
+      parsedImportRows = [];
+      parsedImportAirMap = {};
+      document.getElementById('excelFileInput').value = '';
+      document.getElementById('importPreview').style.display = 'none';
+      document.getElementById('importProgressWrap').style.display = 'none';
+      document.getElementById('importProgressText').style.display = 'none';
+      document.getElementById('btnConfirmImport').disabled = true;
+      document.getElementById('importModal').classList.add('active');
+    }
+
+    function closeImportModal() {
+      document.getElementById('importModal').classList.remove('active');
+    }
+
+    // MULA SISTEM
     loadUsersFromFirebase();
     checkLoginStatus();
     renderSkillTags();
