@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>e-Bancian Johor | Sistem Pemantauan Profil Kemiskinan</title>
   
-  <!-- SOKONGAN MOBILE PWA / APP -->
   <meta name="theme-color" content="#0c2340">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="e-Bancian">
-  <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiZS1CYW5jaWFuIEpvaG9yIiwic2hvcnRfbmFtZSI6ImUtQmFuY2lhbiIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMGMyMzQwIiwidGhlbWVfY29sb3IiOiIjMGMyMzQwIn0=">
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
@@ -545,8 +543,7 @@
       <div style="display:flex; align-items:center; gap:8px;">
         <span id="headerUserBadge" class="role-badge role-daerah">Pengguna</span>
         <button class="btn btn-outline" id="btnAdminUsers" style="display:none; padding:5px 10px; font-size:0.75rem;" onclick="switchPage('tab-users')">👥 Pengurusan Pengguna</button>
-        <button class="btn btn-outline" style="padding:5px 10px; font-size:0.75rem;" onclick="promptInstallPWA()">📱 Pasang App</button>
-        <button class="btn btn-outline" style="padding:5px 10px; font-size:0.75rem; color:var(--johor-red);" onclick="handleLogout()">Keluar</button>
+        <button class="btn btn-outline" style="padding:5px 10px; font-size:0.75rem;" onclick="handleLogout()">Keluar</button>
       </div>
     </div>
   </header>
@@ -577,18 +574,18 @@
         <div class="kpi-card-box">
           <div class="kpi-icon icon-pink">🏢</div>
           <div class="kpi-info">
-            <div class="kpi-title">MISKIN BANDAR (830 KEBAWAH)</div>
+            <div class="kpi-title">MISKIN BANDAR (&le; RM830)</div>
             <div class="kpi-number red" id="statPoorUrban">0</div>
-            <div class="kpi-desc">Strata Bandar (Ambang RM830 kebawah)</div>
+            <div class="kpi-desc">Strata Bandar (&le; RM830)</div>
           </div>
         </div>
 
         <div class="kpi-card-box">
           <div class="kpi-icon icon-amber">🌲</div>
           <div class="kpi-info">
-            <div class="kpi-title">MISKIN LUAR BANDAR (677 KEBAWAH)</div>
+            <div class="kpi-title">MISKIN LUAR BANDAR (&le; RM677)</div>
             <div class="kpi-number amber" id="statPoorRural">0</div>
-            <div class="kpi-desc">Strata Luar Bandar (Ambang RM677 kebawah)</div>
+            <div class="kpi-desc">Strata Luar Bandar (&le; RM677)</div>
           </div>
         </div>
 
@@ -597,7 +594,7 @@
           <div class="kpi-info">
             <div class="kpi-title">Terkeluar Daripada Miskin</div>
             <div class="kpi-number green" id="statAbove">0</div>
-            <div class="kpi-desc">Bandar ≥ RM831 / Luar Bandar ≥ RM678</div>
+            <div class="kpi-desc">Bandar &ge; RM831 / Luar Bandar &ge; RM678</div>
           </div>
         </div>
       </section>
@@ -623,8 +620,8 @@
                 <th>Daerah</th>
                 <th style="text-align:center;">Jumlah KIR</th>
                 <th style="text-align:center;">Tanggungan</th>
-                <th style="text-align:center;" class="col-red">Miskin Bandar (830 kebawah)</th>
-                <th style="text-align:center;" class="col-amber">Miskin Luar Bandar (677 kebawah)</th>
+                <th style="text-align:center;" class="col-red">Miskin Bandar (&le; RM830)</th>
+                <th style="text-align:center;" class="col-amber">Miskin Luar Bandar (&le; RM677)</th>
                 <th style="text-align:center;" class="col-green">Terkeluar Dr Miskin</th>
                 <th style="text-align:right;">Purata Pendapatan IR</th>
               </tr>
@@ -885,8 +882,8 @@
             <div class="form-group">
               <label>Strata * (Penentu PGK)</label>
               <select id="fStrata" onchange="recalculateForm()" required>
-                <option value="Bandar">Bandar (PGK: 830 kebawah)</option>
-                <option value="Luar Bandar">Luar Bandar (PGK: 677 kebawah)</option>
+                <option value="Bandar">Bandar (&le; RM830)</option>
+                <option value="Luar Bandar">Luar Bandar (&le; RM677)</option>
               </select>
             </div>
             <div class="form-group col-span-2">
@@ -909,7 +906,7 @@
           </div>
           <div id="airContainer"></div>
 
-          <!-- BAHAGIAN C: BANTUAN DENGAN DROPDOWN AGENSI TERKINI -->
+          <!-- BAHAGIAN C: BANTUAN -->
           <div style="display:flex; justify-content:space-between; align-items:center; margin:24px 0 8px;">
             <div>
               <h4 style="color:var(--johor-blue); font-size:0.9rem;">C. MAKLUMAT PROGRAM BANTUAN YANG DITERIMA</h4>
@@ -1138,7 +1135,6 @@
           Muat naik fail Excel untuk mendaftarkan senarai isi rumah secara kelompok (*bulk*).
         </p>
 
-        <!-- KOTAK PILIHAN UNCHECKED SECARA LALAI SUPAYA DATA DAERAH LAIN TIDAK TERPADAM -->
         <div style="background:#fef2f2; border:1px solid #fecaca; padding:10px 12px; border-radius:8px; margin-bottom:12px; font-size:0.78rem; color:#991b1b;">
           <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:700;">
             <input type="checkbox" id="cbCleanReplace">
@@ -1179,7 +1175,6 @@
   <script>
     const FIREBASE_DB_URL = "https://e-bancianv3-default-rtdb.asia-southeast1.firebasedatabase.app";
     const FIREBASE_BACKUP_URL = "https://e-bancianv3-default-rtdb.asia-southeast1.firebasedatabase.app";
-    const SHEETDB_URL = "https://sheetdb.io/api/v1/k4vnnko52f2rg";
 
     const DISTRICTS_ORDER = [
       'Johor Bahru', 'Kulai', 'Pontian', 'Kota Tinggi', 'Kluang',
@@ -1193,7 +1188,12 @@
       "agensi_maij": { pass: "maij2026", nama: "Majlis Agama Islam Negeri Johor", peranan: "agensi" }
     };
 
-    let systemUsers = JSON.parse(localStorage.getItem('ebancian_users_cache')) || DEFAULT_USERS;
+    let systemUsers = DEFAULT_USERS;
+    try {
+      const cachedUsers = localStorage.getItem('ebancian_users_cache');
+      if (cachedUsers) systemUsers = JSON.parse(cachedUsers);
+    } catch(e) {}
+
     let records = [];
     let activeFirebaseUrl = FIREBASE_DB_URL;
     let parsedImportRows = [];
@@ -1210,6 +1210,14 @@
     let currentPage = 1;
     const recordsPerPage = 50;
     let selectedRecordIds = new Set();
+
+    function safeCacheSave(key, data) {
+      try {
+        localStorage.setItem(key, JSON.stringify(data));
+      } catch (err) {
+        console.warn('Had memori pelayar penuh, mengabaikan simpanan cache tempatan:', err);
+      }
+    }
 
     function addDisabilityTag(target, val) {
       if (!val) return;
@@ -1323,7 +1331,7 @@
         const data = await res.json();
         if (data && typeof data === 'object') {
           systemUsers = { ...DEFAULT_USERS, ...data };
-          localStorage.setItem('ebancian_users_cache', JSON.stringify(systemUsers));
+          safeCacheSave('ebancian_users_cache', systemUsers);
         } else {
           await tryFetchFirebase('/pengguna.json', {
             method: 'PUT',
@@ -1332,7 +1340,7 @@
           });
         }
       } catch (e) {
-        console.warn('Gagal muat pengguna dari Firebase, guna cache:', e);
+        console.warn('Gagal muat pengguna dari Firebase, guna senarai lalai:', e);
       }
       renderUsersTable();
     }
@@ -1374,7 +1382,6 @@
 
           document.getElementById('loginScreen').style.display = 'none';
           checkLoginStatus();
-          alert(`Selamat Datang, ${systemUsers[userId].nama}!`);
         } else {
           alert('Kata laluan tidak sah! Sila semak semula.');
         }
@@ -1403,7 +1410,7 @@
       }
 
       systemUsers[uId] = { pass: uPass, nama: uName, peranan: uRole };
-      localStorage.setItem('ebancian_users_cache', JSON.stringify(systemUsers));
+      safeCacheSave('ebancian_users_cache', systemUsers);
 
       try {
         await tryFetchFirebase(`/pengguna/${uId}.json`, {
@@ -1430,7 +1437,7 @@
       if (!confirm(`Adakah anda pasti mahu memadam akaun pengguna [${uId}]?`)) return;
 
       delete systemUsers[uId];
-      localStorage.setItem('ebancian_users_cache', JSON.stringify(systemUsers));
+      safeCacheSave('ebancian_users_cache', systemUsers);
 
       try {
         await tryFetchFirebase(`/pengguna/${uId}.json`, { method: 'DELETE' });
@@ -1466,26 +1473,6 @@
       }
     }
 
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-    });
-
-    function promptInstallPWA() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choice) => {
-          if (choice.outcome === 'accepted') {
-            alert('Aplikasi e-Bancian sedang dipasang di telefon anda!');
-          }
-          deferredPrompt = null;
-        });
-      } else {
-        alert('Untuk memasang di telefon pintar:\n1. Buka pelayar Chrome / Safari di telefon.\n2. Tekan menu pilihan (tiga titik / butang Share).\n3. Pilih "Add to Home screen" atau "Install App".');
-      }
-    }
-
     function switchPage(pageId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       const targetTab = document.getElementById(pageId);
@@ -1506,11 +1493,12 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // LOGIK PENENTUAN STATUS PGK (IKUT NOTA PELEKAT: <= RM830, <= RM677, >= RM831, >= RM678)
     function checkPGK(strata, perCapita) {
       if (strata === 'Bandar') {
-        return perCapita >= 831 ? 'Terkeluar Dr Miskin' : 'Miskin Bandar (830 kebawah)';
+        return perCapita >= 831 ? 'Terkeluar Dr Miskin' : 'Miskin Bandar (≤ RM830)';
       } else {
-        return perCapita >= 678 ? 'Terkeluar Dr Miskin' : 'Miskin Luar Bandar (677 kebawah)';
+        return perCapita >= 678 ? 'Terkeluar Dr Miskin' : 'Miskin Luar Bandar (≤ RM677)';
       }
     }
 
@@ -1801,6 +1789,7 @@
 
     function renderSkillTags() {
       const kirWrap = document.getElementById('kirSkillsContainer');
+      if (!kirWrap) return;
       kirWrap.innerHTML = selectedSkillsKir.length === 0 
         ? '<span style="font-size:0.75rem; color:#94a3b8;">Belum ada kemahiran KIR dipilih</span>' 
         : selectedSkillsKir.map(s => `
@@ -1808,6 +1797,7 @@
         `).join('');
 
       const airWrap = document.getElementById('airSkillsContainer');
+      if (!airWrap) return;
       airWrap.innerHTML = selectedSkillsAir.length === 0 
         ? '<span style="font-size:0.75rem; color:#94a3b8;">Belum ada kemahiran AIR dipilih</span>' 
         : selectedSkillsAir.map(s => `
@@ -1894,7 +1884,7 @@
         r.help_list.forEach(h => addHelpRow(h));
       }
 
-      selectedSkillsKir = r.skillsKir || (r.skills || []);
+      selectedSkillsKir = r.skillsKir || [];
       selectedSkillsAir = r.skillsAir || [];
       renderSkillTags();
 
@@ -1974,8 +1964,8 @@
     async function loadFromFirebase() {
       const syncDot = document.getElementById('syncDot');
       const syncText = document.getElementById('syncText');
-      syncDot.className = 'sync-dot loading';
-      syncText.innerText = 'Menyegerak Firebase...';
+      if (syncDot) syncDot.className = 'sync-dot loading';
+      if (syncText) syncText.innerText = 'Menyegerak Firebase...';
 
       try {
         const res = await tryFetchFirebase('/bancian.json');
@@ -1995,19 +1985,16 @@
           records = [];
         }
 
-        try {
-          localStorage.setItem('ebancian_johor_cache', JSON.stringify(records));
-        } catch(e) {
-          console.warn('Saiz cache melebihi kuota pelayar, guna mod memori langsung.');
-        }
+        safeCacheSave('ebancian_johor_cache', records);
 
-        syncDot.className = 'sync-dot online';
-        syncText.innerText = `Firebase Live (${records.length} rekod)`;
+        if (syncDot) syncDot.className = 'sync-dot online';
+        if (syncText) syncText.innerText = `Firebase Live (${records.length} rekod)`;
       } catch (err) {
-        syncDot.className = 'sync-dot';
-        syncText.innerText = 'Mod Luar Talian';
+        if (syncDot) syncDot.className = 'sync-dot';
+        if (syncText) syncText.innerText = 'Mod Memori';
         try {
-          records = JSON.parse(localStorage.getItem('ebancian_johor_cache')) || [];
+          const cached = localStorage.getItem('ebancian_johor_cache');
+          records = cached ? JSON.parse(cached) : [];
         } catch(e) { records = []; }
       }
 
@@ -2037,11 +2024,13 @@
       });
 
       const banner = document.getElementById('expiringAidBanner');
-      if (expiringCount > 0) {
-        document.getElementById('expiringAidDesc').innerText = `Terdapat ${expiringCount} program bantuan yang bakal atau telah tamat tempoh dalam masa 30 hari.`;
-        banner.style.display = 'flex';
-      } else {
-        banner.style.display = 'none';
+      if (banner) {
+        if (expiringCount > 0) {
+          document.getElementById('expiringAidDesc').innerText = `Terdapat ${expiringCount} program bantuan yang bakal atau telah tamat tempoh dalam masa 30 hari.`;
+          banner.style.display = 'flex';
+        } else {
+          banner.style.display = 'none';
+        }
       }
     }
 
@@ -2208,7 +2197,7 @@
         helpTotalVal: Number(helpTotalVal),
         skillsKir: selectedSkillsKir,
         skillsAir: selectedSkillsAir,
-        kecenderungan: String(row => row.kecenderungan || kecenderungan),
+        kecenderungan: String(kecenderungan),
         cadanganBantuan: String(cadanganBantuan),
         kkName: String(document.getElementById('fKkName').value),
         kkDate: String(document.getElementById('fKkDate').value || new Date().toISOString().split('T')[0]),
@@ -2240,7 +2229,7 @@
           alert(`✅ Rekod ${nama} (${daerah}) berjaya disimpan!`);
         }
 
-        try { localStorage.setItem('ebancian_johor_cache', JSON.stringify(records)); } catch(e){}
+        safeCacheSave('ebancian_johor_cache', records);
         cancelEditMode();
         checkExpiringAids();
         renderDashboard();
@@ -2264,7 +2253,7 @@
       records = records.filter(x => x.id !== id);
       selectedRecordIds.delete(id);
       updateBatchActionBar();
-      try { localStorage.setItem('ebancian_johor_cache', JSON.stringify(records)); } catch(e){}
+      safeCacheSave('ebancian_johor_cache', records);
       checkExpiringAids();
       renderDashboard();
       renderRecordsTable();
@@ -2349,7 +2338,7 @@
       }
 
       records = records.filter(r => !selectedRecordIds.has(r.id));
-      try { localStorage.setItem('ebancian_johor_cache', JSON.stringify(records)); } catch(e){}
+      safeCacheSave('ebancian_johor_cache', records);
 
       alert(`✅ Berjaya memadamkan ${count} rekod terpilih!`);
       deselectAllRecords();
@@ -2692,7 +2681,7 @@
         records = [...newItems.reverse(), ...records];
       }
 
-      try { localStorage.setItem('ebancian_johor_cache', JSON.stringify(records)); } catch(e){}
+      safeCacheSave('ebancian_johor_cache', records);
       
       alert(`✅ Selesai! Berjaya memasukkan ${successCount} keluarga ke dalam pangkalan data.`);
       closeImportModal();
@@ -2703,7 +2692,6 @@
       switchPage('tab-records');
     }
 
-    // PAPARAN PROFIL MODAL
     function viewRecord(id) {
       const r = records.find(x => x.id === id);
       if (!r) return;
@@ -2876,10 +2864,19 @@
 
     function renderDashboard() {
       const totalKir = records.length;
-      const totalAir = records.reduce((acc, r) => acc + (parseInt(r.air_count) || (r.air_list ? r.air_list.length : 0)), 0);
-      const poorUrban = records.filter(r => (r.statusPGK || '').includes('Miskin Bandar')).length;
-      const poorRural = records.filter(r => (r.statusPGK || '').includes('Miskin Luar Bandar')).length;
-      const above = records.filter(r => (r.statusPGK || '').includes('Terkeluar')).length;
+      let totalAir = 0;
+      let poorUrban = 0;
+      let poorRural = 0;
+      let above = 0;
+
+      for (let i = 0; i < records.length; i++) {
+        const r = records[i];
+        totalAir += (r.air_count || (r.air_list ? r.air_list.length : 0));
+        const st = r.statusPGK || '';
+        if (st.includes('Bandar') && st.includes('Miskin')) poorUrban++;
+        else if (st.includes('Luar Bandar') && st.includes('Miskin')) poorRural++;
+        else if (st.includes('Terkeluar')) above++;
+      }
 
       document.getElementById('statKir').innerText = totalKir;
       document.getElementById('statAirSub').innerText = totalAir + ' Tanggungan (AIR)';
@@ -2888,6 +2885,7 @@
       document.getElementById('statAbove').innerText = above;
 
       const tbody = document.getElementById('districtTableBody');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       DISTRICTS_ORDER.forEach(d => {
@@ -2972,8 +2970,10 @@
           : `Menunjukkan ${startIndex + 1} - ${endIndex} daripada ${totalFiltered} rekod (Halaman ${currentPage}/${totalPages})`;
       }
 
-      document.getElementById('btnPrevPage').disabled = (currentPage <= 1);
-      document.getElementById('btnNextPage').disabled = (currentPage >= totalPages);
+      const prevBtn = document.getElementById('btnPrevPage');
+      const nextBtn = document.getElementById('btnNextPage');
+      if (prevBtn) prevBtn.disabled = (currentPage <= 1);
+      if (nextBtn) nextBtn.disabled = (currentPage >= totalPages);
 
       const masterCb = document.getElementById('selectAllCheckbox');
       if (masterCb) {
@@ -3074,6 +3074,8 @@
           "Anggaran Kos Lepas Miskin (RM/Bulan)": (parseFloat(r.exitCost) || 0).toFixed(2),
           "Jumlah Nilai Bantuan Bulanan (RM)": (parseFloat(r.helpTotalVal) || 0).toFixed(2),
           "Perincian Bantuan Diterima": assistanceSummary || 'Tiada Bantuan',
+          "Kemahiran KIR (Tag)": (r.skillsKir || []).join(', ') || 'Tiada',
+          "Kemahiran AIR (Tag)": (r.skillsAir || []).join(', ') || 'Tiada',
           "Kecenderungan Minat": r.kecenderungan || 'Tiada',
           "Cadangan Bantuan Diperlukan": r.cadanganBantuan || 'Tiada',
           "Ketua Kampung / Penghulu / Ahli Majlis": r.kkName || '-',
@@ -3082,9 +3084,44 @@
         };
       });
 
+      const rowsAIR = [];
+      records.forEach(r => {
+        const airList = r.air_list || [];
+        airList.forEach((a, idx) => {
+          rowsAIR.push({
+            "ID Rekod KIR": r.id,
+            "Nama Ketua Isi Rumah (KIR)": r.nama,
+            "No. KP KIR": r.ic,
+            "Daerah": r.daerah,
+            "Bil. AIR": idx + 1,
+            "Nama Ahli Isi Rumah (AIR)": a.nama || '-',
+            "No. KP / MyKid AIR": a.ic || '-',
+            "Tarikh Lahir": a.tarikhLahir || '-',
+            "Umur AIR": a.umur ? `${a.umur} Tahun` : '-',
+            "Jantina": a.jantina || '-',
+            "Warganegara": a.warganegara || 'Malaysia',
+            "Agama": a.agama || 'Islam',
+            "Kumpulan Etnik": a.etnik || 'Melayu',
+            "Hubungan Dengan KIR": a.hubungan || '-',
+            "Status Perkahwinan": a.kahwin || '-',
+            "Tahap Pendidikan": a.pendidikan || '-',
+            "Sijil Tahap Pendidikan": a.sijil || 'Tiada Sijil',
+            "Status Pekerjaan": a.statusKerja || '-',
+            "Pekerjaan Spesifik": a.kerja || '-',
+            "Penyakit": a.penyakit || 'Tiada',
+            "Kecacatan": a.kecacatan || a.kesihatan || 'Tiada Kecacatan',
+            "Status Produktif": a.produktif || 'PRODUKTIF',
+            "Faktor": a.faktor || '-',
+            "Pendapatan Sebulan (RM)": (parseFloat(a.inc) || 0).toFixed(2),
+            "Catatan AIR": a.catatan || '-'
+          });
+        });
+      });
+
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rowsKIR), "Ringkasan_KIR");
-      XLSX.writeFile(wb, `eBancian_Johor_${new Date().toISOString().split('T')[0]}.xlsx`);
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rowsAIR.length ? rowsAIR : [{"Info": "Tiada AIR"}]), "Maklumat_Penuh_AIR");
+      XLSX.writeFile(wb, `eBancian_Johor_Lengkap_${new Date().toISOString().split('T')[0]}.xlsx`);
     }
 
     function openImportModal() {
